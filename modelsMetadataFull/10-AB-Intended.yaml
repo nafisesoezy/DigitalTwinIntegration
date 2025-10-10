@@ -1,0 +1,78 @@
+AB-Intended:
+  title: "Integrated OFAM3–WOMBAT Model"
+  unique_identifier: ""
+  model_version: ""
+  description: >
+    A conceptual integration of the OFAM3 physical ocean model and the WOMBAT
+    biogeochemical model. The framework is designed to simulate interactions
+    between ocean circulation and nutrient/biogeochemical processes at
+    near-global scale. Specific configurations and parameters depend on use case.
+  keywords:
+    - Ocean circulation
+    - Biogeochemistry
+    - Model integration
+    - OFAM3
+    - WOMBAT
+  model_type: "Mechanistic"
+  scope: "Near-global ocean"
+  purpose_pattern:
+    purpose: "Simulate coupled physical and biogeochemical ocean dynamics"
+    pattern: "Embedded Coupling (tight integration)"
+  assumptions:
+    - "Physical ocean processes drive biogeochemical cycling"
+    - "Nutrient-phytoplankton-zooplankton-detritus (NPZD) structure represents ecosystem"
+    - "Synchronous timestep between physical and biogeochemical models"
+  dimensionality: ""
+  spatial_extent: ""
+  spatial_resolution: ""
+  variable_spatial_resolution: ""
+  temporal_extent: ""
+  temporal_resolution: ""
+  variable_temporal_resolution: ""
+  calibration_tools_data: ""
+  publications: []
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+  error_handling: ""
+  license: ""
+  landing_page: ""
+  distribution_version: ""
+  programming_language: ""
+  software_requirements: ""
+  hardware_requirements: ""
+  execution_instructions: ""
+  parallel_execution: ""
+  implementation_verification: ""
+  source_code_availability: ""
+  parameters: []
+  datasets:
+    - uid: ""
+      version: ""
+      access_url: ""
+      dependencies: []
+  integrated_input:
+    - uid: ""
+      version: ""
+      description: "Output from OFAM3 (temperature, salinity, circulation) provided to WOMBAT biogeochemistry"
+  data_evaluation: ""
+  output:
+    format: []
+    variables: ""
+    units: ""
+    verification: ""
+    corroboration: ""
+  integration:
+    pattern: "Embedded"
+    submodels:
+      - "OFAM3 (physical ocean circulation)"
+      - "WOMBAT (biogeochemistry)"
+    execution_constraints: "Shared timestep and grid"
+    acknowledgment: "Submodel configurations TBD"
+    latency_expectations: "Synchronous"
+    data_synchronization: "In-memory exchange"
+  authors:
+    - name: ""
+      orcid: ""
+      role: ""

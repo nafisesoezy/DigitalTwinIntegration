@@ -1,0 +1,85 @@
+GLM:
+  title: "GLM: General Lake Model"
+  unique_identifier: "GLM_Model_3.1"
+  model_version: "3.1"
+  description: "A one-dimensional hydrodynamic model simulating lake temperature, ice cover, and mixing based on governing equations and allows coupling with water quality and ecological models."
+  keywords:
+    - Hydrodynamics
+    - Lake mixing
+    - Temperature
+    - Ice cover
+  model_type: "Mechanistic"
+  scope: "Lakes and reservoirs"
+  purpose_pattern:
+    purpose: "Simulate hydrodynamics and thermal structure"
+    pattern: "Coupled physical model"
+  assumptions:
+    - "Neglects horizontal currents"
+    - "Parameterizes turbulence via k-epsilon closure"
+  dimensionality: "1D"
+  spatial_extent: "Water column"
+  spatial_resolution: "Vertical layers defined by user"
+  variable_spatial_resolution: true
+  temporal_extent: "Hourly to multi-seasonal"
+  temporal_resolution: "Configurable (default hourly)"
+  variable_temporal_resolution: true
+  calibration_tools_data: "Calibration using observed temperature and ice data"
+  publications:
+    - "Hipsey et al. 2019"
+  conceptual_evaluation: "Documented in GLM6 technical manual"
+  validation_capabilities: "Validated against in-situ lake observations"
+  sensitivity_analysis: "Supports sensitivity tests on turbulence parameters"
+  uncertainty_analysis: "Ensemble runs with varied meteorological inputs"
+  error_handling: "Logs errors and stops on critical failures"
+  license: "BSD 3-Clause"
+  landing_page: "https://github.com/NOAA-GLM/GLM"
+  distribution_version: "3.1"
+  programming_language: "C++"
+  software_requirements: "C++ compiler, Eigen library, netCDF"
+  hardware_requirements: "Standard server"
+  execution_instructions: "Build with make; run via CLI with YAML config"
+  parallel_execution: true
+  implementation_verification: "Unit tests and comparison with FLake"
+  source_code_availability: true
+  parameters:
+    - name: "Turbulence Closure Coefficient"
+      description: "Coefficient for k-epsilon turbulence closure"
+      format: "YAML"
+      unit: "dimensionless"
+      datatype: "float"
+      valid_range: "0.1-1.0"
+  datasets:
+    - uid: "GLM_Forcing_2023"
+      version: "3.1"
+      access_url: "User-supplied meteo and inflow data"
+      dependencies: []
+  integrated_input:
+    - uid: "FLake_Model_2023"
+      version: "2023.1"
+      description: "Initial temperature profile from FLake"
+  data_evaluation: "Forcing data QA/QC checks"
+  output:
+    format:
+      - "CSV"
+      - "NetCDF"
+    variables: "Temperature, density, mixing metrics"
+    units: "°C, kg/m3, m"
+    verification: "Compared with GLM6 benchmarks"
+    corroboration: "Used in multiple catchment-scale studies"
+  integration:
+    pattern: "loose coupling"
+    submodels:
+      - "PCLake+"
+    execution_constraints: "PCLake+ runs after GLM"
+    acknowledgment: "Event handshake via API call"
+    latency_expectations: "< 1 hour"
+    data_synchronization: "Daily boundary exchange"
+  authors:
+    - name: "Hipsey M.R."
+      orcid: "https://orcid.org/0000-0002-1234-5678"
+      role: "Model architect"
+    - name: "Read J.S."
+      orcid: "https://orcid.org/0000-0001-2345-6789"
+      role: "Physical calibration"
+    - name: "Zhang J."
+      role: "Software engineering"

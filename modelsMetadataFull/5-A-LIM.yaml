@@ -1,0 +1,97 @@
+LIM:
+  title: "LIM: Louvain-la-Neuve Sea-Ice Model"
+  unique_identifier: "LIM_UCL_1997_1999"
+  model_version: "dynamic–thermodynamic LIM (as used in ORCA2-LIM)"
+  description: >
+    Two-dimensional dynamic–thermodynamic sea-ice model with a three-layer thermodynamics
+    scheme (snow: 1 layer; ice: 2 layers) and viscous–plastic (VP) rheology; advection via
+    second-order moments (Prather) and parameterized lead formation/closure. Coupled to OPA
+    to exchange momentum, heat, and freshwater fluxes.
+  keywords:
+    - Sea ice
+    - VP rheology
+    - Thermodynamics
+    - Leads and ridging
+    - Albedo parameterization
+    - High latitudes
+  model_type: "Mechanistic"
+  scope: "Global (Arctic and Antarctic) when coupled; climate to decadal scales"
+  purpose_pattern:
+    purpose: "Simulate realistic sea-ice extent, thickness, and drift for climate applications and high-latitude process studies"
+    pattern: "2-D continuum mechanics with VP rheology and multilayer thermodynamics; coupled momentum/heat/salt exchange with ocean"
+  assumptions:
+    - "Sea ice treated as a 2-D continuum with VP rheology."
+    - "Effective thermal conductivity assumes uniform subgrid thickness distribution."
+    - "Albedo parameterized by surface state and snow/ice thickness."
+    - "Snow-ice formation when snow depresses surface below sea level."
+  dimensionality: "2D (plan-view) with multilayer thermodynamics"
+  spatial_extent: "Global sea-ice cover (when coupled)"
+  spatial_resolution: "Follows host ocean grid (e.g., ORCA2 ≈2° mean)"
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-decadal simulations"
+  temporal_resolution: "Coupled every few ocean steps; diagnostics monthly/daily"
+  variable_temporal_resolution: true
+  calibration_tools_data: "Choice of P* and h0 tuned for coarse-resolution realism"
+  publications:
+    - "Fichefet & Morales Maqueda (1997, 1999)"
+    - "Goosse & Fichefet (1999)"
+    - "Timmermann et al. (2005)"
+  conceptual_evaluation: "Based on established VP rheology and multilayer thermodynamics; widely used in global coupled setups."
+  validation_capabilities: "Arctic/Antarctic extent, seasonal variability, and drift comparisons"
+  sensitivity_analysis: "Impacts of ice strength and lead parameterization on extent/thickness"
+  uncertainty_analysis: "Scenario changes in rheology strength and lead parameter explored"
+  error_handling: "Model-internal state checks"
+  license: "Unspecified (paper)"
+  distribution_version: "As used in ORCA2-LIM (2005 application)"
+  programming_language:
+    - Fortran
+  software_requirements: "NetCDF I/O; coupled driver for flux exchanges"
+  hardware_requirements: "Workstation to HPC"
+  execution_instructions: "Run coupled with ocean using specified flux exchange and parameter set; initialize with ice/snow thickness fields."
+  parallel_execution: true
+  implementation_verification: "Reproduces large-scale observed patterns in coupled mode"
+  source_code_availability: "Historically distributed with coupled frameworks"
+
+  input:
+    description: "Ocean surface state and fluxes from OPA"
+    format: "NetCDF (via coupler)"
+    variables:
+      - sea_surface_temperature    # °C
+      - sea_surface_salinity       # PSU
+      - ocean_surface_currents_u   # m/s
+      - ocean_surface_currents_v   # m/s
+      - ocean_mixed_layer_depth    # m
+      - downwelling_shortwave_radiation # W/m²
+      - downwelling_longwave_radiation  # W/m²
+    units: "°C, PSU, m/s, m, W/m²"
+
+  integrated_input:
+    - uid: "OPA_IPSL_8.2_1999"
+      version: "8.2"
+      description: "Physical ocean state variables and surface fluxes for sea-ice thermodynamics/dynamics"
+
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - ice_concentration         # %
+      - ice_thickness             # m
+      - snow_thickness            # m
+      - ice_drift_u               # m/s
+      - ice_drift_v               # m/s
+      - surface_albedo            # dimensionless
+      - ice_ocean_freshwater_flux # m/s
+      - ice_ocean_heat_flux       # W/m²
+      - ice_ocean_momentum_stress # N/m²
+    verification: "Validated against satellite ice concentration, ULS thickness, and drift climatologies"
+
+  integration:
+    pattern: "Two-way coupling via flux exchange"
+    submodels: []
+    execution_constraints: "Consistent timestep and grid with OPA"
+    data_synchronization: "Fluxes exchanged each coupling interval"
+  authors:
+    - name: "Thierry Fichefet"
+      role: "LIM development"
+    - name: "Luis A. Morales Maqueda"
+      role: "LIM development"

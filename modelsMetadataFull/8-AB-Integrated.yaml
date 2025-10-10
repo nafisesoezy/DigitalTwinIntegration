@@ -1,0 +1,79 @@
+AB-Integrated:
+  title: "Integrated NEMO\u2013PlankTOM10 Ocean Biogeochemical Model"
+  unique_identifier: NEMO_PlankTOM10_2010
+  model_version: v3.3
+  description: "\n            An integrated ocean modeling system combining the NEMO\
+    \ physical circulation model with the PlankTOM10 marine biogeochemical model.\n\
+    \            Simulates physical ocean dynamics and dimethylsulphide (DMS) production/emissions\
+    \ using interactive coupling.\n        "
+  keywords:
+  - Ocean biogeochemistry
+  - Coupled modeling
+  - Dimethylsulphide
+  - Climate modeling
+  - NEMO
+  - PlankTOM10
+  model_type: Mechanistic
+  scope: Global ocean and marine ecosystems
+  purpose_pattern:
+    purpose: Simulate coupled physical and biogeochemical ocean processes including
+      DMS cycling
+    pattern: Online coupling of hydrodynamics and ecological tracers
+  assumptions:
+  - Dynamic tracer exchange
+  - DMS production is influenced by plankton and light
+  - No feedback from atmosphere modeled in this setup
+  dimensionality: 3D
+  spatial_extent: Global ocean
+  spatial_resolution: "Shared grid from NEMO (e.g., 1\xB0 or 1/4\xB0)"
+  variable_spatial_resolution: true
+  temporal_extent: Multi-year
+  temporal_resolution: Hourly to daily
+  variable_temporal_resolution: true
+  calibration_tools_data: DMS climatology, satellite chlorophyll, in situ nutrient
+    data
+  publications:
+  - Vogt et al., 2010
+  conceptual_evaluation: Captures key seasonal trends in DMS emissions
+  validation_capabilities: Compared against global DMS climatologies and satellite-derived
+    datasets
+  sensitivity_analysis: Biogeochemical parameter sweeps
+  uncertainty_analysis: Scenario-based uncertainty on emission estimates
+  error_handling: Handled via NEMO tracer integration controls
+  license: CeCILL
+  landing_page: https://www.nemo-ocean.eu
+  distribution_version: v3.3
+  programming_language:
+  - Fortran 90
+  software_requirements: NEMO compiled with PlankTOM10 tracer package
+  hardware_requirements: HPC recommended for global runs
+  execution_instructions: Run using NEMO configuration with PlankTOM10 activated via
+    namelists
+  parallel_execution: true
+  implementation_verification: Validation through standard test cases and climatology
+    comparison
+  source_code_availability: true
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format:
+    - NetCDF
+    variables: Temperature, salinity, DMS, chlorophyll, nutrients
+    units: Standard oceanographic units
+    verification: DMS seasonal cycles and flux validation
+    corroboration: ''
+  integration:
+    pattern: "Loose coupling"
+    submodels:
+    - NEMO
+    - PlankTOM10
+    execution_constraints: Shared timestep and vertical grid
+    acknowledgment: Model developers acknowledged in publications
+    latency_expectations: Tightly coupled
+    data_synchronization: Tracer exchange at each timestep
+  authors:
+  - name: Vogt, M.
+    orcid: ''
+    role: Biogeochemical model integration and validation

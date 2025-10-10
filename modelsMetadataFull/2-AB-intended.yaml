@@ -1,0 +1,114 @@
+Intended_Model:
+  title: "User-Defined Coupled MISMIP+–ISOMIP+ workflow"
+  unique_identifier: ""
+  model_version: ""
+  description: >
+    A conceptual loose-coupling workflow between an idealized marine ice-sheet experiment (MISMIP+)
+    and an idealized ice-shelf–ocean experiment (ISOMIP+). Geometry from the ice model drives
+    the ocean melt calculation, and the resulting sub-shelf melt rates drive the next ice evolution step.
+    Exchanges occur via NetCDF files at defined coupling intervals (no in-memory synchronization).
+
+  keywords:
+    - Model integration
+    - Loose coupling
+    - Ice–ocean interaction
+    - Sub-shelf melt
+    - Grounding line
+    - NetCDF exchange
+
+  model_type: "Mechanistic (intended)"
+  scope: "Idealized marine ice-sheet/shelf–ocean system"
+  purpose_pattern:
+    purpose: "Iteratively assess ice–ocean feedbacks using file-based exchanges between specialized models"
+    pattern: "Loose two-way coupling via offline NetCDF file exchange"
+
+  assumptions:
+    - "Both models operate on compatible or mappable grids"
+    - "Coupling cadence is coarse (iterative/batch), allowing lagged feedback"
+    - "Units and sign conventions are harmonized across exchanges"
+    - "No hard requirement for identical timesteps; remapping may be needed"
+
+  dimensionality: ""
+  spatial_extent: ""
+  spatial_resolution: ""
+  variable_spatial_resolution: ""
+  temporal_extent: ""
+  temporal_resolution: ""
+  variable_temporal_resolution: ""
+
+  calibration_tools_data: ""
+  publications: []
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+  error_handling: ""
+
+  license: ""
+  landing_page: ""
+  distribution_version: ""
+  programming_language: ""
+  software_requirements: "NetCDF I/O; remapping utilities"
+  hardware_requirements: ""
+  execution_instructions: "Run A then B (or B then A) per coupling schedule; exchange files; iterate"
+  parallel_execution: "Batch or sequential per exchange cycle"
+  implementation_verification: ""
+  source_code_availability: ""
+
+  parameters: []
+
+  datasets:
+    - uid: ""
+      version: ""
+      access_url: ""
+      dependencies: []
+
+  integrated_input:
+    - uid: "MISMIPPlus_Model_2016"
+      version: "2016.1"
+      description: "Provides ice geometry (ice_draft_geometry, grounding_line_position) to ISOMIP+"
+    - uid: "ISOMIPPlus_Model_2016"
+      version: "2016.1"
+      description: "Provides sub-shelf melt rates (melt_rate) to MISMIP+"
+
+  data_evaluation: "Automated checks on units, sign conventions, grid coverage, and remapping consistency"
+
+  output:
+    format:
+      - "NetCDF"
+    variables: "Coupled history: geometry, melt, thickness, grounding-line trajectory per exchange cycle"
+    units: "m, m a^-1, m^3 (as applicable)"
+    verification: "Cross-check against published MISMIP+/ISOMIP+ benchmark behaviors"
+    corroboration: "Reproduces consensus trends under standard perturbations"
+
+  integration:
+    pattern: "Loose"
+    submodels:
+      - "MISMIP+ (ice)"
+      - "ISOMIP+ (ocean)"
+    execution_constraints: "Coordinate coupling interval; perform grid remapping where necessary; no requirement for same timestep"
+    acknowledgment: "Cite MISMIP+ and ISOMIP+ protocols"
+    latency_expectations: "Exchange every N years/iterations (coarse cadence)"
+    data_synchronization: "File-based, lagged (offline) exchange; no in-memory sync"
+
+  # Optional but helpful for automated detection
+  coupling_contract:
+    A_to_B:   # MISMIP+ → ISOMIP+
+      variables:
+        - name: ice_draft_geometry
+          unit: "m"
+        - name: grounding_line_position
+          unit: "m"
+      format: "NetCDF"
+      cadence: "per coupling iteration"
+    B_to_A:   # ISOMIP+ → MISMIP+
+      variables:
+        - name: melt_rate
+          unit: "m a^-1"
+      format: "NetCDF"
+      cadence: "per coupling iteration"
+
+  authors:
+    - name: "TBD"
+      orcid: ""
+      role: "Integration designer / user"

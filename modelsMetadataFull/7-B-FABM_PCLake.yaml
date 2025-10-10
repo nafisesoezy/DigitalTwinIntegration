@@ -1,0 +1,94 @@
+FABM_PCLake:
+  title: "PCLake+ Integrated via FABM"
+  unique_identifier: "FABM_PCLake_2023"
+  model_version: "2023.1"
+  description: >
+    A process-based biogeochemical lake ecosystem model simulating nutrient cycling,
+    primary production, oxygen dynamics, and sediment–water interactions,
+    implemented within the Framework for Aquatic Biogeochemical Models (FABM)
+    for coupling with host hydrodynamic models such as GOTM.
+  keywords:
+    - Nutrient cycling
+    - Ecological modeling
+    - Lake ecosystems
+    - PCLake+
+    - FABM
+  model_type: "Mechanistic"
+  scope: "Shallow and stratified lakes"
+  purpose_pattern:
+    purpose: "Simulate ecological dynamics in response to nutrient inputs, physical mixing, and climate drivers"
+    pattern: "FABM plugin with ecological processes driven by hydrodynamic state variables"
+  assumptions:
+    - Ecology responds to physical drivers (light, mixing, temperature)
+    - Trophic groups and sediment modeled mechanistically
+    - No horizontal heterogeneity
+  dimensionality: "1D"
+  spatial_extent: "Lake water column"
+  spatial_resolution: "Matches hydrodynamic vertical grid"
+  variable_spatial_resolution: true
+  temporal_extent: "Decadal"
+  temporal_resolution: "Daily (driven by hourly hydrodynamic forcing)"
+  variable_temporal_resolution: false
+  calibration_tools_data: "Biological monitoring data and nutrient input records"
+  publications:
+    - "Janssen et al., 2019"
+  conceptual_evaluation: "Well-established with peer-reviewed validations"
+  validation_capabilities: "Validated on multiple lakes worldwide"
+  sensitivity_analysis: "Manual and automated tools available"
+  uncertainty_analysis: "Scenario and ensemble runs"
+  error_handling: "Input checking and diagnostics via FABM"
+  license: "GPL"
+  landing_page: "https://github.com/fabm-model/fabm"
+  distribution_version: "2023.1"
+  programming_language:
+    - "Fortran"
+    - "C++"
+  software_requirements: "FABM environment"
+  hardware_requirements: "Standard workstation"
+  execution_instructions: "Configured as an FABM plugin; receives physical state from host hydrodynamic model (e.g., GOTM)"
+  parallel_execution: false
+  implementation_verification: "Tested within FABM test cases"
+  source_code_availability: true
+
+  input:
+    description: "Physical and chemical drivers provided by GOTM via FABM interface"
+    format: "In-memory exchange (via FABM API)"
+    variables:
+      - Temperature profile (T)
+      - Turbulent mixing coefficients (Kz)
+      - Scalar irradiance / PAR
+      - Salinity profile (if relevant)
+    units: "°C, m² s⁻¹, W m⁻², PSU"
+
+  integrated_input:
+    - uid: "GOTM_FABM_2014"
+      version: "5.0"
+      description: "Physical hydrodynamic and optical drivers from GOTM"
+
+  output:
+    format:
+      - "NetCDF"
+      - "CSV"
+    variables:
+      - Nutrient concentrations (N, P, Si)
+      - Phytoplankton biomass
+      - Macrophyte biomass
+      - Zooplankton biomass
+      - Oxygen concentration
+      - Bio-optical properties (Kd_bio)
+      - Heat production due to light absorption (Q_bio)
+      - Surface albedo/drag modifiers
+    units: "mg L⁻¹, mmol m⁻³, m⁻¹, W m⁻², dimensionless"
+    verification: "Validated against long-term lake monitoring datasets"
+    corroboration: "Matches known seasonal nutrient and biomass cycles"
+
+  integration:
+    pattern: ""
+    submodels:
+      - "PCLake+ ecological processes"
+    execution_constraints: "Time step and grid must match GOTM; physical drivers updated each coupling step"
+    data_synchronization: "Receives GOTM drivers; returns bio-feedbacks to GOTM"
+
+  authors:
+    - name: "Arie B.G. Janssen"
+      role: "Ecological model development"

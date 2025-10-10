@@ -1,0 +1,90 @@
+MISMIP+:
+  title: "MISMIP+: Marine Ice Sheet Model Intercomparison Project, Phase 3"
+  unique_identifier: "MISMIPPlus_Model_2016"
+  model_version: "2016.1"
+  description: "Idealized benchmark experiments to evaluate marine ice sheet model behavior, with a focus on grounding-line dynamics and buttressing under varying sub-shelf melt rates. Used here as the ice component that consumes ocean-driven melt rates and produces updated ice geometry."
+  keywords:
+    - Marine ice sheets
+    - Grounding line
+    - Ice shelf
+    - Ice dynamics
+    - Sea-level rise
+    - Intercomparison
+  model_type: "Mechanistic"
+  scope: "Idealized marine ice sheet domains at decadal to centennial scale"
+  purpose_pattern:
+    purpose: "Benchmark grounding-line treatment and sensitivity to ocean-induced melting"
+    pattern: "Consumes prescribed sub-shelf melt-rate fields to update ice geometry"
+  assumptions:
+    - "2D or 3D flow approximations (SSA, SIA, hybrid, or full-Stokes)"
+    - "Prescribed bed topography and accumulation fields"
+    - "Synthetic ice shelf geometry"
+  links_to_publications_and_reports:
+    - "Asay-Davis et al. (2016), Geosci. Model Dev."
+    - "Pattyn et al. (2013), The Cryosphere"
+  conceptual_model_evaluation: "Validated against semi-analytical solutions; tested in multi-model comparisons"
+  uncertainty_analysis: "Scenario-based melt and friction laws"
+  sensitivity_analysis: "Resolution and parameter sensitivity"
+  input:
+    description: "Sub-shelf melt-rate fields provided externally (e.g., from ISOMIP+ runs)"
+    format: "NetCDF"
+    variables:
+      - melt_rate                # m a^-1
+    units: "m a^-1"
+  parameters:
+    - name: "MISMIPPlus_Parameters"
+      description: "Topography, ice rheology, sliding laws"
+      format: "YAML, NetCDF"
+      unit: "various"
+      datatype: "float"
+      valid_range: "Defined per experimental setup"
+      default_values: "Standard from intercomparison protocol"
+  datasets: []
+  integrated_input:
+    - uid: "ISOMIPPlus_Output"
+      version: "2016.1"
+      description: "Sub-shelf melt rates used as forcing"
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - ice_draft_geometry       # m
+      - grounding_line_position  # m or index
+      - ice_thickness            # m
+      - volume_above_flotation   # m^3
+    units:
+      - "m"
+      - "m"
+      - "m"
+      - "m^3"
+    verification: "Comparison to analytical and multi-model results"
+    corroboration: "Reproduces expected retreat/advance behaviors"
+  data_evaluation: "Protocol-based checks for physical plausibility"
+  dimensionality: "2D (plan-view) or 3D"
+  spatial_extent: "Idealized ice sheet–shelf domain"
+  spatial_resolution: "100 m–1 km"
+  variable_spatial_resolution: true
+  temporal_extent: "100–1000 years"
+  time_steps_temporal_resolution: "Annual or sub-annual"
+  variable_temporal_resolution: true
+  programming_language:
+    - "Fortran"
+    - "C++"
+    - "Python"
+  availability_of_source_code: false
+  implementation_verification: "Consensus steady-state and perturbation responses"
+  error_handling: "Model-specific logging and validation"
+  software_specification_and_requirements: "Ice sheet model with grounding-line tracking"
+  hardware_specification_and_requirements: "Workstation to HPC"
+  execution_instructions: "Initialize, apply melt forcing, run per protocol"
+  parallel_execution: true
+  license: "Open model experiment specification"
+  landing_page: "https://www.geosci-model-dev.net/9/2471/2016/"
+  distribution_version: "2016.1"
+  file_formats:
+    - "NetCDF"
+  authors:
+    - name: "Stephen L. Cornford"
+      role: "Ice sheet model design and coordination"
+    - name: "Xylar S. Asay-Davis"
+      role: "Project lead, experimental design and analysis"

@@ -1,0 +1,117 @@
+NEMO:
+  title: "NEMO: Nucleus for European Modelling of the Ocean"
+  unique_identifier: "NEMO_Model_3.4"
+  model_version: "v3.4 (used in experiments)"
+  description: >
+    A state-of-the-art ocean general circulation model for simulating the global ocean,
+    including thermohaline circulation and upper-ocean mixing. In configurations with
+    wave coupling, NEMO ingests Stokes drift, sea-state dependent momentum flux, and
+    wave-breaking TKE flux to represent wave effects on currents and mixing.
+  keywords:
+    - Ocean circulation
+    - Mixed layer dynamics
+    - Stokes drift
+    - Sea-state dependent stress
+    - Wave–ocean coupling
+  model_type: "Mechanistic"
+  scope: "Global and regional ocean basins"
+  purpose_pattern:
+    purpose: "Simulate 3D ocean currents, temperature, salinity, mixing, and (optionally) sea ice/biogeochemistry"
+    pattern: "Modular ocean core with optional coupling to waves and atmosphere"
+  assumptions:
+    - "Boussinesq, hydrostatic primitive equations"
+    - "GLS/TKE turbulence closures"
+    - "Structured grid (e.g., ORCA) with lateral mixing schemes"
+  dimensionality: "3D"
+  spatial_extent: "Global ocean or regional subdomains"
+  spatial_resolution: "Varies from 1° to eddy-resolving (≤1/4°)"
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-decadal to centennial"
+  temporal_resolution: "Hourly to daily"
+  variable_temporal_resolution: true
+  calibration_tools_data: "Tuned using observed climatologies and reanalyses"
+  publications:
+    - "Madec 2008"
+    - "Breivik et al. 2015"
+  conceptual_evaluation: "Widely validated in CMIP and operational contexts"
+  validation_capabilities: "Against ARGO, SST, altimetry, and sea-ice datasets"
+  sensitivity_analysis: "Parameters for mixing, drag, and coupling frequency"
+  uncertainty_analysis: "Ensemble runs with perturbed forcings"
+  error_handling: "Diagnostics for CFL, NaNs, and restart safety"
+  license: "CeCILL-C"
+  landing_page: "https://www.nemo-ocean.eu/"
+  distribution_version: "v3.4"
+  programming_language:
+    - "Fortran 90"
+  software_requirements: "MPI, NetCDF, decomposition libraries"
+  hardware_requirements: "Parallel HPC cluster"
+  execution_instructions: "Configure via namelists; compile; supply grid/bathymetry/forcing files"
+  parallel_execution: true
+  implementation_verification: "Reference configurations and test cases"
+  source_code_availability: true
+
+  parameters:
+    - name: "NEMO_Config_Parameters"
+      description: "Mixing and coupling controls (e.g., Langmuir/wave settings)"
+      format: "namelist"
+      unit: "various"
+      datatype: "float"
+      valid_range: "As per configuration"
+      CRS: "ORCA or regional grid"
+      default_values: "Defaults in reference configs"
+
+  datasets:
+    - uid: "NEMO_Forcing_2015"
+      version: "2015"
+      access_url: "ECMWF or other reanalysis providers"
+      dependencies:
+        - "Surface wind stress and heat/freshwater fluxes"
+        - "Runoff and restoring fields"
+        - "Sea-ice fields if LIM is enabled"
+
+  # — Signals for pattern detection (no pattern set for standalone B) —
+  input:
+    description: "Wave-induced fields from a spectral wave model plus standard surface forcing"
+    format: "NetCDF (or coupler fields when present)"
+    variables:
+      - stokes_drift_surface_u            # m s^-1
+      - stokes_drift_surface_v            # m s^-1
+      - stokes_profile_scale              # 1 m^-1
+      - wave_modified_stress_to_ocean     # N m^-2
+      - wave_breaking_TKE_flux            # W m^-2
+      - sea_ice_concentration             # 0–1 (from wave/ice system or external)
+    units: "see inline"
+  integrated_input:
+    - uid: "ECWAM_Model_2015"
+      version: "CY38R1"
+      description: "Provides Stokes drift, wave-modified stress, and breaking-induced TKE flux"
+
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - sea_surface_temperature           # °C
+      - sea_surface_salinity              # PSU
+      - surface_current_u                 # m s^-1
+      - surface_current_v                 # m s^-1
+      - mixed_layer_depth                 # m
+      - sea_ice_concentration             # 0–1 (if LIM)
+      - surface_stress_to_atmosphere      # N m^-2 (diagnostic)
+    units: "see inline"
+    verification: "Compared with observations and reanalyses"
+    corroboration: "Upper-ocean response consistent with wave-aware physics"
+
+  integration:
+    submodels:
+      - "LIM (optional)"
+      - "PISCES (optional)"
+    execution_constraints: "When coupled, ensure consistent coupling interval and grid remapping"
+    acknowledgment: "NEMO Consortium; wave–ocean coupling as in literature"
+    latency_expectations: "Typical exchange hourly–3-hourly when used in AB"
+    data_synchronization: "File/coupler-based exchange when coupled"
+
+  authors:
+    - name: "Jean-Marc Molines"
+      role: "Core developer (NEMO ocean dynamics)"
+    - name: "Øyvind Breivik"
+      role: "Wave–ocean coupling experiments and implementation"

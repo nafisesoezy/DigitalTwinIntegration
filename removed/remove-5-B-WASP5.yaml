@@ -1,0 +1,72 @@
+WASP5:
+  title: WASP5 Water Quality Model
+  unique_identifier: WASP5_Venice_2003
+  model_version: '5.0'
+  description: A water quality and ecological model simulating nutrients, oxygen dynamics,
+    organic matter, and phytoplankton biomass. Supports multiple compartments and
+    transport inputs from external hydrodynamic models.
+  keywords:
+  - Water quality
+  - Ecological modeling
+  - Nutrient cycling
+  - Oxygen dynamics
+  - Phytoplankton
+  model_type: Mechanistic
+  scope: Aquatic biogeochemistry in coastal systems
+  purpose_pattern:
+    purpose: Simulate nutrient dynamics and phytoplankton in the Venice Lagoon
+    pattern: One-way coupling using SHYFEM hydrodynamic input
+  assumptions:
+  - Process-based mass balance equations
+  - External advection inputs
+  - Compartmental simulation of constituents
+  dimensionality: "1D\u20133D (via compartments)"
+  spatial_extent: Venice Lagoon
+  spatial_resolution: Linked to SHYFEM mesh (compartments)
+  variable_spatial_resolution: true
+  temporal_extent: Seasonal
+  temporal_resolution: Hourly to daily
+  variable_temporal_resolution: true
+  calibration_tools_data: Calibrated using observed chlorophyll, oxygen, nutrient
+    data
+  publications:
+  - Solidoro et al. 2003
+  conceptual_evaluation: Built upon EPA framework for aquatic systems
+  validation_capabilities: Validated against field nutrient and oxygen data
+  sensitivity_analysis: ''
+  uncertainty_analysis: ''
+  error_handling: Error logs for mass balance and negative concentration checks
+  license: U.S. EPA license
+  landing_page: ''
+  distribution_version: '5.0'
+  programming_language:
+  - Fortran
+  software_requirements: EPA WASP5 executable environment
+  hardware_requirements: Desktop or cluster
+  execution_instructions: Driven by input files generated from hydrodynamic output
+  parallel_execution: false
+  implementation_verification: Verified against known water quality benchmarks
+  source_code_availability: false
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format:
+    - CSV
+    - Text
+    variables: Nutrient concentrations, DO, phytoplankton biomass
+    units: "mg/L, \xB5g/L"
+    verification: Comparison with in situ water quality monitoring
+    corroboration: ''
+  integration:
+    pattern: null
+    submodels: []
+    execution_constraints: null
+    acknowledgment: U.S. EPA WASP team
+    latency_expectations: ''
+    data_synchronization: ''
+  authors:
+  - name: Caterina Solidoro
+    orcid: ''
+    role: Ecological model configuration and coupling

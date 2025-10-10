@@ -1,0 +1,102 @@
+AB-Integrated:
+   title: "ORCA2-LIM: Coupled Global Sea-Ice–Ocean Model"
+  unique_identifier: "ORCA2_LIM_UCL_LODYC_2005"
+  model_version: "OPA 8.2 + LIM (1997/1999 thermodynamics, VP dynamics)"
+  description: "Two-way coupled sea-ice–ocean system on the ORCA2 tripolar grid (78°S–90°N, ~2° mean resolution), evaluating high-latitude processes, sea-ice variability, and ocean circulation under combined reanalysis/climatology forcing." :contentReference[oaicite:64]{index=64}
+  keywords:
+    - Coupled model
+    - ORCA2 grid
+    - High latitudes
+    - Sea-ice–ocean interaction
+    - Convection sites
+    - Sensitivity studies
+  model_type: "Mechanistic (coupled)"
+  scope: "Global ocean with explicit Arctic/Antarctic sea-ice cover" :contentReference[oaicite:65]{index=65}
+  purpose_pattern:
+    purpose: "Assess representation of high-latitude processes and sea-ice variability in a coarse-resolution global model" :contentReference[oaicite:66]{index=66}
+    pattern: "OPA–LIM two-way coupling exchanging momentum, heat and freshwater fluxes at fixed intervals" :contentReference[oaicite:67]{index=67}
+  assumptions:
+    - "Bulk exchange at ice–ocean interface; drag and heat transfer laws per literature." :contentReference[oaicite:68]{index=68}
+    - "SSS restoring used to limit drift and avoid spurious convection." :contentReference[oaicite:69]{index=69}
+    - "Coarse grid under-resolves narrow currents and small polynya features." :contentReference[oaicite:70]{index=70}
+  links_to_publications_and_reports:
+    - "Timmermann et al. (2005), Ocean Modelling — main ORCA2-LIM paper." :contentReference[oaicite:71]{index=71}
+    - "Goosse & Fichefet (1999) — coupling equations." :contentReference[oaicite:72]{index=72}
+  conceptual_model_evaluation: "Realistic seasonal growth/decay, drift, and major convection sites; some regional biases remain." :contentReference[oaicite:73]{index=73}
+  uncertainty_analysis: "Sensitivity to forcing choice (NCEP stress vs wind), SSS restoring, and ice parameters." :contentReference[oaicite:74]{index=74}
+  sensitivity_analysis: "Using NCEP wind stress directly overestimates ice drift; dropping SSS restoring triggers Southern Ocean open-ocean convection." :contentReference[oaicite:75]{index=75}
+  parameters:
+    - name: "Coupling_Parameters"
+      description: "Ice–ocean interface exchange and schedule"
+      format: "YAML"
+      entries:
+        ocean_time_step_s: 5760           # 96 minutes :contentReference[oaicite:76]{index=76}
+        coupling_interval_steps: 5        # bidirectional every 5 steps (~8 h) :contentReference[oaicite:77]{index=77}
+        ice_ocean_drag_coeff: 0.005       # quadratic bulk drag (5×10^-3) :contentReference[oaicite:78]{index=78}
+        heat_flux_param: "McPhee (1992) friction-velocity-based" :contentReference[oaicite:79]{index=79}
+        ice_salinity_psu: 6               # constant in fluxes :contentReference[oaicite:80]{index=80}
+        snow_salinity_psu: 0              # constant in fluxes :contentReference[oaicite:81]{index=81}
+    - name: "Forcing_And_Restoring"
+      description: "Atmospheric and surface boundary conditions"
+      format: "YAML"
+      entries:
+        winds_temp: "NCEP/NCAR daily (10 m wind speed, 2 m air temperature)" :contentReference[oaicite:82]{index=82}
+        humidity_clouds_precip: "Monthly climatologies (Trenberth 1989; Berliand & Strokina 1980; Xie & Arkin 1996)" :contentReference[oaicite:83]{index=83}
+        wind_stress_drag_coeff: 0.00225   # 2.25×10^-3 :contentReference[oaicite:84]{index=84}
+        SSS_restoring: "PHC seasonal, 60-day timescale" :contentReference[oaicite:85]{index=85}
+        runoff: "Baumgartner & Reichel + GRDC seasonal cycle" :contentReference[oaicite:86]{index=86}
+  datasets:
+    - uid: "PHC_Initialization"
+      version: "2001"
+      description: "January PHC fields for ocean T/S; initial sea-ice and snow thickness specified by hemisphere." :contentReference[oaicite:87]{index=87}
+  integrated_input:
+    - uid: "Atmospheric_Forcing_Combined"
+      version: "1977–1999"
+      description: "NCEP/NCAR daily + monthly climatologies; river runoff; used for two 23-yr passes (spin-up + analysis)." :contentReference[oaicite:88]{index=88}
+  data_evaluation: "Sea-ice extent anomalies vs passive microwave; thickness vs ULS moorings; drift vs SSM/I; ocean hydrography and ACC metrics." :contentReference[oaicite:89]{index=89}
+  output:
+    format: ["NetCDF"]
+    variables: "Sea-ice concentration, thickness, drift; ocean velocity/temperature/salinity; MLD; convection diagnostics"
+    units: "%, m, m/s, °C, PSU"
+    verification: "Time series and climatologies compared against observations/reanalyses" :contentReference[oaicite:90]{index=90}
+    corroboration: "Captures main patterns; ACC and boundary current widths overestimated at 2°." :contentReference[oaicite:91]{index=91}
+  integration:
+    pattern: "shared coupling" :contentReference[oaicite:92]{index=92}
+    submodels:
+      - "OPA 8.2 OGCM" :contentReference[oaicite:93]{index=93}
+      - "LIM dynamic–thermodynamic sea-ice model" :contentReference[oaicite:94]{index=94}
+    execution_constraints: "Maintain SSS restoring to avoid spurious Weddell Sea convection; avoid direct NCEP stress forcing for realistic drift." :contentReference[oaicite:95]{index=95}
+    acknowledgment: "UCL (LIM) & LODYC/IPSL (OPA) collaboration." :contentReference[oaicite:96]{index=96}
+    latency_expectations: "Coupling every ~8 h of model time" :contentReference[oaicite:97]{index=97}
+    data_synchronization: "Exchange at fixed coupling intervals"
+  authors:
+    - name: "Ralph Timmermann"
+      role: "Lead author, evaluation"
+    - name: "Hugues Goosse"
+      role: "Coupling & sea-ice"
+    - name: "Gurvan Madec"
+      role: "Ocean model"
+    - name: "Thierry Fichefet"
+      role: "Sea-ice model"
+    - name: "Christian Ethé"
+      role: "Model development"
+    - name: "Valérie Dulière"
+      role: "Configuration"
+  dimensionality: "2D (ice) + 3D (ocean)"
+  spatial_extent: "78°S–90°N (global)" :contentReference[oaicite:98]{index=98}
+  spatial_resolution: "Tripolar ORCA2: ~2° mean; ~50–65 km in high latitudes; 30 vertical levels (10 in top 100 m)" :contentReference[oaicite:99]{index=99}
+  variable_spatial_resolution: true
+  temporal_extent: "1977–1999 (study analysis period), multi-decadal capability" :contentReference[oaicite:100]{index=100}
+  temporal_resolution: "Ocean Δt=96 min; coupling every 5 steps; diagnostics monthly/daily" :contentReference[oaicite:101]{index=101}
+  variable_temporal_resolution: true
+  programming_language: ["Fortran"]
+  software_requirements: "NetCDF I/O; tripolar grid; coupling driver"
+  hardware_requirements: "Workstation/HPC"
+  execution_instructions: "Spin-up one pass of 1977–1999 forcing in fully coupled mode; analyze results on second pass." :contentReference[oaicite:102]{index=102}
+  parallel_execution: true
+  implementation_verification: "Sea-ice extent/seasonal cycles realistic; convection sites reproduced; some biases persist." :contentReference[oaicite:103]{index=103}
+  source_code_availability: "OPA documentation site referenced; LIM described in literature (code availability not specified in paper)." :contentReference[oaicite:104]{index=104}
+  license: "Unspecified (paper)"
+  landing_page: null
+  distribution_version: "ORCA2-LIM (paper configuration, 2005)" :contentReference[oaicite:105]{index=105}
+  file_formats: ["NetCDF"]

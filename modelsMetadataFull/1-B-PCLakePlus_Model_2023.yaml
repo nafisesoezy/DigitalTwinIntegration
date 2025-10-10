@@ -1,0 +1,99 @@
+PCLake+:
+  title: "PCLake+: A Process-Based Ecological Model for Lakes"
+  unique_identifier: "PCLakePlus_Model_2023"
+  model_version: "2023.1"
+  description: "A process-based mechanistic model simulating nutrient cycling, food web dynamics, water quality, and ecosystem service provisioning in freshwater lakes, including vertical stratification."
+  keywords:
+    - Lake ecology
+    - Eutrophication
+    - Nutrient cycling
+    - Water quality
+    - Ecosystem services
+    - Restoration
+    - Trophic interactions
+  model_type: "Mechanistic"
+  scope: "Freshwater lakes, shallow and deep with vertical stratification"
+  purpose_pattern:
+    purpose: "Simulate ecological responses of lakes to nutrient loading, restoration, and climate scenarios"
+    pattern: "Consumes boundary conditions from external physical models"
+  assumptions:
+    - "1D vertical structure captures key ecological processes"
+    - "External loads dominate nutrient inputs"
+    - "No feedback to physical model"
+  dimensionality: "1D"
+  spatial_extent: "Lake water column"
+  spatial_resolution: "Discrete vertical layers (fixed)"
+  variable_spatial_resolution: false
+  temporal_extent: "Multi-year to decadal"
+  temporal_resolution: "Daily"
+  variable_temporal_resolution: false
+  calibration_tools_data: "Empirical calibration using observed nutrient loads, water quality, and biological monitoring data"
+  publications:
+    - "Janse 2005"
+    - "Janse et al. 2010"
+    - "Janssen et al. 2019"
+    - "Zhan et al. 2023"
+  conceptual_evaluation: "Extensively documented in peer-reviewed studies; applied to >50 lakes worldwide"
+  validation_capabilities: "Validated against long-term monitoring of nutrients, oxygen, chlorophyll-a, macrophyte cover"
+  sensitivity_analysis: "Supports manual or automated sensitivity tests"
+  uncertainty_analysis: "Scenario analysis, Monte Carlo simulations"
+  error_handling: "Input validation, logging of numerical errors or instabilities"
+  license: "GNU GPL"
+  landing_page: "https://github.com/pcmodel/PCModel"
+  distribution_version: "2023.1"
+  programming_language:
+    - "C++ (core)"
+    - "R (wrapper)"
+  software_requirements: "C++ compiler; R with PCModel package"
+  hardware_requirements: "Standard desktop/server"
+  execution_instructions: "Command-line via C++ binary or R script; configure via YAML/JSON files"
+  parallel_execution: false
+  implementation_verification: "Peer-reviewed validation and consistency tests"
+  source_code_availability: true
+  parameters:
+    - name: "PCLakePlus_Static_Parameters"
+      description: "Constants for biogeochemistry, food web, sediment processes"
+      format: "CSV/JSON"
+      unit: "various"
+      datatype: "float"
+      valid_range: "Defined per parameter in manual"
+      CRS: "N/A"
+      default_values: "Default parameters from literature calibration"
+  datasets:
+    - uid: "PCLakePlus_Input_2023"
+      version: "2023.1"
+      access_url: "Model repository or linked datasets"
+      dependencies:
+        - "Meteorological data"
+        - "Nutrient load data"
+        - "Bathymetry"
+        - "Hydrology"
+  integrated_input:
+    - uid: "FLake_Model_2023"
+      version: "2023.1"
+      description: "Daily mixing depth and temperature profile from FLake"
+  data_evaluation: "Built-in checks for input completeness, ranges, and consistency"
+  output:
+    format:
+      - "CSV"
+      - "NetCDF"
+    variables: "Nutrient concentrations, phytoplankton biomass, macrophyte cover, oxygen, ecosystem service indicators"
+    units: "various"
+    verification: "Compared to field data from case studies (oxygen, nutrients, chlorophyll-a)"
+    corroboration: "Peer-reviewed publications demonstrate ecological realism and match with observations"
+  integration:
+    pattern:
+    submodels:
+      - "Physical lake model (FLake)"
+    execution_constraints: "Consumes outputs from FLake as input forcing; no return variables sent back"
+    acknowledgment: "No feedback coupling implemented"
+    latency_expectations: "Batch/offline"
+    data_synchronization: "File-based input from physical model"
+  authors:
+    - name: "Janse J.H."
+      orcid: "https://orcid.org/0000-0003-1636-679X"
+      role: "Developer, calibration, validation"
+    - name: "Janssen A.B.G."
+      role: "Ecological modeling, analysis"
+    - name: "Zhan Q."
+      role: "Integration testing"

@@ -1,0 +1,87 @@
+GOTM:
+  title: "General Ocean Turbulence Model (GOTM)"
+  unique_identifier: "GOTM_FABM_2014"
+  model_version: "5.0"
+  description: >
+    A 1D water column hydrodynamic model simulating vertical mixing, turbulence, and hydrodynamics,
+    providing physical driver fields for coupled biogeochemical models via FABM, and receiving ecological
+    feedback variables (e.g., light attenuation, heat flux) from FABM submodels such as PCLake+.
+  keywords:
+    - Hydrodynamic model
+    - Turbulence
+    - Vertical mixing
+    - Marine systems
+    - Lake modeling
+    - FABM coupling
+  model_type: "Mechanistic"
+  scope: "1D vertical hydrodynamics in aquatic systems"
+  purpose_pattern:
+    purpose: "Simulate vertical transport and mixing in marine and freshwater systems"
+    pattern: "Layered turbulence closure with online ecological coupling via FABM"
+  assumptions:
+    - Horizontal homogeneity
+    - Turbulence driven by wind, buoyancy, and bottom shear
+    - 1D vertical structure
+  dimensionality: "1D"
+  spatial_extent: "Water column"
+  spatial_resolution: "Adaptive vertical layers"
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-year"
+  temporal_resolution: "Hourly"
+  variable_temporal_resolution: true
+  calibration_tools_data: "Temperature and salinity profiles"
+  publications:
+    - "Burchard et al., 1999"
+    - "Bruggeman and Bolding, 2014"
+  conceptual_evaluation: "Widely validated for estuarine and coastal systems"
+  validation_capabilities: "Profile comparisons to physical observations"
+  sensitivity_analysis: "Available through configuration scenarios"
+  uncertainty_analysis: "Scenario testing"
+  error_handling: "Error trapping and timestep control"
+  license: "GPL"
+  landing_page: "https://gotm.net"
+  distribution_version: "5.0"
+  programming_language:
+    - "Fortran"
+  software_requirements: "NetCDF, Fortran compiler"
+  hardware_requirements: "Standard workstation"
+  execution_instructions: "Configure through YAML/NML files and run via CLI"
+  parallel_execution: false
+  implementation_verification: "Benchmarked with standard GOTM cases"
+  source_code_availability: true
+
+  input:
+    description: >
+      Meteorological forcing and initial hydrodynamic conditions;
+      additionally receives ecological feedback variables from FABM submodels.
+    format: "NetCDF, YAML/NML, in-memory via FABM API"
+    variables:
+      - Meteorological forcing (wind, air temperature, radiation)
+      - Initial temperature and salinity profiles
+      - Bio-optical feedback: biologically induced light attenuation (Kd_bio)
+      - Heat flux feedback (Q_bio)
+      - Surface albedo / wind-drag modifiers
+    units: "°C, PSU, W m⁻², m⁻¹, dimensionless"
+
+  output:
+    format: "In-memory exchange via FABM API"
+    variables:
+      - Temperature profile (T)
+      - Salinity profile
+      - Turbulent mixing coefficients (Kz)
+      - Scalar irradiance / PAR
+    units: "°C, PSU, m² s⁻¹, W m⁻²"
+    verification: "Benchmarked against canonical GOTM-FABM cases"
+
+  integration:
+    pattern: "Tool coupling via FABM"
+    submodels: []
+    execution_constraints: "Time step and vertical grid synchronized with FABM plugins"
+    acknowledgment: "Coupling through FABM middleware ensures consistent exchange"
+    latency_expectations: "Online synchronous exchange each time step"
+    data_synchronization: "Two-way: provides physical drivers, receives ecological feedbacks"
+
+  authors:
+    - name: Karsten Bolding
+      orcid: ""
+      role: Developer

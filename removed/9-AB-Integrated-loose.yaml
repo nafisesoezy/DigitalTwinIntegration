@@ -1,0 +1,74 @@
+AB-Integrated:
+  title: Integrated CanESM2 Climate Modeling System
+  unique_identifier: CanESM2_CanAM4_NCOM1.3_2013
+  model_version: v2
+  description: "\n            The Canadian Earth System Model version 2 (CanESM2)\
+    \ integrates the CanAM4 atmospheric model with the NCOM1.3 ocean model.\n    \
+    \        This coupled system simulates global climate dynamics including the impact\
+    \ of stratospheric aerosols on surface temperature and precipitation.\n      \
+    \  "
+  keywords:
+  - Earth system model
+  - Climate modeling
+  - Atmosphere-ocean coupling
+  - Stratospheric aerosols
+  - Surface temperature
+  model_type: Mechanistic
+  scope: Global atmosphere and ocean
+  purpose_pattern:
+    purpose: Simulate climate response to internal and external forcings
+    pattern: Coupled climate model (AGCM + OGCM)
+  assumptions:
+  - Coupled exchange of fluxes and state variables at daily resolution
+  - Hydrostatic atmosphere and ocean
+  - Aerosol perturbations affect radiation and cloud microphysics
+  dimensionality: 3D
+  spatial_extent: Global
+  spatial_resolution: "Atmosphere: T63 (~2.8\xB0), Ocean: 1.4\xB0"
+  variable_spatial_resolution: false
+  temporal_extent: Multi-decadal
+  temporal_resolution: 30-min to daily
+  variable_temporal_resolution: false
+  calibration_tools_data: CMIP5 tuning, historical reanalysis
+  publications:
+  - Fyfe et al., 2013
+  conceptual_evaluation: CMIP5 and aerosol forcing validation
+  validation_capabilities: Surface temperature and precipitation skill metrics
+  sensitivity_analysis: Multiple aerosol and GHG scenarios
+  uncertainty_analysis: Ensemble experiments for climate projections
+  error_handling: Coupling interface handles missing data and restarts
+  license: Institutional CCCma
+  landing_page: https://climate-modelling.canada.ca/
+  distribution_version: v2
+  programming_language:
+  - Fortran
+  software_requirements: NEMO, CanAM4, NetCDF, MPI
+  hardware_requirements: Supercomputing clusters required
+  execution_instructions: Run as predefined CanESM2 experiments with configured forcing
+  parallel_execution: true
+  implementation_verification: Included in CMIP5 benchmarks
+  source_code_availability: false
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format:
+    - NetCDF
+    variables: Atmospheric fields, SST, sea ice, ocean heat content
+    units: Standard CMIP units
+    verification: Compared to observations and CMIP5 reference runs
+    corroboration: ''
+  integration:
+    pattern: Synchronous online coupling
+    submodels:
+    - CanAM4
+    - NCOM1.3
+    execution_constraints: Flux coupling timestep synchronization
+    acknowledgment: Canadian Centre for Climate Modelling and Analysis (CCCma)
+    latency_expectations: Low-latency component coupling
+    data_synchronization: Hourly to daily via coupler layer
+  authors:
+  - name: Fyfe, J.C.
+    orcid: ''
+    role: Earth system modeling and analysis

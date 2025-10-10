@@ -1,0 +1,84 @@
+AB-Integrated:
+  title: Integrated Agent-Based Land-Use and Ecosystem Services Model
+  unique_identifier: ABM_ES_Coupled_2013
+  model_version: '1.0'
+  description: "\n            This integrated model combines a spatially explicit\
+    \ agent-based land-use model with an ecosystem services meta-model. \n       \
+    \     Land-use decisions by agents dynamically update land cover, which is passed\
+    \ to the ES module that calculates carbon storage, erosion control, and agricultural\
+    \ yield.\n            These ES indicators then influence agent decision-making\
+    \ in a feedback loop.\n        "
+  keywords:
+  - Land-use change
+  - Agent-based modeling
+  - Ecosystem services
+  - Model integration
+  - Environmental decision-making
+  model_type: Mechanistic + Empirical
+  scope: Regional landscape systems with spatial heterogeneity
+  purpose_pattern:
+    purpose: Assess how land-use dynamics impact ecosystem services under different
+      policy and behavioral scenarios
+    pattern: "Iterative feedback coupling (ABM \u2192 ES \u2192 ABM)"
+  assumptions:
+  - Land-use fully determines ES provision
+  - Agents incorporate ES values in decision-making
+  - Lookup values accurately represent service levels
+  dimensionality: 2D
+  spatial_extent: Parcel-based regional landscape
+  spatial_resolution: 1 ha
+  variable_spatial_resolution: false
+  temporal_extent: Decadal
+  temporal_resolution: Annual
+  variable_temporal_resolution: false
+  calibration_tools_data: Historical land use, empirical ES valuation
+  publications:
+  - Parker et al. 2013
+  conceptual_evaluation: Supports spatial decision support through iterative policy
+    testing
+  validation_capabilities: Compared with observed land-use and ES trends
+  sensitivity_analysis: Tested against ES valuation shifts and agent preferences
+  uncertainty_analysis: Scenario analysis of ES inputs and behavior rules
+  error_handling: Defaults and error logs for invalid land use types
+  license: Academic
+  landing_page: ''
+  distribution_version: '1.0'
+  programming_language:
+  - NetLogo
+  - Python
+  software_requirements: ABM platform, spreadsheet/lookup system
+  hardware_requirements: Standard PC
+  execution_instructions: Run ABM annually, pipe output to ES evaluator, re-ingest
+    into next ABM timestep
+  parallel_execution: false
+  implementation_verification: Internal consistency of feedback loop validated with
+    test scenarios
+  source_code_availability: false
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format:
+    - CSV
+    - Raster
+    variables: Land-use maps, carbon, erosion, yield
+    units: categorical, tC/ha, t/ha
+    verification: Compared with empirical benchmarks
+    corroboration: ''
+  integration:
+    pattern: "embedded coupling"
+    submodels:
+    - Agent-Based Land-Use Model
+    - Ecosystem Service Meta-Model
+    execution_constraints: Synchronized temporal steps
+    acknowledgment: Parker et al. 2013
+    latency_expectations: 'Low latency: annual timestep exchange'
+    data_synchronization: "Land-use \u2192 ES scores \u2192 agent utility"
+  authors:
+  - name: Dawn C. Parker
+    orcid: ''
+    role: ABM design and integration
+  - name: C. Jantz
+    orcid: ''
+    role: Ecosystem services modeling

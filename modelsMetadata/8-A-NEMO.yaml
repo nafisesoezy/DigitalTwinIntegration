@@ -1,0 +1,84 @@
+xNEMO:
+  title: NEMO Ocean Circulation Model
+  unique_identifier: NEMO_v3.3_2010
+  model_version: v3.3
+  description: "A 3D ocean general circulation model simulating currents, mixing, sea ice, thermohaline structures, and surface fluxes, providing the physical environment for biogeochemical modules such as PlankTOM10."
+  keywords:
+    - Ocean circulation
+    - Hydrodynamics
+    - Sea ice
+    - NEMO
+    - Climate modeling
+  model_type: Mechanistic
+  scope: Global and regional ocean domains
+  purpose_pattern:
+    purpose: "Simulate physical ocean properties and dynamics"
+    pattern: "3D structured grid, hydrostatic approximation"
+  assumptions:
+    - Hydrostatic and Boussinesq approximations
+    - Finite-difference discretization
+    - Fixed bathymetry
+  dimensionality: 3D
+  spatial_extent: Global ocean
+  spatial_resolution: "1/2° to 1/12°"
+  variable_spatial_resolution: true
+  temporal_extent: Multi-decadal
+  temporal_resolution: Hourly to daily
+  variable_temporal_resolution: true
+  calibration_tools_data: Ocean reanalysis datasets, Argo, satellite data
+  publications:
+    - Madec et al., 2008
+    - Vogt et al., 2010
+  conceptual_evaluation: Validated in CMIP and regional configurations
+  validation_capabilities: Comparison to reanalysis and observational datasets
+  sensitivity_analysis: Tunable through parameter sets
+  uncertainty_analysis: Ensemble simulations supported
+  error_handling: Built-in checks for CFL violations, NaNs, restarts
+  license: CeCILL
+  landing_page: https://www.nemo-ocean.eu
+  distribution_version: v3.3
+  programming_language:
+    - Fortran 90
+  software_requirements: NetCDF, MPI, Fortran compiler
+  hardware_requirements: HPC system
+  execution_instructions: "Compile with provided scripts, run using namelist config files"
+  parallel_execution: true
+  implementation_verification: Validated via reference configurations
+  source_code_availability: true
+
+  input:
+    description: "Initial and boundary conditions for ocean state variables; optionally, biogeochemical feedback fields from PlankTOM10."
+    format: NetCDF
+    variables:
+      - Bathymetry, initial T/S fields, surface forcing (winds, heat, freshwater flux)
+      - OPTIONAL from PlankTOM10: biologically mediated optical properties (light attenuation), air–sea gas flux modifiers (e.g., DMS influence on clouds via radiative forcing)
+    units: "various (°C, PSU, m/s, W m⁻², m⁻¹)"
+
+  integrated_input:
+    - uid: PlankTOM10_2010
+      version: "2010"
+      description: "Biogeochemical feedbacks influencing physical light climate or fluxes"
+
+  output:
+    format:
+      - NetCDF
+    variables:
+      - Temperature (T)
+      - Salinity (S)
+      - 3D velocities (u,v,w)
+      - Mixed layer depth (MLD)
+      - Sea ice cover/thickness
+      - Shortwave radiation at depth
+    units: "°C, PSU, m/s, m, W m⁻²"
+    verification: "Compared against climatologies and observations"
+
+  integration:
+    pattern: ""
+    submodels:
+      - "Ocean physics core"
+    execution_constraints: "Consistent grid and timestep with PlankTOM10"
+    data_synchronization: "Physical state variables passed each timestep to PlankTOM10; optional feedbacks received"
+
+  authors:
+    - name: Madec, G.
+      role: Lead model developer

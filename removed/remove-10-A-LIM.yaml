@@ -1,0 +1,81 @@
+LIM:
+  title: "LIM: Louvain-la-Neuve Sea-Ice Model"
+  unique_identifier: "LIM_UCL_1997_1999"
+  model_version: "dynamic–thermodynamic LIM (as used in ORCA2-LIM)"
+  description: "Two-dimensional dynamic–thermodynamic sea-ice model with a three-layer thermodynamics scheme (snow: 1 layer; ice: 2 layers) and viscous–plastic (VP) rheology; advection via second-order moments (Prather) and parameterized lead formation/closure. Designed for climate studies and coupled to OPA in ORCA2-LIM." :contentReference[oaicite:0]{index=0}
+  keywords:
+    - Sea ice
+    - VP rheology
+    - Thermodynamics
+    - Leads and ridging
+    - Albedo parameterization
+    - High latitudes
+  model_type: "Mechanistic"
+  scope: "Global (Arctic and Antarctic) when coupled; climate to decadal scales" :contentReference[oaicite:1]{index=1}
+  purpose_pattern:
+    purpose: "Simulate realistic sea-ice extent, thickness, and drift for climate applications and high-latitude process studies" :contentReference[oaicite:2]{index=2}
+    pattern: "2-D continuum mechanics with VP rheology and multilayer thermodynamics; coupled momentum/heat/salt exchange with ocean" :contentReference[oaicite:3]{index=3}
+  assumptions:
+    - "Sea ice treated as a 2-D continuum with VP rheology (Hibler-type)." :contentReference[oaicite:4]{index=4}
+    - "Effective thermal conductivity assumes uniform subgrid thickness distribution (0–2× mean)." :contentReference[oaicite:5]{index=5}
+    - "Albedo parameterized by surface state and snow/ice thickness." :contentReference[oaicite:6]{index=6}
+    - "Snow-ice formation when snow depresses surface below sea level." :contentReference[oaicite:7]{index=7}
+  links_to_publications_and_reports:
+    - "Fichefet & Morales Maqueda (1997, 1999) — LIM descriptions." :contentReference[oaicite:8]{index=8}
+    - "Goosse & Fichefet (1999) — ice–ocean interaction equations." :contentReference[oaicite:9]{index=9}
+    - "Timmermann et al. (2005), Ocean Modelling — ORCA2-LIM application." :contentReference[oaicite:10]{index=10}
+  conceptual_model_evaluation: "Based on established VP rheology and multilayer thermodynamics; widely used in global coupled setups." :contentReference[oaicite:11]{index=11}
+  uncertainty_analysis: "Scenario/style changes in rheology strength P* and lead parameter h0 explored in sensitivity tests." :contentReference[oaicite:12]{index=12}
+  sensitivity_analysis: "Impacts of ice strength (P*) and lead closing (h0) on thickness/extent; coupling choices affect drift." :contentReference[oaicite:13]{index=13}
+  parameters:
+    - name: "LIM_Core_Parameters"
+      description: "Key sea-ice dynamic and thermodynamic parameters used in ORCA2-LIM"
+      format: "YAML"
+      entries:
+        P_star_N_per_m2: 20000          # ice strength parameter in study setup :contentReference[oaicite:14]{index=14}
+        lead_closing_h0_m: 1.0          # high value to represent subgrid drift fluctuations :contentReference[oaicite:15]{index=15}
+        momentum_rheology: "Viscous–plastic (Hibler 1979)" :contentReference[oaicite:16]{index=16}
+        advection_scheme: "Prather (second-order moments)" :contentReference[oaicite:17]{index=17}
+        thermodynamics_layers: "Snow:1, Ice:2" :contentReference[oaicite:18]{index=18}
+        albedo_scheme: "Shine & Henderson-Sellers with clear/overcast adjustments" :contentReference[oaicite:19]{index=19}
+  datasets: []
+  integrated_input: []
+  data_evaluation: "Validated within ORCA2-LIM against satellite ice concentration, ULS thickness, and drift climatologies." :contentReference[oaicite:20]{index=20}
+  data:
+    format: ["NetCDF"]
+    variables: "Ice concentration, thickness, drift, snow/ice enthalpy, brine reservoir" :contentReference[oaicite:21]{index=21}
+    units: "%, m, m/s, J/m²"
+  model_output_verification: "Compared against observed ice extent/seasonal cycle and ULS thickness records" :contentReference[oaicite:22]{index=22}
+  model_output_corroboration: "Captures realistic growth/decay cycles and drift patterns with noted regional biases" :contentReference[oaicite:23]{index=23}
+  calibration_tools_data: "Choice of P* and h0 tuned for coarse-resolution realism" :contentReference[oaicite:24]{index=24}
+  validation_capabilities: "Arctic/Antarctic extent, seasonal variability, and drift comparisons" :contentReference[oaicite:25]{index=25}
+  dimensionality: "2D (plan-view) with multilayer thermodynamics"
+  spatial_extent: "Global sea-ice cover (when coupled)"
+  spatial_resolution: "Follows host ocean grid (e.g., ORCA2 ≈2° mean; ~50–65 km at high latitudes)" :contentReference[oaicite:26]{index=26}
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-decadal simulations"
+  time_steps_temporal_resolution: "Coupled every few ocean steps; diagnostics monthly/daily" :contentReference[oaicite:27]{index=27}
+  variable_temporal_resolution: true
+  programming_language: ["Fortran"]
+  availability_of_source_code: "Not specified in paper; distributed historically with coupled frameworks (e.g., CLIO/ORCA)." :contentReference[oaicite:28]{index=28}
+  implementation_verification: "Reproduces large-scale observed patterns in coupled mode" :contentReference[oaicite:29]{index=29}
+  error_handling: "Model-internal (not standardized in paper)"
+  software_specification_and_requirements: "NetCDF I/O; coupled driver for flux exchanges"
+  hardware_specification_and_requirements: "Workstation to HPC (resolution-dependent)"
+  execution_instructions: "Run coupled with ocean using specified flux exchange and parameter set; initialize with ice/snow thickness fields." :contentReference[oaicite:30]{index=30}
+  parallel_execution: true
+  integration_pattern: "Two-way coupled to ocean (momentum, heat, freshwater)" :contentReference[oaicite:31]{index=31}
+  unique_identifier_of_submodels: []
+  execution_constraints: "Coarse grids under-resolve narrow features; parameters P*, h0 matter" :contentReference[oaicite:32]{index=32}
+  acknowledgment_protocols: null
+  latency_expectations: null
+  data_synchronization: "At coupling intervals with ocean"
+  license: "Unspecified (paper)"
+  landing_page: null
+  distribution_version: "As used in ORCA2-LIM (2005 application)" :contentReference[oaicite:33]{index=33}
+  file_formats: ["NetCDF"]
+  authors:
+    - name: "Thierry Fichefet"
+      role: "LIM development"
+    - name: "Luis A. Morales Maqueda"
+      role: "LIM development"

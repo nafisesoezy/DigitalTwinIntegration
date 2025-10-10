@@ -1,0 +1,93 @@
+CanAM4:
+  title: Canadian Atmospheric Model version 4 (CanAM4)
+  unique_identifier: CanAM4_2013
+  model_version: v4
+  description: A spectral atmospheric general circulation model used in the CanESM2 Earth system model. Simulates atmospheric processes including radiation, cloud physics, and dynamics.
+  keywords:
+    - Atmospheric model
+    - Radiation
+    - Cloud processes
+    - Spectral GCM
+    - Climate modeling
+  model_type: Mechanistic
+  scope: Global atmospheric dynamics and climate
+  purpose_pattern:
+    purpose: Simulate atmospheric circulation and energy balance in Earth system models
+    pattern: Spectral dynamical core with physical parameterizations
+  assumptions:
+    - Hydrostatic balance
+    - Spherical harmonics basis for spectral core
+    - Radiative forcing from GHGs and aerosols
+  dimensionality: 3D
+  spatial_extent: Global atmosphere
+  spatial_resolution: "T63 (~2.8° x 2.8°)"
+  variable_spatial_resolution: false
+  temporal_extent: Multi-decadal
+  temporal_resolution: 30 min to 1 hr
+  variable_temporal_resolution: false
+  calibration_tools_data: Tuned to reproduce observed climatology
+  publications:
+    - Fyfe et al., 2013
+  conceptual_evaluation: Extensively used in CMIP5 and CanESM2
+  validation_capabilities: Validated against ERA-Interim and satellite data
+  sensitivity_analysis: Supported via parameter ensemble experiments
+  uncertainty_analysis: Scenario-based exploration
+  error_handling: Failsafes for model divergence
+  license: Institutional (CCCR/CCCma)
+  landing_page: https://climate-modelling.canada.ca/climatemodels/canesm2/
+  distribution_version: v4
+  programming_language:
+    - Fortran
+  software_requirements: NetCDF, MPI, Fortran compiler
+  hardware_requirements: HPC cluster required
+  execution_instructions: Configured via CanESM2 experiment setup
+  parallel_execution: true
+  implementation_verification: Tested via CMIP protocols
+  source_code_availability: false
+  parameters: []
+  datasets: []
+  integrated_input:
+    - uid: NCOM1.3_2013
+      version: v1.3
+      description: Ocean surface state used for lower boundary conditions (SST, SIC, SITh, currents, SSH) provided via the CanESM2 internal coupler
+  data_evaluation: "Coupler diagnostics for flux conservation; checks on land/sea masks and grid remapping weights"
+  input:
+    description: Ocean lower-boundary fields from NCOM1.3 (exchanged via the CanESM2 internal coupler)
+    format: NetCDF (coupler-mediated exchange fields)
+    variables:
+      - Sea surface temperature (SST)
+      - Sea surface salinity (SSS) OPTIONAL
+      - Sea ice concentration (SIC)
+      - Sea ice thickness (SITh) OPTIONAL
+      - Ocean surface currents (u_ocean, v_ocean)
+      - Sea surface height (SSH) OPTIONAL
+    units: "°C, PSU, 0–1 (fraction), m, m s⁻¹, m"
+  output:
+    format:
+      - NetCDF
+    variables:
+      - Surface wind stress (tau_x, tau_y)
+      - 10 m wind (u10, v10) OPTIONAL
+      - Net shortwave radiation at surface (SW_down)
+      - Net longwave radiation at surface (LW_down)
+      - Sensible heat flux (Q_sens)
+      - Latent heat flux (Q_lat)
+      - Precipitation rate (P)
+      - Evaporation rate (E)
+      - Freshwater flux (P_minus_E)
+      - Runoff flux (R) OPTIONAL
+      - Mean sea level pressure (MSLP)
+      - Downwelling PAR at surface OPTIONAL
+    units: "N m⁻²; m s⁻¹; W m⁻²; W m⁻²; W m⁻²; W m⁻²; kg m⁻² s⁻¹; kg m⁻² s⁻¹; kg m⁻² s⁻¹; kg m⁻² s⁻¹; hPa; W m⁻²"
+    verification: Compared against reanalysis data
+  integration:
+    pattern: ""
+    submodels: []
+    execution_constraints: "Coupling timestep aligned with ocean (e.g., hourly–6-hourly); conservative flux remapping; synchronized calendars"
+    acknowledgment: ""
+    latency_expectations: "Exchange each coupling step via CanESM2 internal coupler"
+    data_synchronization: "Fluxes (atm→ocn) sent; surface state (ocn→atm) received through coupler with grid remapping"
+  authors:
+    - name: Fyfe, J.C.
+      orcid: ""
+      role: Modeling and climate simulation

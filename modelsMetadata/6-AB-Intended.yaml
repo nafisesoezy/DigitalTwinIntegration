@@ -1,0 +1,94 @@
+Intended_Model:
+  title: "User-Defined Embedded Atmosphere–Lake Modeling Framework"
+  unique_identifier: ""
+  model_version: ""
+  description: >
+    A conceptual integration plan for embedding a one-dimensional lake model within a
+    regional atmospheric model. The intended goal is to represent two-way interactions
+    between lake surfaces and the overlying atmosphere, including heat, moisture, and
+    momentum exchanges, as well as seasonal ice/snow cover on lakes. Model components
+    are not yet selected.
+
+  keywords:
+    - Atmosphere–lake coupling
+    - Surface fluxes
+    - Lake ice and snow
+    - Lower boundary condition
+    - Climate and weather simulation
+    - Embedded modeling
+
+  model_type: "Mechanistic"
+  scope: "Regional atmospheric domains containing inland water bodies"
+  purpose_pattern:
+    purpose: "Simulate feedbacks between lake surface states and atmospheric conditions"
+    pattern: "Embedded coupling of a 1-D lake column into the atmospheric surface scheme"
+
+  assumptions:
+    - "Atmospheric model provides near-surface meteorological and radiative forcing to lake"
+    - "Lake model returns surface state variables and fluxes for atmospheric lower boundary"
+    - "Compatible time step and spatial grid over lake grid points"
+    - "Energy and mass are conserved at the interface"
+
+  dimensionality: ""
+  spatial_extent: ""
+  spatial_resolution: ""
+  variable_spatial_resolution: ""
+  temporal_extent: ""
+  temporal_resolution: ""
+  variable_temporal_resolution: ""
+
+  calibration_tools_data: ""
+  publications: []
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+  error_handling: ""
+
+  license: ""
+  landing_page: ""
+  distribution_version: ""
+  programming_language: ""
+  software_requirements: ""
+  hardware_requirements: ""
+  execution_instructions: ""
+  parallel_execution: ""
+  implementation_verification: ""
+  source_code_availability: ""
+
+  parameters: []
+
+  datasets:
+    - uid: ""
+      version: ""
+      access_url: ""
+      dependencies: []
+
+  integrated_input:
+    - uid: ""
+      version: ""
+      description: "Expected input such as 2-m air temperature, humidity, wind speed, precipitation, and radiative fluxes from the atmospheric model"
+
+  data_evaluation: ""
+
+  output:
+    format: []
+    variables: ""
+    units: ""
+    verification: ""
+    corroboration: ""
+
+  integration:
+    pattern: "embedded coupling"
+    submodels:
+      - "Atmospheric model (e.g., TBD)"
+      - "1-D lake model (e.g., TBD)"
+    execution_constraints: "Synchronous coupling at physics time step with shared grid cell ownership over lakes"
+    acknowledgment: ""
+    latency_expectations: ""
+    data_synchronization: "Two-way in-memory exchange each coupling step"
+
+  authors:
+    - name: ""
+      orcid: ""
+      role: "Integration designer / user"

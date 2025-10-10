@@ -1,0 +1,72 @@
+AgentBasedLandUse:
+  title: Agent-Based Land-Use Model
+  unique_identifier: ABM_LandUse_ES_2013
+  model_version: '1.0'
+  description: A spatially explicit agent-based model simulating land-use decisions
+    by individual agents, considering economic, policy, and environmental factors.
+  keywords:
+  - Agent-based modeling
+  - Land-use change
+  - Spatial simulation
+  - Decision-making
+  - Policy impact
+  model_type: Mechanistic
+  scope: Regional landscapes (parcel-level land-use)
+  purpose_pattern:
+    purpose: Simulate land-use decisions under different policy and economic scenarios
+    pattern: Autonomous agent decisions on spatial grid
+  assumptions:
+  - Agent decisions influenced by utility, neighbors, and regulations
+  - Each land unit belongs to one agent
+  - Spatial decision rules are uniform within agent types
+  dimensionality: 2D
+  spatial_extent: Agricultural region
+  spatial_resolution: Parcel/grid cell (~1 ha)
+  variable_spatial_resolution: false
+  temporal_extent: Multi-decadal
+  temporal_resolution: Annual
+  variable_temporal_resolution: false
+  calibration_tools_data: Historical land-use and agent behavior data
+  publications:
+  - 'Paper: An Agent-Based Model Integrating Land-Use Change and Ecosystem Services
+    (2013)'
+  conceptual_evaluation: Behavioral rules and agent structure validated against theory
+  validation_capabilities: Calibrated against historical land use maps
+  sensitivity_analysis: Tested across parameter sweeps (utility weights, policy levers)
+  uncertainty_analysis: Scenario-based analysis of decision rules
+  error_handling: Conflict resolution rules, boundary constraints
+  license: Academic use
+  landing_page: ''
+  distribution_version: '1.0'
+  programming_language:
+  - NetLogo
+  - Java
+  software_requirements: NetLogo runtime or Java agent framework
+  hardware_requirements: Desktop/laptop
+  execution_instructions: Configure agent parameters and run via model GUI or CLI
+  parallel_execution: false
+  implementation_verification: Internal consistency and logical trace of agent decisions
+  source_code_availability: false
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format:
+    - CSV
+    - Raster
+    variables: Land use per grid cell, agent decisions
+    units: categorical
+    verification: Comparison with real-world land cover
+    corroboration: ''
+  integration:
+    pattern: null
+    submodels: []
+    execution_constraints: null
+    acknowledgment: Authors of 2013 model
+    latency_expectations: ''
+    data_synchronization: ''
+  authors:
+  - name: Parker D.C.
+    orcid: ''
+    role: Agent-based modeling and integration

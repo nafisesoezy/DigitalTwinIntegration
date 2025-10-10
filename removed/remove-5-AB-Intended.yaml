@@ -1,0 +1,65 @@
+Intended_Model:
+  title: Intended Coupled Hydrodynamic and Biogeochemical Model
+  unique_identifier: ''
+  model_version: ''
+  description: "\n            A conceptual placeholder for an integrated modeling\
+    \ system that couples physical hydrodynamic processes \n            with ecological\
+    \ and water quality dynamics in coastal or lagoon systems. Specific model components\
+    \ will \n            be selected based on accuracy, compatibility, and data availability.\n\
+    \        "
+  keywords:
+  - Hydrodynamic-ecological coupling
+  - Water quality
+  - Nutrient transport
+  - Model integration
+  model_type: Mechanistic
+  scope: ''
+  purpose_pattern:
+    purpose: Simulate interactions between physical transport and biogeochemical processes
+    pattern: Modular integration (hydrodynamic + ecological model)
+  assumptions: []
+  dimensionality: ''
+  spatial_extent: ''
+  spatial_resolution: ''
+  variable_spatial_resolution: ''
+  temporal_extent: ''
+  temporal_resolution: ''
+  variable_temporal_resolution: ''
+  calibration_tools_data: ''
+  publications: []
+  conceptual_evaluation: ''
+  validation_capabilities: ''
+  sensitivity_analysis: ''
+  uncertainty_analysis: ''
+  error_handling: ''
+  license: ''
+  landing_page: ''
+  distribution_version: ''
+  programming_language: ''
+  software_requirements: ''
+  hardware_requirements: ''
+  execution_instructions: ''
+  parallel_execution: ''
+  implementation_verification: ''
+  source_code_availability: ''
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format: []
+    variables: ''
+    units: ''
+    verification: ''
+    corroboration: ''
+  integration:
+    pattern: ''
+    submodels: []
+    execution_constraints: ''
+    acknowledgment: ''
+    latency_expectations: ''
+    data_synchronization: ''
+  authors:
+  - name: ''
+    orcid: ''
+    role: User-defined integration

@@ -1,0 +1,111 @@
+Integrated_Model:
+  title: "Coupled NEMO–ECWAM Ocean-Wave Modeling System"
+  unique_identifier: "NEMO_ECWAM_Coupled_Model_2015"
+  model_version: "NEMO v3.4 + ECWAM CY38R1"
+  description: >
+    A fully coupled wave–ocean modeling system integrating NEMO (ocean general circulation model) 
+    and ECWAM (spectral wave model) to account for surface wave effects in ocean dynamics. 
+    The coupling enables exchange of wave-modified surface stress, Stokes drift, and turbulent 
+    kinetic energy flux from breaking waves, improving realism in upper-ocean processes and air–sea interaction.
+
+  keywords:
+    - Wave–ocean interaction
+    - Stokes drift
+    - Ocean mixing
+    - Coupled modeling
+    - Surface stress
+    - TKE injection
+
+  model_type: "Mechanistic"
+  scope: "Global and regional oceans with wave-affected surface layer dynamics"
+  purpose_pattern:
+    purpose: "Simulate realistic ocean dynamics including surface wave effects on mixing and momentum flux"
+    pattern: "Two-way coupled ocean–wave model exchanging momentum and turbulence fields"
+
+  assumptions:
+    - "Stokes drift affects upper-ocean mixing"
+    - "Wave breaking injects turbulence at surface"
+    - "Wave-modified stress alters momentum input into the ocean"
+    - "Coupling is achieved through shared fields and compatible spatial grids"
+
+  dimensionality: "3D (ocean), 2D spectral (waves)"
+  spatial_extent: "Global or regional (e.g., North Atlantic test domain)"
+  spatial_resolution: "1/4° horizontal ocean grid; wave model matched to ECMWF grid"
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-year simulations"
+  temporal_resolution: "Hourly–daily"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: "Tested using observed wind forcing and ocean reanalysis datasets"
+  publications:
+    - "Breivik et al. 2015, JGR Oceans"
+  conceptual_evaluation: "Demonstrated improvement in MLD and SST realism compared to uncoupled runs"
+  validation_capabilities: "Verified using satellite and buoy data (wave height, SST, MLD)"
+  sensitivity_analysis: "Evaluated influence of Stokes drift, TKE, and stress separately"
+  uncertainty_analysis: "Scenario comparisons for different coupling configurations"
+  error_handling: "Implemented via diagnostics in NEMO and ECWAM"
+
+  license: "NEMO under CeCILL-C; ECWAM via ECMWF license"
+  landing_page: "https://www.nemo-ocean.eu/"
+  distribution_version: "2015 release"
+  programming_language:
+    - "Fortran"
+  software_requirements: "OASIS coupler (optional), netCDF, MPI"
+  hardware_requirements: "HPC recommended for long simulations"
+  execution_instructions: >
+    Configure NEMO and ECWAM with consistent domains. Enable wave-related physics in NEMO. 
+    Input ECWAM fields (Stokes drift, wave stress, TKE flux) at coupling interval.
+  parallel_execution: true
+  implementation_verification: "Benchmarked via twin experiments (forced vs. coupled runs)"
+  source_code_availability: "Available for NEMO; ECWAM under ECMWF licensing terms"
+
+  parameters:
+    - name: "Coupling_Params"
+      description: "Frequency of coupling, choice of wave variables to use"
+      format: "namelist"
+      unit: "various"
+      datatype: "float"
+      valid_range: "Documented in model configs"
+      CRS: "Regular or ORCA grid"
+      default_values: "1–3 hour coupling interval"
+
+  datasets:
+    - uid: "Wave_Ocean_Forcing_2015"
+      version: "2015"
+      access_url: ""
+      dependencies:
+        - "Wind forcing from ECMWF"
+        - "Initial ocean state"
+        - "Bathymetry, coastline, and ice masks"
+
+  integrated_input:
+    - uid: "ECWAM_Output"
+      version: "CY38R1"
+      description: "Stokes drift, wave stress, and surface TKE flux to NEMO"
+
+  data_evaluation: "Comparison with observed wave height, MLD, and SST patterns"
+
+  output:
+    format:
+      - "NetCDF"
+    variables: "Ocean velocity, SST, MLD, wave stress, TKE flux"
+    units: "°C, m/s, m, N/m²"
+    verification: "SST and MLD compared to satellite and reanalysis data"
+    corroboration: "Coupled runs match observed upper-ocean structure more closely than uncoupled NEMO"
+
+  integration:
+    pattern: "Loose"
+    submodels:
+      - "NEMO ocean model"
+      - "ECWAM wave model"
+    execution_constraints: "Coupling interval must match dynamic response scales (e.g., 1–3 hours)"
+    acknowledgment: "NEMO and ECMWF modeling teams"
+    latency_expectations: "Wave model outputs must be available at ocean model time steps"
+    data_synchronization: "Interpolation used to match coupling intervals"
+
+  authors:
+    - name: "Øyvind Breivik"
+      orcid: "https://orcid.org/0000-0001-7016-8023"
+      role: "Lead integration and coupling experiments"
+    - name: "Jean-Marc Molines"
+      role: "Ocean model development (NEMO core)"

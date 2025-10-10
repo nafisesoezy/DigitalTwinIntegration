@@ -1,0 +1,91 @@
+OPA:
+  title: "OPA 8.2: Océan Parallélisé Ocean General Circulation Model"
+  unique_identifier: "OPA_IPSL_8.2_1999"
+  model_version: "8.2 (study)"
+  description: >
+    Hydrostatic, primitive-equation OGCM with free surface; includes isopycnal mixing,
+    Gent–McWilliams eddy advection, TKE vertical mixing, double diffusion, and a bottom
+    boundary-layer scheme. Coupled to LIM for sea-ice interactions.
+  keywords:
+    - OGCM
+    - Free surface
+    - Isopycnal mixing
+    - Gent–McWilliams
+    - TKE closure
+    - Double diffusion
+  model_type: "Mechanistic"
+  scope: "Global ocean circulation with focus on high latitudes when coupled (ORCA2 grid)"
+  purpose_pattern:
+    purpose: "Simulate large-scale ocean dynamics, stratification, and circulation across basins"
+    pattern: "z-level finite-difference OGCM with parameterized mesoscale and vertical mixing"
+  assumptions:
+    - "Hydrostatic, Boussinesq primitive equations; nonlinear EOS."
+    - "Parameterized mesoscale eddies via GM90; level-1.5 TKE for vertical mixing."
+    - "Bottom boundary-layer scheme for dense overflows."
+  dimensionality: "3D"
+  spatial_extent: "Global (78°S–90°N in ORCA2)"
+  spatial_resolution: "ORCA2 tripolar grid: ~2° mean"
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-decadal"
+  temporal_resolution: "96 min timestep in study"
+  variable_temporal_resolution: true
+  calibration_tools_data: "SSS restoring used to limit drift; runoff climatologies specified"
+  publications:
+    - "Madec et al. (1999)"
+    - "Timmermann et al. (2005)"
+  conceptual_evaluation: "Extensively validated in tropics and high latitudes"
+  validation_capabilities: "Supports multi-decadal hindcasts with combined reanalysis/climatology forcing"
+  sensitivity_analysis: "Forcing choices and parameter changes affect results"
+  uncertainty_analysis: "Mixing coefficients, GM parameters, restoring choices tested"
+  error_handling: "Basic runtime checks"
+  license: "Unspecified (paper)"
+  landing_page: "http://www.lodyc.jussieu.fr/opa/"
+  distribution_version: "8.2 (study)"
+  programming_language:
+    - "Fortran 90/95"
+  software_requirements: "NetCDF I/O; tripolar grid support"
+  hardware_requirements: "Workstation to HPC"
+  execution_instructions: "Initialize from PHC; apply forcing and coupling with LIM"
+  parallel_execution: true
+  implementation_verification: "Validated in coupled and uncoupled modes"
+  source_code_availability: "Historically available via LODYC/IPSL"
+
+  input:
+    description: "Sea-ice state and fluxes from LIM"
+    format: "NetCDF (via coupler)"
+    variables:
+      - ice_concentration         # %
+      - ice_thickness             # m
+      - snow_thickness            # m
+      - ice_ocean_freshwater_flux # m/s
+      - ice_ocean_heat_flux       # W/m²
+      - ice_ocean_momentum_stress # N/m²
+    units: "%, m, m, m/s, W/m², N/m²"
+
+  integrated_input:
+    - uid: "LIM_UCL_1997_1999"
+      version: "dynamic–thermodynamic LIM"
+      description: "Sea-ice thermodynamic and dynamic state plus ice–ocean fluxes"
+
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - sea_surface_temperature   # °C
+      - sea_surface_salinity      # PSU
+      - ocean_surface_currents_u  # m/s
+      - ocean_surface_currents_v  # m/s
+      - mixed_layer_depth         # m
+      - downwelling_shortwave_radiation # W/m²
+      - downwelling_longwave_radiation  # W/m²
+    verification: "Circulation and hydrography compared to observations; convection sites reproduced"
+
+
+  integration:
+    pattern: "Two-way coupling via flux exchange"
+    submodels: []
+    execution_constraints: "Consistent timestep and grid with LIM"
+    data_synchronization: "Fluxes exchanged each coupling interval"
+  authors:
+    - name: "Gurvan Madec"
+      role: "Lead developer (OPAv8 series)"

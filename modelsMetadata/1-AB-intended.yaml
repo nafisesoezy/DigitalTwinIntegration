@@ -1,0 +1,82 @@
+Intended_Model:
+  title: "Integrated Lake Ecosystem and Service Modeling Framework"
+  unique_identifier: ""
+  model_version: ""
+  description: >
+    A conceptual framework to integrate a physical lake model with an ecological process model
+    and an ecosystem service evaluation module. The goal is to simulate the influence of
+    restoration and climate scenarios on ecological state and ecosystem service provisioning
+    in freshwater lake systems. Specific model components will be selected based on fitness
+    for purpose and availability.
+  keywords:
+    - Ecosystem services
+    - Lake modeling
+    - Model integration
+    - Restoration assessment
+    - Climate impact
+    - Model coupling
+  model_type: "Mechanistic"
+  scope: "Freshwater lakes and reservoirs"
+  purpose_pattern:
+    purpose: "Simulate physical and ecological lake processes and translate ecological outcomes into ecosystem service provisioning metrics"
+    pattern: "One-way transfer from physical to ecological model"
+  assumptions:
+    - "1D vertical structure (tentative)"
+    - "Physical lake processes can influence ecological dynamics"
+    - "Ecosystem services can be inferred from ecological state indicators"
+    - "No feedback from ecological model to physical model"
+  dimensionality: ""
+  spatial_extent: ""
+  spatial_resolution: ""
+  variable_spatial_resolution: ""
+  temporal_extent: ""
+  temporal_resolution: ""
+  variable_temporal_resolution: ""
+  calibration_tools_data: ""
+  publications: []
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+  error_handling: ""
+  license: ""
+  landing_page: ""
+  distribution_version: ""
+  programming_language: ""
+  software_requirements: ""
+  hardware_requirements: ""
+  execution_instructions: ""
+  parallel_execution: ""
+  implementation_verification: ""
+  source_code_availability: ""
+  parameters: []
+  datasets:
+    - uid: ""
+      version: ""
+      access_url: ""
+      dependencies: []
+  integrated_input:
+    - uid: ""
+      version: ""
+      description: "Output from physical lake model (e.g., temperature profile, mixing depth)"
+  data_evaluation: ""
+  output:
+    format: []
+    variables: ""
+    units: ""
+    verification: ""
+    corroboration: ""
+  integration:
+    pattern: "one-way"
+    submodels:
+      - "Physical lake model (to simulate hydrodynamics and temperature)"
+      - "Ecological model (to simulate biogeochemistry, vegetation, trophic interactions)"
+      - "Ecosystem service evaluation module (to translate ecological indicators into service metrics)"
+    execution_constraints: "Physical model output serves as boundary condition for ecological model"
+    acknowledgment: "Submodel selection and coupling mechanism TBD"
+    latency_expectations: "Batch/offline"
+    data_synchronization: "Post-run file-based"
+  authors:
+    - name: ""
+      orcid: ""
+      role: ""

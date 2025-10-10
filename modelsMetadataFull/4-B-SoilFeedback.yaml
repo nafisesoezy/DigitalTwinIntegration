@@ -1,0 +1,98 @@
+SoilFeedback:
+  title: "Cellular Automaton-Based Soil Feedback Model"
+  unique_identifier: "SoilFeedback_Model_2017"
+  model_version: "1.0"
+  description: >
+    A grid-based model tracking plant-induced soil autotoxicity accumulation, decay,
+    and spatial diffusion. Designed to couple with IBM vegetation model in a loose feedback loop.
+  keywords:
+    - Soil feedback
+    - Cellular automaton
+    - Plant–soil interaction
+    - Ecological memory
+    - Negative feedback
+  model_type: "Mechanistic"
+  scope: "Patch- to landscape-scale vegetation–soil feedback dynamics"
+  purpose_pattern:
+    purpose: "Simulate accumulation, decay, and spread of plant-specific soil feedback effects"
+    pattern: "Grid-based dynamic updates based on IBM plant biomass/density inputs"
+  assumptions:
+    - Soil conditions modified proportionally to local plant biomass/density
+    - Feedback reduces germination probability for conspecifics
+    - Soil memory decays at constant rate
+    - Effects are species-specific
+  dimensionality: "2D"
+  spatial_extent: "Same grid as IBM"
+  spatial_resolution: "User-defined, matching IBM cell size"
+  variable_spatial_resolution: false
+  temporal_extent: "Multi-year"
+  temporal_resolution: "Annual updates, possible sub-annual decay"
+  variable_temporal_resolution: false
+  calibration_tools_data: "Pattern-based calibration to match known vegetation–soil patterns"
+  publications:
+    - "Vincenot et al., 2017"
+  conceptual_evaluation: "Validated via emergent pattern reproduction"
+  validation_capabilities: "No empirical soil chemistry; patterns match theory"
+  sensitivity_analysis: "Feedback strength, decay rate varied"
+  uncertainty_analysis: "Scenario-based"
+  error_handling: "Valid toxicity checks; prevents negative values"
+  license: "CC BY"
+  landing_page: "http://christian.vincenot.biz/models.html"
+  distribution_version: "1.0"
+  programming_language:
+    - "C++"
+    - "NetLogo"
+  software_requirements: "Grid-based CA platform or custom code"
+  hardware_requirements: "Standard workstation"
+  execution_instructions: "Run annually, taking IBM biomass/density maps as input"
+  parallel_execution: false
+  implementation_verification: "Produces theoretical PSNF patterns"
+  source_code_availability: false
+
+  input:
+    description: "Annual plant biomass and density maps from IBM"
+    format: "CSV or in-memory structure"
+    variables:
+      - plant_biomass_per_cell   # g m⁻²
+      - plant_density_per_cell   # count m⁻²
+      - species_identity_per_cell
+    units:
+      - "g m⁻²"
+      - "count m⁻²"
+  integrated_input:
+    - uid: "IBM_Vegetation_Model_2017"
+      version: "1.0"
+      description: "Provides plant biomass/density maps for toxicity updates"
+
+  parameters:
+    - name: "Soil feedback parameters"
+      description: "Decay rate, feedback strength, diffusion radius, species-specific sensitivity"
+      format: "Table"
+      unit: "varies"
+      datatype: "float"
+      valid_range: "Positive ecological bounds"
+
+  output:
+    format:
+      - "CSV"
+      - "Text"
+    variables:
+      - soil_toxicity_per_cell             # dimensionless
+      - modified_germination_prob_per_cell # probability
+    units:
+      - "dimensionless"
+      - "probability (0–1)"
+    verification: "Spatial toxicity gradients vs. theory"
+    corroboration: "Explains patchiness and Janzen–Connell gaps"
+
+  integration:
+    submodels: []
+    execution_constraints: "Must run after IBM each timestep"
+    acknowledgment: "Vincenot et al., 2017"
+    latency_expectations: "Annual coupling step"
+    data_synchronization: "Grids must be aligned at each coupling step"
+
+  authors:
+    - name: "Vincent Vincenot"
+      orcid: "http://orcid.org/0000-0002-2386-1626"
+      role: "Model development"

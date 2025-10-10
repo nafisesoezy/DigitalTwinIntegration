@@ -1,0 +1,65 @@
+AB-Intended:
+  title: "Intended Coupled Atmosphere–Ocean Climate Modeling Framework"
+  unique_identifier: ''
+  model_version: ''
+  description: |
+    A generic metadata template for developing coupled climate models combining atmospheric and ocean circulation components with embedded biogeochemistry.
+    Suitable for exploring feedbacks between aerosol forcing, radiative processes, nutrient cycles, and ocean heat transport.
+  keywords:
+    - Coupled modeling
+    - Climate feedbacks
+    - Atmosphere–ocean interactions
+    - Earth system
+  model_type: ''
+  scope: ''
+  purpose_pattern:
+    purpose: Enable co-evolution of atmospheric, oceanic, and biogeochemical states in climate scenarios
+    pattern: Modular AGCM + OGCM + BGC with coupling interface
+  assumptions: []
+  dimensionality: ''
+  spatial_extent: ''
+  spatial_resolution: ''
+  variable_spatial_resolution: ''
+  temporal_extent: ''
+  temporal_resolution: ''
+  variable_temporal_resolution: ''
+  calibration_tools_data: ''
+  publications: []
+  conceptual_evaluation: ''
+  validation_capabilities: ''
+  sensitivity_analysis: ''
+  uncertainty_analysis: ''
+  error_handling: ''
+  license: ''
+  landing_page: ''
+  distribution_version: ''
+  programming_language: ''
+  software_requirements: ''
+  hardware_requirements: ''
+  execution_instructions: ''
+  parallel_execution: ''
+  implementation_verification: ''
+  source_code_availability: ''
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format: []
+    variables: ''
+    units: ''
+    verification: ''
+    corroboration: ''
+  integration:
+    pattern: "integrated Coupling"
+    submodels:
+      - "CanAM4 atmospheric model"
+      - "NCOM1.3 ocean model"
+    execution_constraints: "Coupler mediates conservative remapping; aligned coupling interval; consistent calendars and masks"
+    acknowledgment: ""
+    latency_expectations: "Exchange at defined coupling steps via CanESM2 internal coupler"
+    data_synchronization: "Atmosphere provides surface fluxes (stress, heat, freshwater, radiation) to ocean; ocean returns surface state (SST, SIC, currents, SSH) to atmosphere"
+  authors:
+    - name: ''
+      orcid: ''
+      role: ''

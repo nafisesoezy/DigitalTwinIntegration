@@ -1,0 +1,98 @@
+NCOM1.3:
+  title: NCAR Community Ocean Model version 1.3 (NCOM1.3)
+  unique_identifier: NCOM1.3_2013
+  model_version: v1.3
+  description: A 3D ocean general circulation model that simulates ocean currents, temperature, salinity, and mixing. Coupled with CanAM4 in the CanESM2 system.
+  keywords:
+    - Ocean model
+    - OGCM
+    - Climate model
+    - CanESM2
+    - Marine processes
+  model_type: Mechanistic
+  scope: Global ocean circulation
+  purpose_pattern:
+    purpose: Simulate oceanic processes for coupled climate modeling
+    pattern: Grid-based ocean GCM with vertical mixing schemes
+  assumptions:
+    - Boussinesq and hydrostatic approximations
+    - No tides or coastal detail in standard runs
+  dimensionality: 3D
+  spatial_extent: Global ocean
+  spatial_resolution: "1.4° x 1.4°, 40 vertical levels"
+  variable_spatial_resolution: false
+  temporal_extent: Multi-decadal
+  temporal_resolution: Hourly to daily
+  variable_temporal_resolution: false
+  calibration_tools_data: Tuned using ocean reanalysis and climatology
+  publications:
+    - Fyfe et al., 2013
+  conceptual_evaluation: Used in CanESM2 CMIP5 runs
+  validation_capabilities: Tested with observed ocean heat content and sea surface temp
+  sensitivity_analysis: Enabled via coupled perturbations
+  uncertainty_analysis: Long-term variability under forcing scenarios
+  error_handling: Tracer checks and restart systems
+  license: Institutional (CCCR)
+  landing_page: https://climate-modelling.canada.ca/
+  distribution_version: v1.3
+  programming_language:
+    - Fortran
+  software_requirements: Coupled into CanESM2
+  hardware_requirements: HPC required
+  execution_instructions: Run as component of CanESM2
+  parallel_execution: true
+  implementation_verification: Validated with Earth system output
+  source_code_availability: false
+
+  parameters: []
+  datasets: []
+  integrated_input:
+    - uid: CanAM4_2013
+      version: v4
+      description: Atmospheric surface fluxes and pressure forcing for ocean surface boundary conditions
+
+  data_evaluation: "Conservation checks for heat/freshwater/momentum; ice–ocean consistency; stability/CFL safeguards"
+
+  input:
+    description: Atmospheric surface forcing from CanAM4 (loose coupling with feedback enabled)
+    format: NetCDF (via coupler or exchange files)
+    variables:
+      - Surface wind stress (tau_x, tau_y)
+      - 10 m wind (u10, v10) OPTIONAL
+      - Net shortwave radiation at surface (SW_down)
+      - Net longwave radiation at surface (LW_down)
+      - Sensible heat flux (Q_sens)
+      - Latent heat flux (Q_lat)
+      - Precipitation rate (P)
+      - Evaporation rate (E)
+      - Freshwater flux (P_minus_E)
+      - Runoff flux (R) OPTIONAL
+      - Mean sea level pressure (MSLP)
+      - Downwelling PAR at surface OPTIONAL
+    units: "N m⁻²; m s⁻¹; W m⁻²; W m⁻²; W m⁻²; W m⁻²; kg m⁻² s⁻¹; kg m⁻² s⁻¹; kg m⁻² s⁻¹; kg m⁻² s⁻¹; hPa; W m⁻²"
+
+  output:
+    format:
+      - NetCDF
+    variables:
+      - Sea surface temperature (SST)
+      - Sea surface salinity (SSS)
+      - Ocean surface currents (u_ocean, v_ocean)
+      - Sea surface height (SSH)
+      - Sea ice concentration (SIC)
+      - Sea ice thickness (SITh)
+    units: "°C, PSU, m s⁻¹, m, 0–1 (fraction), m"
+    verification: Compared with reanalysis ocean datasets
+
+  integration:
+    pattern: "Loose coupling (two-way, feedback enabled)"
+    submodels: []
+    execution_constraints: "Consistent coupling timestep; conservative flux coupling; identical calendars/time-bases"
+    acknowledgment: ""
+    latency_expectations: "Exchange each coupling step"
+    data_synchronization: "Ocean surface state (ocn→atm) and fluxes (atm→ocn) exchanged via coupler with remapping and masking"
+
+  authors:
+    - name: Fyfe, J.C.
+      orcid: ""
+      role: Coupled modeling

@@ -1,0 +1,88 @@
+Intended_Model:
+  title: "Integrated Plant–Soil Feedback Simulation Model"
+  unique_identifier: ""
+  model_version: ""
+  description: >
+    A spatially explicit ecological simulation integrating an individual-based plant model
+    with a grid-based soil feedback model. Vegetation growth, mortality, and reproduction
+    are influenced by local soil conditions, while plant presence modifies soil properties.
+  keywords:
+    - Integrated ecological modeling
+    - Individual-based model
+    - Soil feedback
+    - Plant–soil interactions
+    - Spatial ecology
+  model_type: "Mechanistic"
+  scope: "Patch- to landscape-scale vegetation–soil feedback dynamics"
+  purpose_pattern:
+    purpose: "Simulate coupled vegetation and soil processes to explore how feedbacks shape spatial patterns and community structure"
+    pattern: "Loose coupling between agent-based vegetation submodel and grid-based soil feedback submodel"
+  assumptions:
+    - Both submodels use identical grid extents and resolutions
+    - Coupling occurs once per simulated year
+    - Variables are exchanged without unit conversions
+  calibration_tools_data: ""
+  publications: []
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+  error_handling: ""
+  license: ""
+  software_requirements: "NetCDF or CSV I/O; in-memory coupling possible"
+  hardware_requirements: ""
+  execution_instructions: "Run IBM, pass biomass/density to SoilFeedback, update soil toxicity, return to IBM"
+  parallel_execution: "Possible sequential or co-simulation"
+  implementation_verification: ""
+  source_code_availability: ""
+
+  integrated_input:
+    - uid: "IBM_Vegetation_Model_2017"
+      version: "1.0"
+      description: "Outputs biomass/density maps to SoilFeedback"
+    - uid: "SoilFeedback_Model_2017"
+      version: "1.0"
+      description: "Outputs soil toxicity and germination probabilities to IBM"
+
+  output:
+    format:
+      - "CSV"
+    variables: "Combined vegetation–soil maps for each coupling step"
+    units: "g m⁻², count m⁻², dimensionless toxicity, probability"
+    verification: "Cross-check against theoretical spatial patterns"
+    corroboration: "Reproduces known feedback-driven spatial structures"
+
+  integration:
+    pattern: "Loose"
+    submodels:
+      - "IBM vegetation submodel"
+      - "SoilFeedback submodel"
+    execution_constraints: "Same grid, same annual step; sequential run order: IBM → SoilFeedback → IBM"
+    acknowledgment: "Cite Vincenot et al., 2017"
+    latency_expectations: "Exchange annually"
+    data_synchronization: "Synchronized annual timestep; matching grids"
+
+  coupling_contract:
+    A_to_B:   # IBM → SoilFeedback
+      variables:
+        - name: plant_biomass_per_cell
+          unit: "g m⁻²"
+        - name: plant_density_per_cell
+          unit: "count m⁻²"
+        - name: species_identity_per_cell
+          unit: "category"
+      format: "CSV or in-memory"
+      cadence: "annual"
+    B_to_A:   # SoilFeedback → IBM
+      variables:
+        - name: soil_toxicity_per_cell
+          unit: "dimensionless"
+        - name: modified_germination_prob_per_cell
+          unit: "probability (0–1)"
+      format: "CSV or in-memory"
+      cadence: "annual"
+
+  authors:
+    - name: ""
+      orcid: ""
+      role: "Integration designer / user"

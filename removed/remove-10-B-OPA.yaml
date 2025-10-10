@@ -1,0 +1,79 @@
+OPA:
+  title: "OPA 8.2: Océan Parallélisé Ocean General Circulation Model"
+  unique_identifier: "OPA_IPSL_8.2_1999"
+  model_version: "8.2 (study); 8.1 manual cited"
+  description: "Hydrostatic, primitive-equation OGCM with free surface; lateral isopycnal mixing, Gent–McWilliams eddy advection, level-1.5 TKE vertical mixing, double diffusion, and a bottom boundary-layer scheme." :contentReference[oaicite:34]{index=34}
+  keywords:
+    - OGCM
+    - Free surface
+    - Isopycnal mixing
+    - Gent–McWilliams
+    - TKE closure
+    - Double diffusion
+  model_type: "Mechanistic"
+  scope: "Global ocean circulation with focus on high latitudes when coupled (ORCA2 grid)" :contentReference[oaicite:35]{index=35}
+  purpose_pattern:
+    purpose: "Simulate large-scale ocean dynamics, stratification, and circulation across basins"
+    pattern: "z-level finite-difference OGCM with parameterized mesoscale and vertical mixing" :contentReference[oaicite:36]{index=36}
+  assumptions:
+    - "Hydrostatic, Boussinesq primitive equations; nonlinear EOS (Jackett & McDougall)." :contentReference[oaicite:37]{index=37}
+    - "Parameterized mesoscale eddies via GM90; level-1.5 TKE for vertical mixing." :contentReference[oaicite:38]{index=38}
+    - "Bottom boundary-layer scheme for dense overflows." :contentReference[oaicite:39]{index=39}
+  links_to_publications_and_reports:
+    - "Madec et al. (1999) OPA reference manual (v8.1)." :contentReference[oaicite:40]{index=40}
+    - "Timmermann et al. (2005) application details." :contentReference[oaicite:41]{index=41}
+  conceptual_model_evaluation: "Extensively validated in tropics and used in coupled GCM studies; robust for basin-scale dynamics." :contentReference[oaicite:42]{index=42}
+  uncertainty_analysis: "Sensitivity to mixing coefficients, GM parameters, and restoring choices explored in study variants." :contentReference[oaicite:43]{index=43}
+  sensitivity_analysis: "Forcing choices (wind stress vs wind speed), SSS restoring, and parameter changes affect ice/ocean fields." :contentReference[oaicite:44]{index=44}
+  parameters:
+    - name: "OPA_Physics_Parameters"
+      description: "Core mixing and advection schemes"
+      format: "YAML"
+      entries:
+        lateral_tracer_mixing: "Isopycnal" :contentReference[oaicite:45]{index=45}
+        eddy_induced_advection: "Gent–McWilliams (reduced in tropics)" :contentReference[oaicite:46]{index=46}
+        vertical_mixing: "Level-1.5 TKE (Bougeault-Lacarrère; Gaspar et al.)" :contentReference[oaicite:47]{index=47}
+        double_diffusion: "Merryfield et al. (1999)" :contentReference[oaicite:48]{index=48}
+        bottom_boundary_layer: "Beckmann & Döscher (1997)" :contentReference[oaicite:49]{index=49}
+  datasets:
+    - uid: "PHC_Climatology_Jan_Init"
+      version: "2001"
+      description: "Initial T/S; Steele et al. (2001)" :contentReference[oaicite:50]{index=50}
+  integrated_input: []
+  data_evaluation: "Circulation and hydrography compared to observations; convection sites reproduced." :contentReference[oaicite:51]{index=51}
+  data:
+    format: ["NetCDF"]
+    variables: "Velocity, temperature, salinity, mixed-layer depth, tracers"
+    units: "m/s, °C, PSU, m"
+  model_output_verification: "Compares well with observed large-scale patterns; ACC width overestimated at coarse grid." :contentReference[oaicite:52]{index=52}
+  model_output_corroboration: "Convection regions and water-mass properties reasonable over decades." :contentReference[oaicite:53]{index=53}
+  calibration_tools_data: "SSS restoring used to limit drift; runoff climatologies specified." :contentReference[oaicite:54]{index=54}
+  validation_capabilities: "Supports multi-decadal hindcasts with combined reanalysis/climatology forcing." :contentReference[oaicite:55]{index=55}
+  dimensionality: "3D"
+  spatial_extent: "Global (78°S–90°N in ORCA2)" :contentReference[oaicite:56]{index=56}
+  spatial_resolution: "ORCA2 tripolar grid: ~2° mean; 0.5° at equator; local refinements" :contentReference[oaicite:57]{index=57}
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-decadal"
+  time_steps_temporal_resolution: "Δt = 5760 s (96 min) in study; ~15 steps/day" :contentReference[oaicite:58]{index=58}
+  variable_temporal_resolution: true
+  programming_language: ["Fortran 90/95"]
+  availability_of_source_code: "Documentation and code historically available via LODYC/IPSL site." :contentReference[oaicite:59]{index=59}
+  implementation_verification: "Validated uncoupled in tropics; widely used in coupled GCMs." :contentReference[oaicite:60]{index=60}
+  error_handling: "Not specified (study context)"
+  software_specification_and_requirements: "NetCDF I/O; tripolar grid support (ORCA)"
+  hardware_specification_and_requirements: "Workstation to HPC"
+  execution_instructions: "Initialize from PHC; apply combined atmospheric forcing and SSS restoring per setup." :contentReference[oaicite:61]{index=61}
+  parallel_execution: true
+  integration_pattern: null
+  unique_identifier_of_submodels: []
+  execution_constraints: "Without SSS restoring, spurious Southern Ocean convection occurs." :contentReference[oaicite:62]{index=62}
+  acknowledgment_protocols: null
+  latency_expectations: null
+  data_synchronization: null
+  license: "Unspecified (paper)"
+  landing_page: "http://www.lodyc.jussieu.fr/opa/" :contentReference[oaicite:63]{index=63}
+  distribution_version: "8.2 (study)"
+  file_formats: ["NetCDF"]
+  authors:
+    - name: "Gurvan Madec"
+      role: "Lead developer (OPAv8 series)"

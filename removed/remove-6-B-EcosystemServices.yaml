@@ -1,0 +1,73 @@
+EcosystemServicesModel:
+  title: Ecosystem Service Lookup/Meta-Model
+  unique_identifier: ESMetaModel_2013
+  model_version: '1.0'
+  description: A lookup or statistical meta-model that estimates ecosystem services
+    (e.g., carbon, erosion, yield) based on land use and biophysical characteristics.
+  keywords:
+  - Ecosystem services
+  - Lookup table
+  - Meta-model
+  - Land use impact
+  - Environmental valuation
+  model_type: Empirical
+  scope: Land use-based ES provisioning
+  purpose_pattern:
+    purpose: Quantify ES indicators from land use at parcel scale
+    pattern: One-way lookup or regression mapping
+  assumptions:
+  - Ecosystem service values are pre-defined for each land-use type
+  - No spatial feedbacks within the model
+  - Values derived from external models or field studies
+  dimensionality: 2D
+  spatial_extent: Same as ABM (parcel/grid)
+  spatial_resolution: 1 ha
+  variable_spatial_resolution: false
+  temporal_extent: Annual update
+  temporal_resolution: Annual
+  variable_temporal_resolution: false
+  calibration_tools_data: Derived from ecological field data or models
+  publications:
+  - 'Paper: An Agent-Based Model Integrating Land-Use Change and Ecosystem Services
+    (2013)'
+  conceptual_evaluation: Values checked against literature and other models (e.g.,
+    InVEST)
+  validation_capabilities: Validated with case study field metrics
+  sensitivity_analysis: Alternative ES lookup values tested
+  uncertainty_analysis: Scenario uncertainty in valuation ranges
+  error_handling: Missing values default to median
+  license: Academic use
+  landing_page: ''
+  distribution_version: '1.0'
+  programming_language:
+  - Python
+  - R
+  - Spreadsheet-based
+  software_requirements: Spreadsheet or statistical software
+  hardware_requirements: Low
+  execution_instructions: Land use raster/table input; outputs ES values by parcel
+  parallel_execution: false
+  implementation_verification: Cross-checked with original lookup tables
+  source_code_availability: false
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format:
+    - CSV
+    variables: Carbon storage, erosion, yield
+    units: tC/ha, t/ha, kg/ha
+    verification: Verified against known ES maps
+    corroboration: ''
+  integration:
+    pattern: null
+    submodels: []
+    execution_constraints: null
+    acknowledgment: ''
+    latency_expectations: ''
+    data_synchronization: ''
+  authors:
+  - name: Jantz C.
+    orcid: ''
+    role: ES model integration

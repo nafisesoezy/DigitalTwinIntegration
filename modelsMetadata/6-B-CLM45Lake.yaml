@@ -1,0 +1,100 @@
+CLM4_5_Lake:
+  title: "WRF Embedded 1-D Lake Scheme (LISSS/CLM4.5-derived)"
+  unique_identifier: CLM4.5_Lake_LISSS_WRF_2016
+  model_version: "CLM4.5 lake scheme as embedded in WRF v3.6+"
+  description: "A 1-D thermal diffusion lake column with layered water, ice, snow, and sediment; computes lake surface temperature, ice/snow evolution, and air–lake fluxes in response to WRF near-surface meteorology and radiation."
+  keywords:
+    - Lake column
+    - Thermal diffusion
+    - Ice/snow on lakes
+    - Surface fluxes
+    - Dynamic albedo
+  model_type: Mechanistic
+  scope: Grid-point lake representation within a regional NWP/RCM
+  purpose_pattern:
+    purpose: "Provide physically consistent lower-boundary state and fluxes over lakes to the host atmosphere"
+    pattern: "Layered 1-D column with prognostic T profiles; embedded in host as a surface tile"
+  assumptions:
+    - Horizontally homogeneous lake column per grid cell (1-D)
+    - Eddy diffusivity parameterized; enhanced mixing options for deep lakes
+    - Dynamic surface albedo with ice/snow processes
+  dimensionality: 1D (vertical)
+  spatial_extent: Water points within WRF domain
+  spatial_resolution: "Layered: 10+ water layers; up to 5 snow layers; 2 ice layers; ~10 sediment layers (configurable)"
+  variable_spatial_resolution: true
+  temporal_extent: Synchronous with host model integration
+  temporal_resolution: Same as WRF physics step
+  variable_temporal_resolution: false
+  calibration_tools_data: "Buoy temperature profiles; ice cover climatology"
+  publications:
+    - "Xiao et al., 2016 (JAMES)"
+  conceptual_evaluation: "Improvements via dynamic albedo and tuned diffusivity reduce LST/ice biases"
+  validation_capabilities: "Profiles vs. moorings; LIC vs. satellite/analyses"
+  sensitivity_analysis: "Diffusivity enhancement factors; albedo options; snow physics toggles"
+  uncertainty_analysis: "Physics parameter sweeps"
+  error_handling: "State/energy checks; non-negative thickness constraints"
+  license: "Inherited from WRF/CLM components"
+  landing_page: ""
+  distribution_version: "Embedded with WRF v3.6+"
+  programming_language:
+    - Fortran
+  software_requirements: "Built as part of WRF physics; no external coupler at runtime"
+  hardware_requirements: "Same as host WRF"
+  execution_instructions: "Enable lake physics in WRF namelist; supply lake mask/bathymetry; run synchronously with atmosphere"
+  parallel_execution: "Yes (per grid cell), via host domain decomposition"
+  implementation_verification: "Case studies of Great Lakes"
+  source_code_availability: true
+
+  input:
+    description: "Near-surface meteorology and radiative forcing from WRF (A → B, in-memory)."
+    format: "In-memory (host ↔ embedded component)"
+    variables:
+      - air_temperature_2m                  # K
+      - specific_humidity_2m                # kg kg^-1
+      - wind_speed_10m                      # m s^-1
+      - wind_u10                           # m s^-1
+      - wind_v10                           # m s^-1
+      - surface_pressure                    # Pa
+      - downwelling_shortwave_radiation     # W m^-2
+      - downwelling_longwave_radiation      # W m^-2
+      - precipitation_rain_rate             # kg m^-2 s^-1
+      - precipitation_snow_rate             # kg m^-2 s^-1
+      - near_surface_air_density            # kg m^-3
+      - reference_height_wind               # m
+    units: "See inline comments"
+
+  integrated_input:
+    - uid: WRF_ARW_v3.6_Lake_2016
+      version: "3.6+"
+      description: "Host atmosphere providing meteorology and radiation to the lake column"
+
+  output:
+    format:
+      - "In-memory to WRF; optional NetCDF diagnostics"
+    variables:
+      - lake_skin_temperature               # K
+      - lake_ice_fraction                   # 0–1
+      - lake_ice_thickness                  # m
+      - lake_surface_albedo                 # dimensionless
+      - surface_roughness_length_water      # m
+      - upward_sensible_heat_flux           # W m^-2
+      - upward_latent_heat_flux             # W m^-2
+      - upward_longwave_radiation           # W m^-2
+      - reflected_shortwave_radiation       # W m^-2
+      - surface_evaporation_rate            # kg m^-2 s^-1
+      - lake_snow_depth                     # m
+    units: "See inline comments"
+    verification: "Energy closure checks; comparison to buoy LST and ice cover"
+
+  integration:
+    pattern: "Embedded coupling (lake column embedded in WRF)"
+    submodels:
+      - "Water column heat budget"
+      - "Ice/snow thermodynamics"
+      - "Sediment heat storage"
+    execution_constraints: "Same timestep as host; strict energy/mass conservation at interface"
+    data_synchronization: "Two-way in-memory exchange every physics step"
+
+  authors:
+    - name: "Subin et al.; Xiao et al."
+      role: "Lake scheme development and WRF integration"

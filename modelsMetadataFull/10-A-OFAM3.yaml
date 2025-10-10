@@ -1,0 +1,104 @@
+OFAM3:
+  title: "OFAM3: Ocean Forecasting Australian Model, version 3"
+  unique_identifier: "OFAM3_Model_2013"
+  model_version: "3.0"
+  description: "OFAM3 is a near-global, eddy-resolving ocean general circulation model based on the Modular Ocean Model (MOM4p1). It simulates physical ocean dynamics, circulation, temperature, salinity, and mesoscale variability, coupled with a biogeochemical model (WOMBAT)."
+  keywords:
+    - Ocean circulation
+    - Eddy-resolving
+    - Climate modeling
+    - Biogeochemistry
+    - Ocean forecasting
+    - Mesoscale variability
+  model_type: "Mechanistic, process-based general circulation model (GCM)"
+  scope: "Simulation of physical ocean dynamics and coupled biogeochemical processes at near-global scale"
+  purpose_pattern:
+    purpose: "Hindcast and forecast upper ocean circulation, mesoscale eddies, and physical-biogeochemical interactions"
+    pattern: "Integrated Coupling with biogeochemical model WOMBAT"
+  assumptions:
+    - "Ocean represented using z* coordinate system"
+    - "Forcing via atmospheric reanalysis fields (ERA-Interim)"
+    - "No explicit sea-ice model included"
+    - "Surface restoring toward climatological temperature and salinity"
+  dimensionality: "3D (longitude, latitude, depth)"
+  spatial_extent: "Near-global ocean (75°S–75°N, all longitudes)"
+  spatial_resolution: "1/10° horizontal resolution, 5–10 m vertical resolution in upper 200 m"
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-decadal integrations (e.g., 32-year runs); operational short-range forecasts"
+  temporal_resolution: "3-hourly forcing; daily to monthly output"
+  variable_temporal_resolution: true
+  calibration_tools_data: "ERA-Interim atmospheric forcing, climatological salinity and temperature, observed transports (ACC, ITF, EAC), satellite altimetry (AVISO), SST (Reynolds, AMSR-E)"
+  publications:
+    - "Oke et al., 2013, Geosci. Model Dev., 6, 591–615"
+    - "Schiller et al., 2008"
+    - "Griffies, 2009"
+  conceptual_evaluation: "Validated against satellite altimetry, SST climatologies, in-situ transports, ENSO indices, and biogeochemical tracers"
+  validation_capabilities: "Yes — validated extensively against observed SST, SLA, MLD, transports, ENSO variability, and chlorophyll-a data"
+  sensitivity_analysis: "Sensitivity tested for vertical mixing, restoring timescales, and atmospheric forcing"
+  uncertainty_analysis: "Scenario-based hindcast vs forecast; comparison with multiple observational datasets"
+  error_handling: "Runtime logging; constraints applied via restoring terms; no automated recovery"
+  license: "Research/Institutional use (CSIRO/Bureau of Meteorology); not openly GPL"
+  landing_page: "http://www.bom.gov.au/oceanography/forecasts/"
+  distribution_version: "3.0"
+  programming_language:
+    - "Fortran (MOM4p1 core, coupled with WOMBAT biogeochemistry)"
+  software_requirements: "Fortran compiler, MPI for parallel execution"
+  hardware_requirements: "High-performance computing (HPC) environment required due to high resolution"
+  execution_instructions: "Compiled and executed on HPC cluster; configured through namelist files for MOM4p1 and WOMBAT modules"
+  parallel_execution: true
+  implementation_verification: "Peer-reviewed comparisons with observed circulation, ENSO indices, and chlorophyll distributions (Oke et al., 2013)"
+  source_code_availability: false
+  parameters:
+    - name: "OFAM3_Config_Parameters"
+      description: "Defines model grid, vertical resolution, viscosity, mixing scheme, restoring timescales"
+      format: "Namelist text files"
+      unit: "varies"
+      datatype: "float, integer, logical"
+      valid_range: "Physically meaningful ranges for ocean state variables"
+      default: "Set according to OFAM3 published configuration"
+  datasets:
+    - uid: "ERA_Interim_Forcing"
+      version: "2009"
+      access_url: "https://www.ecmwf.int/en/forecasts/datasets/reanalysis-datasets/era-interim"
+      dependencies:
+        - "Surface heat, freshwater, and momentum fluxes"
+    - uid: "CNES_CLS09_Mean_Sea_Level"
+      version: "v1.1"
+      access_url: "https://www.aviso.altimetry.fr/"
+      dependencies:
+        - "Satellite altimetry for SLA validation"
+  integrated_input:
+    - "Atmospheric reanalysis (ERA-Interim)"
+    - "Climatological salinity/temperature datasets"
+    - "Biogeochemical initial conditions (WOMBAT)"
+  data_evaluation: "Pre-run checks for forcing fields; climatological consistency checks; stability tests during spin-up"
+  output:
+    format:
+      - "NetCDF"
+    variables: "Sea level, SST, salinity, currents, mixed layer depth, transports, ENSO indices, chlorophyll-a (from WOMBAT)"
+    units:
+      - "°C"
+      - "psu"
+      - "m"
+      - "Sv"
+      - "mg Chl a m⁻³"
+    verification: "Compared against observed climatologies and altimetry datasets"
+    corroboration: "ENSO signals, transports, and variability patterns match observed values within tolerance"
+  integration:
+    pattern: "Integrated Coupling"
+    submodels:
+      - "WOMBAT (biogeochemical NPZD-type model)"
+    execution_constraints: "OFAM3 provides physical ocean state at each timestep; WOMBAT runs synchronously"
+    acknowledgment: "Coupled execution ensures two-way feedbacks between physics and biogeochemistry"
+    latency_expectations: "Real-time coupling within same simulation run"
+    data_synchronization: "In-memory exchange of state variables between MOM4p1 and WOMBAT"
+  authors:
+    - name: "P. R. Oke"
+      orcid: "https://orcid.org/0000-0002-5670-8435"
+      role: "Model development, evaluation"
+    - name: "A. Schiller"
+      orcid: "https://orcid.org/0000-0002-8741-6426"
+      role: "Coupling and validation"
+    - name: "R. J. Matear"
+      orcid: "https://orcid.org/0000-0001-6811-4422"
+      role: "Biogeochemical model integration (WOMBAT)"

@@ -1,0 +1,72 @@
+SHYFEM:
+  title: SHYFEM Hydrodynamic Model
+  unique_identifier: SHYFEM_Venice_2003
+  model_version: 3D
+  description: A finite element hydrodynamic model designed to simulate water levels,
+    currents, salinity, and temperature in complex coastal and lagoon environments.
+    Includes wetting/drying processes suitable for shallow intertidal zones.
+  keywords:
+  - Hydrodynamic model
+  - Finite element
+  - Tidal modeling
+  - Salinity
+  - Lagoon dynamics
+  model_type: Mechanistic
+  scope: Coastal and lagoon hydrodynamics
+  purpose_pattern:
+    purpose: Simulate tidal flows, water levels, salinity and temperature in the Venice
+      Lagoon
+    pattern: Finite element mesh with 2D and 3D hydrodynamics and drying/wetting scheme
+  assumptions:
+  - Hydrostatic assumption
+  - Vertical sigma layers
+  - No real-time atmospheric feedback in this configuration
+  dimensionality: 3D
+  spatial_extent: Venice Lagoon
+  spatial_resolution: Variable resolution finite element mesh
+  variable_spatial_resolution: true
+  temporal_extent: Tidal cycle to seasonal
+  temporal_resolution: Minutes to hourly
+  variable_temporal_resolution: true
+  calibration_tools_data: Calibrated using observed tidal levels and current meter
+    data
+  publications:
+  - Solidoro et al. 2003
+  conceptual_evaluation: Consistent with shallow water theory and estuarine dynamics
+  validation_capabilities: Validated against in situ current and salinity profiles
+  sensitivity_analysis: ''
+  uncertainty_analysis: ''
+  error_handling: Boundary condition and numerical stability checks
+  license: Custom academic use
+  landing_page: ''
+  distribution_version: '2003'
+  programming_language:
+  - Fortran
+  software_requirements: Fortran compiler, netCDF
+  hardware_requirements: Cluster or workstation
+  execution_instructions: Run via namelist input and grid configuration files
+  parallel_execution: false
+  implementation_verification: Tested against known cases and observational data
+  source_code_availability: false
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format:
+    - NetCDF
+    variables: Water level, current velocity, salinity, temperature
+    units: "m, m/s, PSU, \xB0C"
+    verification: Compared with tide gauges and salinity transects
+    corroboration: ''
+  integration:
+    pattern: null
+    submodels: []
+    execution_constraints: null
+    acknowledgment: SHYFEM development team
+    latency_expectations: ''
+    data_synchronization: ''
+  authors:
+  - name: Giuseppe Umgiesser
+    orcid: ''
+    role: Hydrodynamic modeling and SHYFEM development

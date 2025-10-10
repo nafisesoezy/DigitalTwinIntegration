@@ -1,0 +1,82 @@
+Integrated_Model:
+  title: Integrated Hydrodynamic and Water Quality Model for Venice Lagoon
+  unique_identifier: SHYFEM_WASP5_Coupled_2003
+  model_version: '1.0'
+  description: "\n            A one-way coupled modeling system that integrates SHYFEM\
+    \ (a 3D finite element hydrodynamic model) \n            with WASP5 (a water quality\
+    \ and ecological model) to simulate the physical and biogeochemical dynamics \n\
+    \            of the Venice Lagoon. The SHYFEM model provides flow, salinity, and\
+    \ temperature fields that drive \n            the transport and transformation\
+    \ of nutrients and phytoplankton in WASP5.\n        "
+  keywords:
+  - Coupled modeling
+  - Hydrodynamics
+  - Water quality
+  - Nutrient cycling
+  - Lagoon ecosystem
+  model_type: Mechanistic
+  scope: Venice Lagoon ecosystem
+  purpose_pattern:
+    purpose: Simulate the coupled physical and ecological dynamics of the Venice Lagoon
+    pattern: "Offline sequential coupling (SHYFEM output \u2192 WASP5 input)"
+  assumptions:
+  - One-way coupling (no feedback from WASP5 to SHYFEM)
+  - Consistent spatial and temporal discretization between models
+  - WASP5 compartments are derived from SHYFEM mesh
+  dimensionality: 3D
+  spatial_extent: Venice Lagoon
+  spatial_resolution: Variable resolution mesh compartments
+  variable_spatial_resolution: true
+  temporal_extent: Tidal to seasonal
+  temporal_resolution: Hourly to daily
+  variable_temporal_resolution: true
+  calibration_tools_data: Empirical water quality and hydrodynamic observations
+  publications:
+  - Solidoro et al. 2003
+  conceptual_evaluation: Validated through consistency with observed water quality
+    and flow patterns
+  validation_capabilities: Validated using field measurements of chlorophyll, DO,
+    and nutrients
+  sensitivity_analysis: Not reported explicitly
+  uncertainty_analysis: Scenario analysis
+  error_handling: Input checks and transport boundary condition validation
+  license: Mixed academic and public licenses (SHYFEM and WASP5)
+  landing_page: ''
+  distribution_version: '1.0'
+  programming_language:
+  - Fortran
+  software_requirements: SHYFEM and WASP5 executables, grid processor
+  hardware_requirements: Workstation or small cluster
+  execution_instructions: Run SHYFEM simulation and export fields; format outputs
+    for WASP5 input
+  parallel_execution: false
+  implementation_verification: Cross-model consistency verified using test scenarios
+  source_code_availability: false
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format:
+    - NetCDF
+    - CSV
+    variables: Hydrodynamic fields, nutrients, DO, phytoplankton
+    units: various
+    verification: Field validation against lagoon monitoring data
+    corroboration: Confirmed spatial and temporal trends observed
+  integration:
+    pattern: Offline sequential coupling
+    submodels:
+    - SHYFEM Hydrodynamic Model
+    - WASP5 Water Quality Model
+    execution_constraints: Requires synchronization of grid and time steps
+    acknowledgment: Developed by Solidoro et al. 2003
+    latency_expectations: "Low \u2013 batch-mode data transfer"
+    data_synchronization: Daily/hourly export from SHYFEM to WASP5
+  authors:
+  - name: Caterina Solidoro
+    orcid: ''
+    role: Model coupling and ecological validation
+  - name: Giuseppe Umgiesser
+    orcid: ''
+    role: SHYFEM hydrodynamic modeling

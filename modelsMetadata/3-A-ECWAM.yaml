@@ -1,0 +1,113 @@
+ECWAM:
+  title: "ECWAM: ECMWF Wave Model"
+  unique_identifier: "ECWAM_Model_2015"
+  model_version: "CY38R1 (as used in paper)"
+  description: >
+    A spectral wave model developed by ECMWF to simulate surface gravity waves.
+    It computes the evolution of the wave spectrum, including energy input from wind,
+    nonlinear interactions, and dissipation by wave breaking and bottom friction.
+  keywords:
+    - Wave modeling
+    - Spectral wave model
+    - Stokes drift
+    - Wind-wave interaction
+    - Wave–current interaction
+    - Surface roughness
+  model_type: "Mechanistic"
+  scope: "Global and regional surface wave dynamics"
+  purpose_pattern:
+    purpose: "Simulate ocean surface wave spectrum and provide wave-induced parameters for air–sea interaction"
+    pattern: "Standalone wave model or coupled via flux/field exchange"
+  assumptions:
+    - "Linear wave theory with source/sink terms"
+    - "Spectral representation in frequency–direction space"
+    - "Waves forced primarily by 10 m winds; dissipation via breaking and bottom friction"
+  dimensionality: "2D spatial + 2D spectral (frequency × direction)"
+  spatial_extent: "Global or regional ocean surface"
+  spatial_resolution: "Typically 1/8° to 1/4°"
+  variable_spatial_resolution: true
+  temporal_extent: "Days to decades"
+  temporal_resolution: "Hourly to 3-hourly"
+  variable_temporal_resolution: true
+  calibration_tools_data: "Validated against satellite altimetry and buoy observations"
+  publications:
+    - "Janssen 2004"
+    - "Breivik et al. 2015"
+  conceptual_evaluation: "Operational at ECMWF; physics thoroughly documented"
+  validation_capabilities: "Validated in hindcast and operational forecast modes"
+  sensitivity_analysis: "Tuning of drag, dissipation, and nonlinear source terms"
+  uncertainty_analysis: "Scenario and ensemble configurations"
+  error_handling: "Built-in diagnostics and stability checks"
+  license: "ECMWF license (non-commercial use)"
+  landing_page: "https://www.ecmwf.int/en/research/modelling-and-prediction/wave-model"
+  distribution_version: "CY38R1"
+  programming_language:
+    - "Fortran"
+  software_requirements: "NetCDF I/O; MPI; ECMWF wave physics"
+  hardware_requirements: "HPC or workstation"
+  execution_instructions: "Run with wind forcing (e.g., ECMWF analyses), grid configuration, and time step settings"
+  parallel_execution: true
+  implementation_verification: "Benchmarked vs. buoys/altimeters; operational comparisons"
+  source_code_availability: false
+
+  parameters:
+    - name: "Wave_Model_Parameters"
+      description: "Growth, dissipation, and nonlinear interaction coefficients"
+      format: "namelist"
+      unit: "various"
+      datatype: "float"
+      valid_range: "As per documentation"
+      CRS: "Lat–lon or reduced Gaussian grid"
+      default_values: "Operational defaults at ECMWF"
+
+  datasets:
+    - uid: "ECWAM_Inputs_2015"
+      version: "2015"
+      access_url: "ECMWF operational input archive"
+      dependencies:
+        - "10 m wind (U10, V10)"
+        - "Sea-ice concentration (attenuation)"
+        - "Bathymetry and coastlines"
+
+  # — Signals for pattern detection (no pattern set for standalone A) —
+  input:
+    description: "Atmospheric winds and optional ocean/ice modifiers"
+    format: "NetCDF (or coupler when present)"
+    variables:
+      - wind_u10                # m s^-1
+      - wind_v10                # m s^-1
+      - sea_ice_concentration   # 0–1 (optional; attenuation)
+      - surface_current_u       # m s^-1 (optional; from ocean model)
+      - surface_current_v       # m s^-1 (optional; from ocean model)
+    units: "see inline"
+  integrated_input:
+    - uid: "NEMO_Model_3.4"
+      version: "v3.4"
+      description: "Optional surface currents and sea-ice fraction for wave–current/ice effects"
+
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - significant_wave_height           # m
+      - stokes_drift_surface_u            # m s^-1
+      - stokes_drift_surface_v            # m s^-1
+      - stokes_drift_profile_parameters   # (e.g., e-folding depth) 1 m^-1
+      - wave_modified_stress_to_ocean     # N m^-2
+      - wave_breaking_TKE_flux            # W m^-2
+      - spectral_density                  # m^2 Hz^-1 (per direction bin)
+    units: "see inline"
+    verification: "Compared to buoy/altimeter wave heights and spectra"
+    corroboration: "Consistent wave energy evolution under observed winds"
+
+  integration:
+    submodels: []
+    execution_constraints: "When coupled, grid remapping to ocean grid may be required"
+    acknowledgment: "Developed by ECMWF"
+    latency_expectations: "Typically produces fields at hourly–3-hourly cadence"
+    data_synchronization: "Wave outputs can be time-interpolated to ocean model coupling times"
+
+  authors:
+    - name: "Øyvind Breivik"
+      orcid: "https://orcid.org/0000-0001-7016-8023"
+      role: "Model developer, wave–ocean coupling experiments"

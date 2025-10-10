@@ -1,0 +1,93 @@
+OFAM3-WOMBAT-Integrated:
+  title: "Integrated OFAM3–WOMBAT Model"
+  unique_identifier: OFAM3_WOMBAT_2013
+  model_version: "1.0"
+  description: |
+    A fully integrated ocean modeling system coupling the Ocean Forecasting
+    Australian Model, version 3 (OFAM3), with the Whole Ocean Model of Biogeochemistry
+    And Trophic-dynamics (WOMBAT). OFAM3 provides a near-global, eddy-resolving
+    physical ocean circulation framework, while WOMBAT simulates nutrient, carbon,
+    oxygen, and ecosystem cycling. Together, they form a comprehensive Earth system
+    ocean model for hindcasts and scenario-based studies.
+  keywords:
+    - Ocean circulation
+    - Biogeochemistry
+    - OFAM3
+    - WOMBAT
+    - Climate modeling
+    - Coupled modeling
+    - Mesoscale dynamics
+  model_type: Mechanistic
+  scope: Near-global ocean (75°S–75°N)
+  purpose_pattern:
+    purpose: Simulate coupled physical and biogeochemical dynamics of the global ocean, including mesoscale circulation, nutrient cycling, and carbon fluxes
+    pattern: Embedded Coupling (tight integration of OFAM3 physics and WOMBAT biogeochemistry)
+  assumptions:
+    - Ocean circulation dynamics strongly constrain biogeochemical cycles
+    - NPZD-type trophic representation adequate for global applications
+    - Iron limitation and Redfield stoichiometry represent key nutrient dynamics
+    - Coupling is synchronous at each timestep
+  dimensionality: 3D
+  spatial_extent: Near-global ocean domain (75°S–75°N, full longitude)
+  spatial_resolution: 1/10° horizontal; 5–10 m vertical resolution in the upper ocean
+  variable_spatial_resolution: true
+  temporal_extent: Multi-decadal hindcasts and projections
+  temporal_resolution: 3-hourly forcing; daily to monthly output
+  variable_temporal_resolution: true
+  calibration_tools_data: ERA-Interim atmospheric reanalysis, satellite SST and SLA (AVISO), SeaWiFS chlorophyll, WOCE nutrient/oxygen datasets
+  publications:
+    - Oke et al., 2013, Geosci. Model Dev., 6, 591–615
+    - Matear and Lenton, 2008
+    - Kidston et al., 2011
+  conceptual_evaluation: Supports analysis of ENSO variability, global nutrient cycles, and ocean carbon fluxes
+  validation_capabilities: Extensively validated against SST, sea level anomalies, mixed layer depth, transports, chlorophyll, and CO₂ flux datasets
+  sensitivity_analysis: Parameter tests on vertical mixing, biogeochemical uptake rates, and forcing fields
+  uncertainty_analysis: Ensemble runs with varying forcing and parameterization
+  error_handling: Runtime logging and stability checks in coupled execution
+  license: Institutional/Research license (CSIRO/Bureau of Meteorology)
+  landing_page: "http://www.bom.gov.au/oceanography/forecasts/"
+  distribution_version: "2013.1"
+  programming_language:
+    - Fortran (MOM4p1/OFAM3 and WOMBAT modules)
+  software_requirements: Fortran compiler, MPI; HPC environment
+  hardware_requirements: High-performance computing cluster
+  execution_instructions: Compiled and executed as a single coupled system; configured via MOM4p1 and WOMBAT namelist files
+  parallel_execution: true
+  implementation_verification: Benchmarked against observed SST, altimetry, nutrient distributions, and chlorophyll fields
+  source_code_availability: false
+  parameters: []
+  datasets: []
+  integrated_input:
+    - ERA-Interim atmospheric forcing
+    - Initial conditions for physical and biogeochemical fields
+    - Climatological iron deposition
+  data_evaluation: Pre-run quality checks on forcing datasets, nutrient conservation diagnostics
+  output:
+    format:
+      - NetCDF
+    variables: Temperature, salinity, circulation, SLA, nutrients, phytoplankton, zooplankton, detritus, oxygen, carbon fluxes, chlorophyll-a
+    units: "°C, psu, m, mmol m⁻³, mg Chl a m⁻³, µmol O₂ L⁻¹, PgC yr⁻¹"
+    verification: Outputs compared with satellite observations and in-situ datasets
+    corroboration: Validated against ENSO signals, transports, chlorophyll distributions, and CO₂ flux variability
+  integration:
+    pattern: Embedded Coupling
+    submodels:
+      - OFAM3 (physical ocean general circulation model)
+      - WOMBAT (biogeochemical cycling model)
+    execution_constraints: Shared timestep and grid; WOMBAT cannot run independently of OFAM3
+    acknowledgment: Developed by CSIRO/Bureau of Meteorology team, integrating physical and biogeochemical ocean models
+    latency_expectations: Fully synchronous exchange at each timestep
+    data_synchronization: In-memory, embedded integration
+  authors:
+    - name: "P. R. Oke"
+      orcid: "https://orcid.org/0000-0002-5670-8435"
+      role: "Physical ocean model development and evaluation"
+    - name: "R. J. Matear"
+      orcid: "https://orcid.org/0000-0001-6811-4422"
+      role: "Biogeochemical model development (WOMBAT)"
+    - name: "A. Schiller"
+      orcid: "https://orcid.org/0000-0002-8741-6426"
+      role: "Coupling integration and validation"
+    - name: "A. Lenton"
+      orcid: "https://orcid.org/0000-0002-1521-0944"
+      role: "Carbon cycle parameterization and evaluation"

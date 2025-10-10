@@ -1,0 +1,64 @@
+AB-Intended:
+  title: Intended Modular Lake Modeling Framework
+  unique_identifier: ''
+  model_version: ''
+  description: "\n            A placeholder structure for developing a modular aquatic\
+    \ modeling system using GOTM for hydrodynamics and a biogeochemical model such\
+    \ as PCLake through FABM.\n            Intended to simulate ecosystem responses\
+    \ to physical drivers in lakes or coastal waters.\n        "
+  keywords:
+  - Lake modeling
+  - Modular frameworks
+  - FABM
+  - "Hydrodynamic–ecological integration"
+  model_type: ''
+  scope: ''
+  purpose_pattern:
+    purpose: Design and test modular integrations for aquatic ecosystem modeling
+    pattern: Modular online coupling via FABM or similar interface
+  assumptions: []
+  dimensionality: ''
+  spatial_extent: ''
+  spatial_resolution: ''
+  variable_spatial_resolution: ''
+  temporal_extent: ''
+  temporal_resolution: ''
+  variable_temporal_resolution: ''
+  calibration_tools_data: ''
+  publications: []
+  conceptual_evaluation: ''
+  validation_capabilities: ''
+  sensitivity_analysis: ''
+  uncertainty_analysis: ''
+  error_handling: ''
+  license: ''
+  landing_page: ''
+  distribution_version: ''
+  programming_language: ''
+  software_requirements: ''
+  hardware_requirements: ''
+  execution_instructions: ''
+  parallel_execution: ''
+  implementation_verification: ''
+  source_code_availability: ''
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format: []
+    variables: ''
+    units: ''
+    verification: ''
+    corroboration: ''
+  integration:
+    pattern: "integrated coupling"
+    submodels: []
+    execution_constraints: ''
+    acknowledgment: ''
+    latency_expectations: ''
+    data_synchronization: ''
+  authors:
+  - name: ''
+    orcid: ''
+    role: ''

@@ -1,0 +1,83 @@
+AB-Integrated:
+  title: "Integrated GLM\u2013FABM\u2013PCLake Model"
+  unique_identifier: GLM_FABM_PCLake_2020
+  model_version: '1.0'
+  description: "\n            A fully integrated aquatic ecosystem model coupling\
+    \ the General Lake Model (GLM) with the PCLake+ ecological model via the FABM\
+    \ interface.\n            This framework simulates interactions between hydrodynamics\
+    \ (e.g., stratification, temperature) and ecological processes (e.g., phytoplankton,\
+    \ nutrients, macrophytes).\n            Enables simulation of ecosystem responses\
+    \ to climate change and restoration actions.\n        "
+  keywords:
+  - Aquatic ecosystems
+  - Model integration
+  - GLM
+  - FABM
+  - PCLake+
+  - Hydrodynamics
+  - Biogeochemistry
+  model_type: Mechanistic
+  scope: Lakes and reservoirs (1D vertical)
+  purpose_pattern:
+    purpose: Simulate coupled physical and ecological dynamics in shallow lakes under
+      climate and management scenarios
+    pattern: Online coupled via FABM
+  assumptions:
+  - 1D vertical structure captures dominant dynamics
+  - Physical processes drive ecological responses
+  - Modular FABM interface enables tight coupling
+  dimensionality: 1D
+  spatial_extent: Water column of lake
+  spatial_resolution: Variable vertical layers
+  variable_spatial_resolution: true
+  temporal_extent: Multi-year
+  temporal_resolution: Daily to hourly
+  variable_temporal_resolution: true
+  calibration_tools_data: Lake monitoring data, nutrient loads, climate forcing
+  publications:
+  - Andersen et al., 2020
+  conceptual_evaluation: Supports regime shift prediction and ecosystem state changes
+  validation_capabilities: Validated against multi-year lake datasets
+  sensitivity_analysis: Multi-parameter testing supported
+  uncertainty_analysis: Scenarios and ensemble runs possible
+  error_handling: Handled by FABM interface and GLM exception routines
+  license: GPLv3
+  landing_page: https://aquaticmodeling.org
+  distribution_version: '2020.1'
+  programming_language:
+  - Fortran
+  - C++
+  software_requirements: FABM-compatible build of GLM and PCLake
+  hardware_requirements: Workstation or HPC
+  execution_instructions: Compile with FABM; provide config files for GLM and PCLake
+  parallel_execution: false
+  implementation_verification: Benchmarked by FABM and GLM validation datasets
+  source_code_availability: true
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format:
+    - NetCDF
+    - CSV
+    variables: Temperature, nutrients, phytoplankton, macrophytes
+    units: "\xB0C, mmol/m\xB3, mg/L"
+    verification: Profiles and time series compared with observations
+    corroboration: ''
+  integration:
+    pattern: Online modular coupling via FABM
+    submodels:
+    - GLM
+    - "FABM\u2013PCLake"
+    execution_constraints: Shared timestep and vertical grid
+    acknowledgment: Developers of GLM, FABM, and PCLake
+    latency_expectations: Synchronous coupling each timestep
+    data_synchronization: Fully integrated exchange of state variables
+  authors:
+  - name: Andersen, M.R.
+    orcid: ''
+    role: Integration and calibration
+  - name: Janssen, A.B.G.
+    orcid: ''
+    role: Ecological model development

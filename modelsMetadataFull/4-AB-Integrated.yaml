@@ -1,0 +1,77 @@
+Integrated_Model:
+  title: "Integrated Plant\u2013Soil Feedback Model"
+  unique_identifier: Integrated_PSF_Model_2017
+  model_version: '1.0'
+  description: "\n        A tightly coupled spatially explicit modeling framework\
+    \ integrating an individual-based plant model \n        with a cellular automaton-based\
+    \ soil feedback model. Plants grow, compete, and disperse while modifying \n \
+    \       soil state locally. Soil states in turn influence plant survival and establishment\
+    \ via negative feedback mechanisms.\n    "
+  keywords:
+  - Coupled model
+  - "Plant\u2013soil feedback"
+  - Individual-based modeling
+  - Cellular automaton
+  - Vegetation pattern formation
+  model_type: Mechanistic
+  scope: Local to landscape-level ecological systems
+  purpose_pattern:
+    purpose: Simulate emergent vegetation patterns driven by dynamic soil feedback
+      loops
+    pattern: 'Bidirectional integration: plants modify soil, soil modifies plant establishment'
+  assumptions:
+  - Soil is updated synchronously based on local plant history
+  - Plant performance is sensitive to soil memory states
+  - Feedback is negative and local, decaying over time
+  dimensionality: 2D
+  spatial_extent: Grid-based ecological landscape
+  spatial_resolution: "1 m\xB2 per grid cell"
+  variable_spatial_resolution: false
+  temporal_extent: Up to several decades
+  temporal_resolution: Annual
+  variable_temporal_resolution: false
+  calibration_tools_data: Pattern-based tuning; no empirical datasets used
+  publications:
+  - Vincenot et al. 2017
+  conceptual_evaluation: Model behavior compared against ecological theory and expectations
+  validation_capabilities: Not empirically validated but tested for emergent dynamics
+  sensitivity_analysis: Explored for key feedback parameters (decay rate, feedback
+    strength)
+  uncertainty_analysis: Scenario-based variation of key parameters
+  error_handling: Conflicts between plant and soil states managed by resolution rules
+  license: CC BY
+  landing_page: ''
+  distribution_version: '1.0'
+  programming_language:
+  - C++
+  software_requirements: Grid-based model environment; C++ compiler
+  hardware_requirements: Standard desktop or workstation
+  execution_instructions: Run simulation on integrated model using custom configuration
+    files
+  parallel_execution: false
+  implementation_verification: Emergent pattern verification and behavior reproducibility
+  source_code_availability: false
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format:
+    - CSV
+    variables: Plant population, soil memory state, patch patterns
+    units: various
+    verification: Vegetation dynamics match theoretical expectations
+    corroboration: Explains observed ecological phenomena like patchiness and coexistence
+  integration:
+    pattern: "Loose"
+    submodels:
+    - Individual-Based Plant Model (IBM)
+    - Soil Feedback Cellular Automaton Model
+    execution_constraints: Synchronous time step and matching grid size required
+    acknowledgment: Vincenot et al. 2017
+    latency_expectations: Negligible due to integrated implementation
+    data_synchronization: Synchronous update at each time step
+  authors:
+  - name: Vincent Vincenot
+    orcid: ''
+    role: Model integration and ecological interpretation

@@ -1,0 +1,63 @@
+AB-Intended:
+  title: Intended Coupled Ocean Biogeochemical Modeling Framework
+  unique_identifier: ''
+  model_version: ''
+  description: "\n            Placeholder metadata for a modular integrated ocean\
+    \ model combining a general circulation model like NEMO with a biogeochemical\
+    \ model for simulating carbon, nutrients, or sulfur cycles.\n        "
+  keywords:
+  - Ocean modeling
+  - Biogeochemical modeling
+  - Modular coupling
+  - Earth system modeling
+  model_type: ''
+  scope: ''
+  purpose_pattern:
+    purpose: Evaluate impact of ocean physics on marine ecosystems and chemical cycles
+    pattern: Online or offline coupled system
+  assumptions: []
+  dimensionality: ''
+  spatial_extent: ''
+  spatial_resolution: ''
+  variable_spatial_resolution: ''
+  temporal_extent: ''
+  temporal_resolution: ''
+  variable_temporal_resolution: ''
+  calibration_tools_data: ''
+  publications: []
+  conceptual_evaluation: ''
+  validation_capabilities: ''
+  sensitivity_analysis: ''
+  uncertainty_analysis: ''
+  error_handling: ''
+  license: ''
+  landing_page: ''
+  distribution_version: ''
+  programming_language: ''
+  software_requirements: ''
+  hardware_requirements: ''
+  execution_instructions: ''
+  parallel_execution: ''
+  implementation_verification: ''
+  source_code_availability: ''
+  parameters: []
+  datasets: []
+  integrated_input: []
+  data_evaluation: ''
+  output:
+    format: []
+    variables: ''
+    units: ''
+    verification: ''
+    corroboration: ''
+  integration:
+    pattern: "Loose coupling"
+    submodels: []
+    execution_constraints: ''
+    acknowledgment: ''
+    latency_expectations: ''
+    data_synchronization: ''
+  authors:
+  - name: ''
+    orcid: ''
+    role: ''

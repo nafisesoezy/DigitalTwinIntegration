@@ -1,0 +1,88 @@
+AB-Intended:
+  title: "Coupled Sea-Ice–Ocean Modeling Framework (LIM + OPA)"
+  unique_identifier: ""
+  model_version: ""
+  description: >
+    Coupled configuration integrating the Louvain-la-Neuve Sea-Ice Model (LIM) with
+    the Océan Parallélisé OGCM (OPA). Simulates polar ocean–ice interactions, including
+    exchanges of momentum, heat, salt, and freshwater, with two-way flux coupling.
+  keywords:
+    - Sea ice
+    - Ocean circulation
+    - Polar climate
+    - Flux exchange
+    - Thermodynamics
+    - Dynamics
+  model_type: "Mechanistic"
+  scope: "Polar and subpolar ocean–ice systems"
+  purpose_pattern:
+    purpose: "Simulate two-way interactions between sea ice and ocean for climatological and process-level studies"
+    pattern: "Shared coupling via flux exchange"
+  assumptions:
+    - Both submodels share identical timestep and grid
+    - Two-way exchange each coupling interval
+    - Flux variables are directly compatible in units and meaning
+
+  integrated_input:
+    - uid: "LIM_UCL_1997_1999"
+      version: "dynamic–thermodynamic LIM"
+      description: "Provides ice–ocean fluxes and ice state to OPA"
+    - uid: "OPA_IPSL_8.2_1999"
+      version: "8.2"
+      description: "Provides ocean surface state and currents to LIM"
+
+  output:
+    format:
+      - "NetCDF"
+    variables: "Coupled ocean–ice diagnostics"
+    units: "various"
+    verification: "Cross-validated against observed ocean and sea-ice climatology"
+
+  integration:
+    pattern: "Two-way coupling"
+    submodels:
+      - "LIM"
+      - "OPA"
+    execution_constraints: "Synchronized timestep and grid"
+    acknowledgment: "Fichefet & Morales Maqueda; Madec et al."
+    latency_expectations: "Exchange every coupling interval (few ocean steps)"
+    data_synchronization: "Fluxes and state variables exchanged via coupler"
+
+  coupling_contract:
+    A_to_B:   # LIM → OPA
+      variables:
+        - name: ice_concentration
+          unit: "%"
+        - name: ice_thickness
+          unit: "m"
+        - name: snow_thickness
+          unit: "m"
+        - name: ice_ocean_freshwater_flux
+          unit: "m/s"
+        - name: ice_ocean_heat_flux
+          unit: "W/m²"
+        - name: ice_ocean_momentum_stress
+          unit: "N/m²"
+      cadence: "each coupling interval"
+    B_to_A:   # OPA → LIM
+      variables:
+        - name: sea_surface_temperature
+          unit: "°C"
+        - name: sea_surface_salinity
+          unit: "PSU"
+        - name: ocean_surface_currents_u
+          unit: "m/s"
+        - name: ocean_surface_currents_v
+          unit: "m/s"
+        - name: ocean_mixed_layer_depth
+          unit: "m"
+        - name: downwelling_shortwave_radiation
+          unit: "W/m²"
+        - name: downwelling_longwave_radiation
+          unit: "W/m²"
+      cadence: "each coupling interval"
+
+  authors:
+    - name: ""
+      orcid: ""
+      role: "Integration designer / user"

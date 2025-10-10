@@ -1,0 +1,173 @@
+AB-Intended:
+  title: "Intended: Coupled Sea-Ice–Ocean Modeling Framework"
+  unique_identifier: ""
+  model_version: ""
+  description: >
+    A conceptual framework to integrate a sea-ice dynamics/thermodynamics model with an
+    ocean general circulation model (OGCM), optionally via a coupler. The goal is to
+    simulate polar ocean–ice interactions and evaluate sensitivity to forcing and parameters.
+    Specific submodels (sea-ice, ocean, coupler) are not yet selected.
+
+  keywords:
+    - Sea ice
+    - Ocean circulation
+    - Polar climate
+    - Model coupling
+    - Flux exchange
+    - Thermodynamics
+
+  model_type: "Mechanistic (coupled)"
+  scope: ""
+  purpose_pattern:
+    purpose: "Simulate two-way interactions between sea ice and ocean to assess climatological and process-level questions"
+    pattern: "Modular integration (sea-ice + ocean + optional coupler)"
+
+  assumptions:
+    - "Sea ice treated as continuum (tentative)"
+    - "Hydrostatic, Boussinesq ocean (tentative)"
+    - "Bulk flux formulations at the ice–ocean interface (tentative)"
+    - "Atmospheric forcing prescribed (reanalysis/climatology; TBD)"
+    - "No biogeochemistry (initially; TBD)"
+
+  dimensionality: "Ice: 2D; Ocean: 3D (tentative)"
+  spatial_extent: ""
+  spatial_resolution: ""
+  variable_spatial_resolution: ""
+  temporal_extent: ""
+  temporal_resolution: ""
+  variable_temporal_resolution: ""
+
+  calibration_tools_data: ""
+  publications: []
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+  error_handling: ""
+
+  license: ""
+  landing_page: ""
+  distribution_version: ""
+  programming_language: ""
+  software_requirements: ""
+  hardware_requirements: ""
+  execution_instructions: ""
+  parallel_execution: ""
+  implementation_verification: ""
+  source_code_availability: ""
+
+  parameters: []
+
+  datasets:
+    - uid: ""
+      version: ""
+      access_url: ""
+      dependencies: []
+
+  integrated_input:
+    - uid: ""
+      version: ""
+      description: "Atmospheric forcing (winds, air temperature, humidity, radiation, precipitation; TBD)"
+    - uid: ""
+      version: ""
+      description: "Bathymetry/topography and coastline/iceshelf masks (TBD)"
+
+  data_evaluation: ""
+
+  output:
+    format: []
+    variables: ""
+    units: ""
+    verification: ""
+    corroboration: ""
+
+  integration:
+    pattern: "shared coupling"
+    submodels:
+      - "Sea-ice model (TBD)"
+      - "Ocean GCM (TBD)"
+      - "Coupler or in-line coupling (TBD)"
+    execution_constraints: "Sea-ice exchanges momentum/heat/freshwater/salt with ocean on a defined schedule"
+    acknowledgment: "Submodel selection and coupling mechanism TBD"
+    latency_expectations: ""
+    data_synchronization: ""
+
+  # --- Interface contracts help an automated checker find bottlenecks ---
+  interface_contracts:
+    exchange_variables:
+      momentum_flux:
+        unit: "N m^-2"
+        sign_convention: "Positive downward (TBD)"
+      sensible_heat_flux:
+        unit: "W m^-2"
+        sign_convention: "Positive oceanward (TBD)"
+      latent_heat_flux:
+        unit: "W m^-2"
+        sign_convention: "Positive oceanward (TBD)"
+      freshwater_flux:
+        unit: "kg m^-2 s^-1 or m s^-1"
+        sign_convention: "Positive into ocean (TBD)"
+      salt_flux:
+        unit: "kg m^-2 s^-1"
+        sign_convention: "Positive into ocean (TBD)"
+      ice_salinity_assumption:
+        value: ""
+        unit: "PSU"
+      drag_coefficients:
+        air_ice: ""
+        ice_ocean: ""
+      thermodynamic_exchange:
+        law: ""
+        notes: ""
+    grid_and_coordinates:
+      horizontal_grid_type: ""      # e.g., rectilinear, curvilinear, tripolar
+      vertical_coordinate_ocean: "" # e.g., z-level, z*, isopycnal, sigma
+      sea_ice_grid_matches_ocean: "" # true/false/TBD
+      land/sea_mask_convention: ""
+      polar_treatment: ""           # e.g., tripolar, filtering
+      CRS: "WGS84 (TBD)"
+    time_and_coupling:
+      ocean_time_step: ""
+      ice_time_step: ""
+      coupling_interval: ""
+      calendar: ""                  # e.g., 360-day, Gregorian
+      restart_frequency: ""
+      I/O_format: "NetCDF (CF-compliant preferred; TBD)"
+      CF_version: "CF-1.10 (preferred; TBD)"
+
+  # --- Constraints the system can use to shortlist candidate models ---
+  compatibility_constraints:
+    language_preference: ""          # e.g., Fortran/C++/Python
+    license_acceptability: ""        # e.g., GPL/MIT/Apache/BSD
+    compute_budget: ""               # e.g., single node / small cluster / HPC
+    target_domain: ""                # e.g., Global / Arctic / Antarctic / Regional shelf seas
+    required_features:
+      - ""                           # e.g., VP rheology; TKE mixing; GM eddies
+    nice_to_have:
+      - ""                           # e.g., melt ponds; data assimilation
+    external_coupler_preference: ""  # e.g., OASIS-MCT / ESMF / in-line
+    netcdf_cf_required: ""           # true/false/TBD
+
+  # --- Let the system propose models into these buckets; keep empty for now ---
+  candidate_models:
+    sea_ice: []
+    ocean: []
+    coupler: []
+
+  # --- Common integration bottlenecks for the checker to flag automatically ---
+  bottleneck_checklist:
+    - "Grid mismatch (sea-ice vs ocean) or missing remapping weights"
+    - "Vertical coordinate incompatibility (z-level vs isopycnal/sigma)"
+    - "Inconsistent flux sign conventions or units"
+    - "Non-CF-compliant metadata preventing automatic variable mapping"
+    - "Thermodynamic law mismatch (e.g., boundary-layer heat transfer formulations)"
+    - "Different salinity assumptions for sea ice/brine rejection"
+    - "Time-step stability and coupling interval aliasing"
+    - "Unhandled land/ice masks and coastal tiling"
+    - "Missing freshwater budget closure (precip/evap/runoff/ice melt)"
+    - "Parallel decomposition and halo-exchange incompatibilities"
+
+  authors:
+    - name: ""
+      orcid: ""
+      role: ""

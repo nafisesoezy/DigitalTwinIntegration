@@ -1,0 +1,89 @@
+PlankTOM10:
+  title: PlankTOM10 Biogeochemical Model
+  unique_identifier: PlankTOM10_2010
+  model_version: "2010"
+  description: "A 3D marine biogeochemical model simulating plankton dynamics, nutrient cycles, and dimethylsulphide (DMS) production, coupled online with NEMO to use its physical state variables."
+  keywords:
+    - Biogeochemistry
+    - Dimethylsulphide
+    - Plankton
+    - Marine ecosystem
+    - Carbon cycle
+  model_type: Mechanistic
+  scope: Global marine ecosystems
+  purpose_pattern:
+    purpose: "Simulate ocean biogeochemical processes including DMS production"
+    pattern: "Online coupled to physical ocean model"
+  assumptions:
+    - Stoichiometric phytoplankton growth
+    - Temperature and light-dependent production rates
+    - Multiple plankton functional types
+  dimensionality: 3D
+  spatial_extent: Ocean water column
+  spatial_resolution: Same as host model (NEMO)
+  variable_spatial_resolution: true
+  temporal_extent: Multi-year
+  temporal_resolution: Hourly to daily
+  variable_temporal_resolution: true
+  calibration_tools_data: In situ and satellite DMS, chlorophyll data
+  publications:
+    - Vogt et al., 2010
+  conceptual_evaluation: Represents known seasonal DMS production patterns
+  validation_capabilities: Compared with global DMS climatologies
+  sensitivity_analysis: Run with varying biological parameters
+  uncertainty_analysis: Scenario-based DMS flux uncertainty
+  error_handling: Handled through coupling layer with NEMO
+  license: CeCILL
+  landing_page: https://www.nemo-ocean.eu
+  distribution_version: "2010"
+  programming_language:
+    - Fortran 90
+  software_requirements: Runs within NEMO framework
+  hardware_requirements: Same as NEMO
+  execution_instructions: "Activated through NEMO's namelist and tracer definitions"
+  parallel_execution: true
+  implementation_verification: Tested against standalone runs and DMS data
+  source_code_availability: true
+
+  input:
+    description: "Physical ocean state variables from NEMO"
+    format: NetCDF (internal coupling fields)
+    variables:
+      - Temperature (T)
+      - Salinity (S)
+      - 3D velocities (u, v, w)
+      - Mixed layer depth (MLD)
+      - Shortwave radiation at depth
+      - Sea ice cover/thickness
+    units: "°C, PSU, m/s, m, W m⁻², 0–1"
+
+  integrated_input:
+    - uid: NEMO_v3.3_2010
+      version: "v3.3"
+      description: "Physical drivers for biogeochemistry"
+
+  output:
+    format:
+      - NetCDF
+    variables:
+      - DMS concentration
+      - Plankton functional type biomass
+      - Nutrient fields (nitrate, phosphate, silicate)
+      - Air–sea DMS flux
+      - Light attenuation coefficient (Kd_bio)
+      - Bio-induced heat absorption profile (Qbio)
+      - Surface albedo modifier from biological activity
+    units: "nmol/L, mmol/m³, µmol m⁻² d⁻¹, m⁻¹, W m⁻³, 0–1"
+    verification: "Validated against climatology and in-situ measurements"
+
+  integration:
+    pattern: ""
+    submodels:
+      - "Multiple plankton functional types"
+      - "Sulfur cycle module"
+    execution_constraints: "Same timestep and grid as NEMO"
+    data_synchronization: "Receives physical fields each timestep from NEMO; returns bio-optical and gas flux feedbacks"
+
+  authors:
+    - name: Vogt, M.
+      role: Ecological model developer

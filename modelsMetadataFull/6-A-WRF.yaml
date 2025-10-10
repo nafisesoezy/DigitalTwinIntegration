@@ -1,0 +1,101 @@
+WRF:
+  title: Weather Research and Forecasting Model (ARW core) — with embedded 1-D lake scheme
+  unique_identifier: WRF_ARW_v3.6_Lake_2016
+  model_version: "3.6+ (with lake scheme enabled)"
+  description: "Nonhydrostatic regional atmospheric model providing near-surface meteorology and radiation to the embedded 1-D lake scheme and ingesting its surface state and fluxes for the atmospheric lower boundary."
+  keywords:
+    - Regional atmosphere
+    - Boundary layer
+    - Surface fluxes
+    - Radiation
+    - WRF-lake
+  model_type: Mechanistic
+  scope: Continental to regional atmospheric dynamics over lake districts
+  purpose_pattern:
+    purpose: "Simulate atmospheric circulation and surface exchanges over lake-rich regions"
+    pattern: "Spectral/finite-difference dynamical core with physics suites; embedded lake component for water points"
+  assumptions:
+    - Hydrostatic or nonhydrostatic per configuration
+    - Terrain-following vertical coordinate
+    - Lake surface represented by an embedded 1-D water/ice/snow column
+  dimensionality: 3D
+  spatial_extent: Model domain (includes Great Lakes region in study configurations)
+  spatial_resolution: "O(1–10 km) horizontal; ~30–60 vertical levels (configurable)"
+  variable_spatial_resolution: true
+  temporal_extent: "Event to multi-season runs"
+  temporal_resolution: "Timestep seconds; physics 5–30 min (configurable)"
+  variable_temporal_resolution: true
+  calibration_tools_data: "Reanalysis forcing and in situ/satellite validations (e.g., buoys, precipitation analyses)"
+  publications:
+    - "Xiao et al., 2016 (JAMES)"
+  conceptual_evaluation: "Demonstrates improved LST/ice when dynamic albedo, tuned diffusivity, and snow-over-ice are used"
+  validation_capabilities: "Against buoys (LST profiles), ice cover climatology, and precipitation products"
+  sensitivity_analysis: "Physics suite alternatives; lake albedo/diffusivity options"
+  uncertainty_analysis: "Scenario/physics ensemble configurations"
+  error_handling: "Numerical stability checks; restart files"
+  license: "WRF open-source (varies by components)"
+  landing_page: "https://www.mmm.ucar.edu/models/wrf"
+  distribution_version: "3.6+"
+  programming_language:
+    - Fortran
+    - C
+  software_requirements: "NetCDF, MPI; WPS/real.exe pre-processing"
+  hardware_requirements: "HPC/cluster"
+  execution_instructions: "Configure namelists; compile physics with lake option; run real.exe and wrf.exe"
+  parallel_execution: true
+  implementation_verification: "Standard WRF benchmarks; lake-enabled case studies"
+  source_code_availability: true
+
+  input:
+    description: "Surface state and fluxes computed by the embedded lake column at water grid cells (B → A, in-memory)."
+    format: "In-memory structures (no files at coupling step)"
+    variables:
+      - lake_skin_temperature               # K
+      - lake_ice_fraction                   # 0–1
+      - lake_ice_thickness                  # m
+      - lake_surface_albedo                 # dimensionless
+      - surface_roughness_length_water      # m
+      - upward_sensible_heat_flux           # W m^-2
+      - upward_latent_heat_flux             # W m^-2
+      - upward_longwave_radiation           # W m^-2
+      - reflected_shortwave_radiation       # W m^-2
+      - surface_evaporation_rate            # kg m^-2 s^-1
+      - lake_snow_depth                     # m
+    units: "See inline comments"
+
+  integrated_input:
+    - uid: CLM4.5_Lake_LISSS_WRF_2016
+      version: "CLM4.5-based 1-D lake"
+      description: "Embedded lake column providing lower-boundary state and fluxes over water points"
+
+  output:
+    format:
+      - "NetCDF (full model outputs); in-memory (to lake)"
+    variables:
+      # A → B drivers (mirrors Lake.input)
+      - air_temperature_2m                  # K
+      - specific_humidity_2m                # kg kg^-1
+      - wind_speed_10m                      # m s^-1
+      - wind_u10                           # m s^-1
+      - wind_v10                           # m s^-1
+      - surface_pressure                    # Pa
+      - downwelling_shortwave_radiation     # W m^-2
+      - downwelling_longwave_radiation      # W m^-2
+      - precipitation_rain_rate             # kg m^-2 s^-1
+      - precipitation_snow_rate             # kg m^-2 s^-1
+      - near_surface_air_density            # kg m^-3
+      - reference_height_wind               # m   # for flux algorithms
+    units: "See inline comments"
+    verification: "Reanalysis comparison; station/buoy validations"
+
+  integration:
+    pattern: "Embedded coupling (lake column embedded in WRF surface system)"
+    submodels:
+      - "Land-surface & surface-layer physics"
+      - "Embedded 1-D lake/ice/snow column"
+    execution_constraints: "Synchronous timestep; identical grid cell ownership for lake points"
+    data_synchronization: "Two-way, every physics step (in-memory field exchange)"
+
+  authors:
+    - name: "Skamarock et al. (WRF team)"
+      role: "Core and physics"

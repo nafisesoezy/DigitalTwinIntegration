@@ -1,0 +1,98 @@
+IBM:
+  title: "Individual-Based Plant Model (IBM)"
+  unique_identifier: "IBM_Vegetation_Model_2017"
+  model_version: "1.0"
+  description: >
+    A spatially explicit individual-based model simulating plant growth, mortality, dispersal,
+    and competition, with each plant represented as an agent interacting locally with neighbors
+    and the environment. Designed for coupling with a soil feedback submodel.
+  keywords:
+    - Individual-based model
+    - Vegetation dynamics
+    - Spatial ecology
+    - Competition
+    - Dispersal
+  model_type: "Mechanistic"
+  scope: "Local to landscape-scale plant populations"
+  purpose_pattern:
+    purpose: "Simulate spatial vegetation dynamics under competition, dispersal, and environmental feedback"
+    pattern: "Agent-based simulation of plant life cycle with environmental interaction"
+  assumptions:
+    - Plants are discrete individuals
+    - Interactions are local and spatially explicit
+    - Life cycle parameters are homogeneous within species
+    - Soil conditions affecting germination and growth are provided externally
+  dimensionality: "2D"
+  spatial_extent: "Grid of landscape cells (e.g., 100×100)"
+  spatial_resolution: "Cell level (typically 1 m²)"
+  variable_spatial_resolution: false
+  temporal_extent: "Decadal (multi-year)"
+  temporal_resolution: "Annual, with daily internal steps"
+  variable_temporal_resolution: false
+  calibration_tools_data: "Tested via controlled simulation experiments; not calibrated to real species"
+  publications:
+    - "Vincenot et al., 2017"
+  conceptual_evaluation: "Based on ecological theory of local competition and individual behavior"
+  validation_capabilities: "Verified against theoretical expectations (e.g., coexistence, clustering)"
+  sensitivity_analysis: "Parametric sensitivity analysis conducted"
+  uncertainty_analysis: "Scenario-based exploration"
+  error_handling: "Basic input validation and event conflict resolution"
+  license: "CC BY"
+  distribution_version: "1.0"
+  programming_language:
+    - "C++"
+    - "NetLogo"
+  software_requirements: "Standard compiler or agent-based modeling platform"
+  hardware_requirements: "Standard workstation"
+  execution_instructions: "Compile and run with parameter files; can be run standalone or coupled"
+  parallel_execution: false
+  implementation_verification: "Manual checks under controlled inputs"
+  source_code_availability: false
+
+  input:
+    description: "Environmental conditions from SoilFeedback model affecting each grid cell"
+    format: "CSV or in-memory structure"
+    variables:
+      - soil_toxicity_per_cell             # dimensionless
+      - feedback_modified_germination_prob # probability (0–1)
+    units:
+      - "dimensionless"
+      - "probability"
+  integrated_input:
+    - uid: "SoilFeedback_Model_2017"
+      version: "1.0"
+      description: "Provides soil toxicity state per cell used to modulate germination and growth"
+
+  parameters:
+    - name: "Plant life history parameters"
+      description: "Growth, mortality, reproduction, and dispersal traits per species"
+      format: "Table"
+      unit: "varies"
+      datatype: "float"
+      valid_range: "Biologically plausible"
+
+  output:
+    format:
+      - "CSV"
+      - "Text"
+    variables:
+      - plant_biomass_per_cell  # g m⁻²
+      - plant_density_per_cell  # count m⁻²
+      - species_identity_per_cell
+    units:
+      - "g m⁻²"
+      - "count m⁻²"
+    verification: "Patterns and demographics vs. theory"
+    corroboration: "Emergent clustering and coexistence patterns in literature"
+
+  integration:
+    submodels: []
+    execution_constraints: "Requires SoilFeedback outputs when in feedback mode"
+    acknowledgment: "Vincenot et al., 2017"
+    latency_expectations: "Annual coupling step"
+    data_synchronization: "Grids must be aligned at each coupling step"
+
+  authors:
+    - name: "Vincent Vincenot"
+      orcid: ""
+      role: "Model design and implementation"

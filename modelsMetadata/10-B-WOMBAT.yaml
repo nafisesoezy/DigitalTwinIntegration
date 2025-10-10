@@ -1,0 +1,103 @@
+WOMBAT:
+  title: "WOMBAT: Whole Ocean Model of Biogeochemistry And Trophic-dynamics"
+  unique_identifier: "WOMBAT_Model_2013"
+  model_version: "2013.1"
+  description: "WOMBAT is a three-dimensional NPZD-type ocean biogeochemistry model, including nutrients, phytoplankton, zooplankton, detritus, and extensions for carbon, oxygen, and iron cycles. It is designed to simulate large-scale biogeochemical cycling and ecosystem responses when coupled to ocean circulation models."
+  keywords:
+    - Biogeochemistry
+    - NPZD model
+    - Carbon cycle
+    - Nutrient cycling
+    - Phytoplankton
+    - Ocean ecosystems
+  model_type: "Process-based biogeochemical cycling model"
+  scope: "Simulation of nutrient cycles, primary production, and biogeochemical tracers in the global ocean"
+  purpose_pattern:
+    purpose: "Quantify nutrient and carbon cycling, chlorophyll distributions, and ecosystem variability in the global ocean"
+    pattern: "Integrated Coupling with OFAM3 (physical circulation model)"
+  assumptions:
+    - "Nutrient uptake follows Redfield stoichiometry"
+    - "Phytoplankton growth limited by light, phosphate, and iron"
+    - "Simple NPZD structure for ecosystem representation"
+    - "Air-sea gas exchange parameterized by wind speed and climatological ice cover"
+  dimensionality: "3D (longitude, latitude, depth)"
+  spatial_extent: "Same as coupled ocean circulation model (OFAM3, near-global ocean, 75°S–75°N)"
+  spatial_resolution: "Inherits grid resolution of OFAM3 (1/10° horizontal, variable vertical)"
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-decadal integrations (hindcast and scenario simulations)"
+  temporal_resolution: "Daily to monthly outputs"
+  variable_temporal_resolution: true
+  calibration_tools_data: "Iron deposition climatologies, nutrient and oxygen climatologies, observed CO₂ fluxes, SeaWiFS chlorophyll-a"
+  publications:
+    - "Oke et al., 2013, Geosci. Model Dev., 6, 591–615"
+    - "Matear and Lenton, 2008"
+    - "Kidston et al., 2011"
+  conceptual_evaluation: "Evaluated against observed chlorophyll-a, nutrient distributions, CO₂ fluxes, and oxygen cycles"
+  validation_capabilities: "Yes — validated with global chlorophyll, carbon cycle estimates, and regional nutrient profiles"
+  sensitivity_analysis: "Sensitivity tested for nutrient limitation, Redfield ratio assumptions, and light availability"
+  uncertainty_analysis: "Uncertainty from parameterizations and forcing; tested via ensemble and scenario runs"
+  error_handling: "Basic validation of boundary conditions; runtime checks in coupled execution with OFAM3"
+  license: "Research/Institutional use (CSIRO/Bureau of Meteorology)"
+  landing_page: "http://www.bom.gov.au/oceanography/forecasts/"
+  distribution_version: "2013.1"
+  programming_language:
+    - "Fortran (coupled with MOM4p1 in OFAM3)"
+  software_requirements: "Requires coupled execution with OFAM3; Fortran compiler, MPI"
+  hardware_requirements: "High-performance computing (HPC) environment"
+  execution_instructions: "Runs as a coupled module within OFAM3; configured through shared namelist files"
+  parallel_execution: true
+  implementation_verification: "Peer-reviewed validation against observed chlorophyll, oxygen, and carbon flux datasets"
+  source_code_availability: false
+  parameters:
+    - name: "WOMBAT_Config_Parameters"
+      description: "Defines ecosystem constants (uptake rates, remineralization rates, stoichiometric ratios)"
+      format: "Namelist text files"
+      unit: "varies"
+      datatype: "float"
+      valid_range: "Biologically meaningful rates (positive, finite values)"
+      default: "Set according to WOMBAT configuration in Oke et al. (2013)"
+  datasets:
+    - uid: "SeaWiFS_Chlorophyll"
+      version: "2008"
+      access_url: "https://oceancolor.gsfc.nasa.gov/"
+      dependencies:
+        - "Chlorophyll-a validation"
+    - uid: "Iron_Deposition_Climatology"
+      version: "2011"
+      access_url: "CSIRO datasets"
+      dependencies:
+        - "Dust/iron forcing fields"
+  integrated_input:
+    - "Physical ocean state variables from OFAM3"
+    - "Atmospheric iron deposition climatologies"
+    - "Climatological sea ice concentrations"
+  data_evaluation: "Checks for nutrient conservation, Redfield consistency, CO₂ flux plausibility"
+  output:
+    format:
+      - "NetCDF"
+    variables: "Nutrient concentrations, phytoplankton biomass, zooplankton biomass, detritus, chlorophyll-a, oxygen, carbon fluxes"
+    units:
+      - "mmol m⁻³"
+      - "mg Chl a m⁻³"
+      - "µmol O₂ L⁻¹"
+      - "PgC yr⁻¹ (fluxes)"
+    verification: "Validated against SeaWiFS chlorophyll, WOCE nutrient profiles, air-sea CO₂ estimates"
+    corroboration: "Reproduces ENSO-related variability in chlorophyll and CO₂ flux; consistent with observed seasonal cycles"
+  integration:
+    pattern: "Integrated Coupling"
+    submodels:
+      - "OFAM3 (physical ocean general circulation model)"
+    execution_constraints: "Runs synchronously with OFAM3; cannot operate stand-alone at full resolution"
+    acknowledgment: "Coupled execution ensures two-way interaction between physical dynamics and biogeochemistry"
+    latency_expectations: "Real-time coupling within the same integration"
+    data_synchronization: "In-memory exchange of tracer fields and physical state variables"
+  authors:
+    - name: "R. J. Matear"
+      orcid: "https://orcid.org/0000-0001-6811-4422"
+      role: "Biogeochemical model development and integration"
+    - name: "A. Lenton"
+      orcid: "https://orcid.org/0000-0002-1521-0944"
+      role: "Carbon cycle and CO₂ flux parameterizations"
+    - name: "P. R. Oke"
+      orcid: "https://orcid.org/0000-0002-5670-8435"
+      role: "Coupling with OFAM3"
