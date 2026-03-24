@@ -1,0 +1,192 @@
+# 3-AB-Integrated.yaml
+AB-Integrated:
+  title: "Coupled NEMO–ECWAM Ocean-Wave Modeling System"
+  unique_identifier: "NEMO_ECWAM_Coupled_Model_2015"
+  model_version: "NEMO v3.4 + ECWAM CY38R1"
+  description: >
+    A coupled wave–ocean modeling system integrating NEMO (ocean general circulation
+    model) and ECWAM (spectral wave model) to account for surface wave effects in
+    ocean dynamics. In the Breivik et al. (2015) configuration, ECWAM provides
+    sea-state dependent surface stress, Stokes drift, and turbulent kinetic energy
+    (TKE) flux from breaking waves to NEMO, which in turn updates upper-ocean
+    temperature, currents, and mixed layer depth. The system can be run in ocean-only
+    forced mode (NEMO forced by ECWAM fields derived from ERA-Interim) or as part of
+    a fully coupled IFS–ECWAM–NEMO configuration.
+
+  keywords:
+    - Wave–ocean interaction
+    - Stokes drift
+    - Ocean mixing
+    - Coupled modeling
+    - Surface stress
+    - TKE injection
+    - Stokes–Coriolis force
+
+  model_type: "Mechanistic"
+  scope: "Global and regional oceans with wave-affected surface layer dynamics"
+
+  purpose_pattern:
+    purpose: "Simulate realistic ocean dynamics including surface wave effects on mixing, momentum flux, and upper-ocean structure"
+    pattern: >
+      Two-way Earth-system coupling (IFS–ECWAM–NEMO) with direct flux forcing from
+      the wave model to the ocean and indirect feedback from ocean currents and SST
+      to the wave and atmospheric components.
+
+  assumptions:
+    - "Stokes drift modifies upper-ocean momentum through the Stokes–Coriolis term."
+    - "Wave breaking injects turbulence (TKE) at the surface, enhancing upper-ocean mixing."
+    - "Sea-state dependent stress alters momentum input into the ocean relative to air-side stress."
+    - "Coupling fields can be exchanged at discrete intervals (e.g., 3-hourly) without fully synchronous time stepping."
+    - "Grid remapping between ECWAM and NEMO (and IFS) preserves key flux integrals."
+
+  dimensionality: "3D (ocean), 2D spectral (waves)"
+  spatial_extent: "Global ocean (ORCA1 grid) or regional domains (e.g., North Atlantic) with corresponding wave grid"
+  spatial_resolution: >
+    ~1° ORCA1 ocean grid with 42 vertical levels (10 m top level) and ECWAM at
+    ~1.5° global resolution in the reference experiments.
+  variable_spatial_resolution: true
+
+  temporal_extent: "Multi-year to multi-decadal simulations (e.g., 1979–2009 hindcasts; 7-month seasonal forecasts)"
+  temporal_resolution: "Ocean internal step ~1 h; wave step ~15 min; coupling interval ~3 h"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: >
+    Tested using ERA-Interim forcing, ORAS4 ocean reanalysis, EN3 temperature and
+    temperature–salinity profiles, and Reynolds OI_v2 SST analyses for evaluating
+    SST and mixed-layer biases.
+
+  publications:
+    - "Breivik et al. 2015, JGR Oceans: Surface wave effects in the NEMO ocean model – Forced and coupled experiments."
+
+  conceptual_evaluation: >
+    Demonstrated reduction in SST and upper-ocean temperature biases and more
+    realistic ocean heat content trends when wave effects (sea-state dependent
+    stress, TKE flux, Stokes–Coriolis) are included. Shows sensitivity of mixed-layer
+    depth and heat uptake to wave-induced mixing.
+
+  validation_capabilities: >
+    Validated against EN3 profile data, ORAS4 reanalysis, and OI_v2 SST, with
+    systematic comparison of forced and coupled runs, including control (no wave
+    forcing) and multiple wave-effect experiments (TAUOC, WTKE, STCOR, WAVE).
+
+  sensitivity_analysis: >
+    Multi-experiment design exploring separate and combined effects of water-side
+    stress (TAUOC), TKE flux from breaking waves (WTKE), and Stokes–Coriolis forcing
+    (STCOR), plus experiments adjusting Langmuir and empirical deep-mixing (ETAU)
+    parameterizations.
+
+  uncertainty_analysis: >
+    Scenario-based evaluation using different forcing products, parameter choices
+    for mixing, and comparison of forced-only vs fully coupled atmosphere–wave–ocean
+    experiments.
+
+  error_handling: >
+    Error handling is inherited from component models (NEMO, ECWAM, IFS) and
+    coupling infrastructure; includes checks on CFL stability, NaNs, flux
+    consistency, and restart capability.
+
+  license: "NEMO under CeCILL-C; ECWAM and IFS subject to ECMWF licenses; coupling configuration as in Breivik et al. 2015."
+  landing_page: "https://www.nemo-ocean.eu/"
+  distribution_version: "2015 reference configuration (ORCA1L42 + ECWAM CY38R1)"
+
+  programming_language:
+    - "Fortran (NEMO core)"
+    - "Fortran (ECWAM core)"
+  software_requirements: "NEMO and ECWAM build systems; NetCDF I/O; MPI; optional coupler (e.g., IFS single executable framework)"
+  hardware_requirements: "HPC cluster or high-end workstation for multi-decadal and/or high-resolution runs"
+  execution_instructions: >
+    Configure NEMO and ECWAM with consistent domains and calendars. Enable
+    wave-related physics in NEMO (wave-modified stress, TKE flux, Stokes–Coriolis
+    forcing). Provide ECWAM-derived fields (Stokes drift, water-side stress, TKE
+    flux) to NEMO at the chosen coupling interval (e.g., 3 h). In a fully coupled
+    IFS–ECWAM–NEMO setup, run the single executable where IFS drives ECWAM and NEMO,
+    and ECWAM returns roughness and wave fields, while NEMO returns SST and surface
+    currents.
+
+  parallel_execution: true
+  implementation_verification: >
+    Benchmarked via twin experiments (forced vs coupled, with and without wave
+    effects) and comparison with ORAS4 and observational datasets; demonstrated
+    reduced SST bias and improved ocean heat content evolution.
+
+  source_code_availability: "Available for NEMO under CeCILL-C; ECWAM and IFS source under ECMWF licensing terms; coupling scripts/configs as used at ECMWF."
+
+  parameters:
+    - name: "Coupling_Params"
+      description: "Coupling interval, selection of wave effects (TAUOC, WTKE, STCOR), and mapping options between grids"
+      format: "Fortran namelist and/or coupler configuration files"
+      unit: "various"
+      datatype: "float"
+      valid_range: "Documented in model and coupler configuration"
+      CRS: "ORCA ocean grid and ECWAM Gaussian or lat–lon grid"
+      default_values: "3-hour coupling interval; all three wave effects enabled (WAVE run)"
+
+  datasets:
+    - uid: "Wave_Ocean_Forcing_2015"
+      version: "2015"
+      access_url: ""
+      dependencies:
+        - "Wind forcing from ECMWF (ERA-Interim or IFS)"
+        - "Initial ocean state (e.g., ORAS4-based or climatological)"
+        - "Bathymetry, coastline, and ice masks (NEMO + LIM2)"
+        - "Initial wave state (ECWAM restart or spinup)"
+
+  integrated_input:
+    - uid: "ECWAM_Output"
+      version: "CY38R1"
+      description: >
+        Stokes drift surface vector and profile parameters, wave-modified
+        water-side stress, and wave-breaking TKE flux used as boundary
+        conditions in NEMO.
+    - uid: "NEMO_Output"
+      version: "v3.4"
+      description: >
+        Sea surface temperature and surface currents fed back to the atmospheric
+        model (IFS), indirectly influencing ECWAM via changes in stress and roughness.
+
+  data_evaluation: >
+    Mixed-layer depth, SST, and subsurface temperature compared against EN3
+    temperature profiles, OI_v2 SST, and ORAS4 ocean reanalysis; diagnostics of
+    global ocean heat content and bias evolution in forced and coupled experiments.
+
+  output:
+    format:
+      - "NetCDF"
+    variables: >
+      Coupled fields including sea surface temperature, mixed layer depth, upper-ocean
+      currents, wave stress and TKE flux, and Stokes drift diagnostics; experiment
+      includes fields with and without wave effects for comparison.
+    units: "°C, m s^-1, m, N m^-2, W m^-2, etc."
+    verification: >
+      Comparison of SST, MLD, and upper-ocean temperature structure against
+      observations/reanalyses; assessment of heat content trends relative to ORAS4.
+    corroboration: >
+      Coupled runs with wave effects show reduced biases and improved realism in
+      mixed-layer structure, consistent with theoretical expectations for
+      wave-driven mixing.
+
+  integration:
+    pattern: "Loose"
+    submodels:
+      - "NEMO ocean model (ORCA1L42 + LIM2 sea ice)"
+      - "ECWAM spectral wave model"
+      - "IFS atmospheric model (in fully coupled setup)"
+    execution_constraints: >
+      Coupling interval must match dynamic response scales of upper-ocean mixing
+      and wave evolution (~1–3 h). Grid remapping needed between ECWAM and NEMO
+      grids; careful treatment near coasts and ice-covered regions.
+    acknowledgment: >
+      NEMO Consortium and ECMWF modeling teams; coupling and experiments as
+      documented by Breivik et al. (2015) and related technical notes.
+    latency_expectations: "Wave model outputs must be available at or before ocean model coupling time steps."
+    data_synchronization: >
+      Exchange of fields at fixed coupling intervals: IFS → ECWAM and NEMO (winds,
+      fluxes), ECWAM → NEMO (Stokes drift, stress, TKE flux), and NEMO → IFS (SST,
+      currents) within a synchronized integration sequence.
+
+  authors:
+    - name: "Øyvind Breivik"
+      orcid: "https://orcid.org/0000-0001-7016-8023"
+      role: "Lead integration and coupling experiments; wave-process implementation in NEMO"
+    - name: "Jean-Marc Molines"
+      role: "Ocean model development (NEMO core configurations)"

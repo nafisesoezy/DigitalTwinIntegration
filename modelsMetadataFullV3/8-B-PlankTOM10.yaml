@@ -1,0 +1,119 @@
+PlankTOM10:
+  title: "PlankTOM10 Biogeochemical Model"
+  unique_identifier: "PlankTOM10_2010"
+  model_version: "2010"
+
+  description: >
+    A 3D marine biogeochemical model simulating nutrients, plankton functional
+    types, sulfur cycle, and dimethylsulphide (DMS) production. Online coupled to
+    NEMO through its tracer and biogeochemical interface.
+
+  keywords:
+    - Biogeochemistry
+    - Dimethylsulphide
+    - Marine ecosystem
+    - Plankton
+    - Carbon cycle
+
+  model_type: "Mechanistic"
+  scope: "Global marine ecosystems"
+
+  purpose_pattern:
+    purpose: "Simulate biogeochemical cycles including DMS production"
+    pattern: "Online biogeochemical tracer module within physical host"
+
+  assumptions:
+    - Stoichiometric phytoplankton growth
+    - Light- and temperature-dependent DMS production
+    - Multiple plankton functional groups
+
+  dimensionality: "3D"
+  spatial_extent: "Ocean water column"
+  spatial_resolution: "Matches NEMO grid"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Multi-year"
+  temporal_resolution: "Hourly to daily"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: "In situ and satellite DMS & chlorophyll"
+
+  publications:
+    - "Vogt et al., 2010"
+
+  conceptual_evaluation: "Represents major global seasonal patterns of DMS"
+  validation_capabilities: "Global comparisons with climatologies and cruises"
+  sensitivity_analysis: "Tracer parameter sweeps"
+  uncertainty_analysis: "Scenario-based DMS emission uncertainty"
+
+  conceptual_consistency_mismatch: >
+    DMS optical feedbacks are simplified and do not fully interact with all NEMO
+    vertical mixing schemes.
+
+  provenance_and_accessibility_gap: >
+    Detailed tracer parameter files and reference tuning datasets are not always archived.
+
+  license: "CeCILL"
+
+  programming_language:
+    - Fortran 90
+  programming_language_family:
+    - Native_C_CPP_Fortran_Family
+
+  software_requirements:
+    ffi:
+      - C_ABI
+    database: []
+    io_libraries:
+      - NetCDF4_Family
+
+  hardware_requirements: "HPC cluster"
+  source_code_availability: true
+
+  execution_instructions: "Enabled via NEMO TOP/TOP_SRC; activated in tracer namelists"
+  parallel_execution: true
+  error_handling: "Tracer bounds checks; invalid values reset; restart safety"
+
+  input:
+    description: "Physical state from NEMO"
+    format: "in-memory (timestep coupling), netcdf (restart)"
+    variables:
+      - temperature
+      - salinity
+      - velocities
+      - MLD
+      - shortwave_radiation_at_depth
+      - sea_ice_fields
+    units: "various"
+
+  integrated_input:
+    - uid: "NEMO_v3.3_2010"
+      version: "v3.3"
+      description: "Provides physical drivers"
+
+  output:
+    format:
+      - netcdf
+    variables:
+      - DMS_concentration
+      - plankton_functional_types
+      - nutrient_fields
+      - air_sea_DMS_flux
+      - Kd_bio
+      - Qbio
+      - albedo_modifier
+    units: "nmol/L, mmol/m³, µmol m⁻² d⁻¹, m⁻¹, W m⁻³, dimensionless"
+    verification: "Compared to global DMS datasets"
+
+  integration:
+    pattern: 
+    submodels:
+      - "Plankton functional types"
+      - "Sulfur cycle module"
+    communication_mechanism: "in-memory, synchronous, direct call"
+    data_synchronization: "Tracer exchange with NEMO each timestep"
+    execution_constraints: "Grid and timestep must match NEMO"
+
+  authors:
+    - name: "Vogt, M."
+      role: "Ecological model developer"

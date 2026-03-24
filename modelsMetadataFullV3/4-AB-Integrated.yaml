@@ -1,0 +1,122 @@
+Integrated_Model:
+  title: "Integrated Plant–Soil Feedback Model"
+  unique_identifier: "Integrated_PSF_Model_2017"
+  model_version: "1.0"
+
+  description: >
+    A tightly coupled spatially explicit modeling framework integrating an
+    individual-based plant model (IBM) with a cellular automaton soil feedback
+    model. Plants modify soil toxicity, which subsequently affects plant
+    establishment through conspecific negative feedback (PSNF). The system
+    reproduces vegetation patchiness, Janzen–Connell gaps, and multi-scale PSNF
+    patterns described in Vincenot 2017.
+
+  keywords:
+    - Coupled model
+    - Plant–soil feedback
+    - Individual-based modeling
+    - Cellular automaton
+    - Negative feedback
+    - Pattern formation
+
+  model_type: "Mechanistic"
+  scope: "Landscape-level vegetation–soil feedback"
+
+  purpose_pattern:
+    purpose: "Simulate vegetation–soil coevolution under PSNF processes"
+    pattern: "Bidirectional: plants modify soil; soil modifies plant establishment"
+
+  assumptions:
+    - Soil updated synchronously based on local plant history
+    - Negative feedback from conspecifics regulates population
+    - Soil memory decays exponentially (Vincenot 2017)
+    - Spatial effects occur at local-to-regional scales
+
+  dimensionality: "2D"
+  spatial_extent: "Grid-based ecological landscape"
+  spatial_resolution: "1 m²"
+  variable_spatial_resolution: false
+
+  temporal_extent: "Decades"
+  temporal_resolution: "Annual"
+  variable_temporal_resolution: false
+
+  calibration_tools_data: "Pattern-based tuning based on Vincenot 2017 PSNF behaviors"
+
+  publications:
+    - "Vincenot et al. 2017, Oikos"
+
+  conceptual_evaluation: >
+    Reproduces theoretical PSNF dynamics including coexistence, patchiness, and
+    multi-scale vegetation patterns consistent with empirical examples cited in
+    Vincenot 2017.
+
+  validation_capabilities: >
+    Model outcomes match known PSNF signatures: inhibition zones, density
+    dependence, and mosaic vegetation patches.
+
+  sensitivity_analysis: >
+    Conducted for soil decay rate, feedback strength, plant dispersal distance,
+    and demographic parameters.
+
+  uncertainty_analysis: "Scenario-based parameter variation"
+
+  error_handling: "Conflict resolution in synchronous updates"
+
+  license: "CC BY"
+  landing_page: ""
+  distribution_version: "1.0"
+
+  programming_language:
+    - "C++"
+
+  software_requirements: "Grid-based model environment"
+  hardware_requirements: "Workstation"
+
+  execution_instructions: >
+    Run synchronously with IBM and SoilFeedback components. Ensure same spatial
+    grid and yearly coupling.
+
+  parallel_execution: false
+  implementation_verification: >
+    PSNF emergent patterns matched with those shown in Vincenot 2017.
+
+  source_code_availability: false
+
+  parameters: []
+
+  datasets: []
+
+  integrated_input: []
+
+  data_evaluation: "Cross-consistency checks of plant density and soil toxicity"
+
+  output:
+    format:
+      - "CSV"
+    variables:
+      - Plant population
+      - Soil memory state
+      - Patch patterns
+    units: "various"
+
+    verification: >
+      Vegetation dynamics and spatial structure verified against PSNF theory.
+
+    corroboration: >
+      Emergent patchiness and coexistence consistent with Vincenot 2017.
+
+  integration:
+    pattern: "Loose"
+    submodels:
+      - "Individual-Based Plant Model (IBM)"
+      - "Soil Feedback Cellular Automaton Model"
+    execution_constraints: "Must share grid resolution and timestep"
+    acknowledgment: "Vincenot et al. 2017"
+    latency_expectations: "Minimal (synchronous)"
+    data_synchronization: "Shared update per year"
+
+  authors:
+    - name: "Vincent Vincenot"
+      orcid: ""
+      role: "Model integration and ecological interpretation"

@@ -1,0 +1,21 @@
+Viewpoint,Method,FieldsUsed,RowsUsed,Accuracy,Precision,Recall,F1
+domain,Rule-based (Static),15,150,0.6733333333333333,0.3333333333333333,0.85,0.8409090909090908
+domain,A (LLM-result-openai/gpt-oss-120b),15,150,0.9133333333333333,0.5555555555555555,0.85,0.8409090909090908
+domain,B (LLM-result-mistral-small-3.2-24b),15,150,0.9,0.5555555555555555,0.7875,0.8051948051948052
+domain,C (LLM-result-default-text-large),15,150,0.9066666666666666,0.5,0.75,1.0
+information,Rule-based (Static),10,78,0.8,0.48148148148148145,1.0,0.9
+information,A (LLM-result-openai/gpt-oss-120b),10,78,0.9,0.8333333333333334,1.0,1.0
+information,B (LLM-result-mistral-small-3.2-24b),10,78,0.9,0.8333333333333334,1.0,1.0
+information,C (LLM-result-default-text-large),10,78,0.8,0.48148148148148145,1.0,0.9
+computational,Rule-based (Static),1,10,0.9,0.5,1.0,0.6666666666666666
+computational,A (LLM-result-openai/gpt-oss-120b),1,10,0.9,0.5,1.0,0.6666666666666666
+computational,B (LLM-result-mistral-small-3.2-24b),1,10,0.9,0.5,1.0,0.6666666666666666
+computational,C (LLM-result-default-text-large),1,10,0.9,0.5,1.0,0.6666666666666666
+engineering,Rule-based (Static),5,50,0.8,0.32,1.0,0.875
+engineering,A (LLM-result-openai/gpt-oss-120b),5,50,0.9399999999999998,0.5833333333333334,1.0,0.9285714285714286
+engineering,B (LLM-result-mistral-small-3.2-24b),5,50,0.8,0.32,1.0,0.875
+engineering,C (LLM-result-default-text-large),5,50,0.8,0.32,1.0,0.875
+technology,Rule-based (Static),12,121,0.8916666666666666,0.6666666666666666,1.0,1.0
+technology,A (LLM-result-openai/gpt-oss-120b),12,121,1.0,1.0,1.0,1.0
+technology,B (LLM-result-mistral-small-3.2-24b),12,121,0.9416666666666668,0.8571428571428571,1.0,1.0
+technology,C (LLM-result-default-text-large),12,121,0.9166666666666666,0.75,1.0,1.0

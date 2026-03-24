@@ -1,0 +1,123 @@
+{
+  "summary": {
+    "group": "5",
+    "ab_kind": "INTENDED",
+    "num_rows_seen": 9,
+    "num_real_mismatches": 2,
+    "num_not_a_mismatch": 7,
+    "risk_level": "medium"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "dimensionality||dimensionality mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "2d plan-view with multilayer thermodynamics is incompatible with 3d."
+    },
+    {
+      "row_ref": "assumptions||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Both submodels share identical timestep, grid; two-way exchange each coupling interval; flux variables are directly compatible in units, meaning."
+    },
+    {
+      "row_ref": "description||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "A→AB:0.24 (covered: freshwater, heat, momentum, opa, state, two) | B→AB:0.16 (covered: interactions, lim, ogcm, state) | A∪B→AB:0.36 (covered: freshwater, heat, interactions, lim, momentum, ogcm, opa, state, two)"
+    },
+    {
+      "row_ref": "keywords||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "A→AB:0.20 (covered: thermodynamics) | B→AB:0.00 (covered: —) | A∪B→AB:0.20 (covered: thermodynamics)"
+    },
+    {
+      "row_ref": "model version||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "A and B versions are similar enough for integration."
+    },
+    {
+      "row_ref": "scope||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Both models cover polar regions, making them compatible."
+    },
+    {
+      "row_ref": "title||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "A→AB:0.05 (covered: lim) | B→AB:0.05 (covered: opa) | A∪B→AB:0.10 (covered: lim, opa)"
+    },
+    {
+      "row_ref": "software_specification_and_requirements||software environment mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "A↔B token-sim=0.20 (> 0.25)"
+    },
+    {
+      "row_ref": "time_steps_temporal_resolution||temporal resolution mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "Coupled every few ocean steps, diagnostics monthly / daily is incompatible with 96 min timestep in study."
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "F1",
+      "field": "dimensionality",
+      "bottleneck": "dimensionality mismatch",
+      "root_cause": "Incompatible dimensionality between 2d plan-view with multilayer thermodynamics and 3d.",
+      "evidence": {
+        "A_value": "2d plan-view with multilayer thermodynamics",
+        "B_value": "3d"
+      },
+      "why_it_blocks_integration": "The models operate in different dimensions, making direct integration impossible.",
+      "proposed_fix": "Resample or interpolate one of the models to match the dimensionality of the other.",
+      "data_transform": {
+        "rules": [
+          "Resample or interpolate 3d data to 2d plan-view with multilayer thermodynamics."
+        ],
+        "example": "Use interpolation techniques to convert 3d data to 2d."
+      },
+      "runtime_orchestration": {
+        "pattern": "Resampling",
+        "steps": [
+          "Convert 3d data to 2d plan-view with multilayer thermodynamics."
+        ]
+      },
+      "yaml_patches": {
+        "A": "",
+        "B": "resample_to_2d: true",
+        "AB": ""
+      },
+      "validation": [
+        "Verify the resampled data matches the expected dimensionality."
+      ]
+    },
+    {
+      "id": "F2",
+      "field": "time_steps_temporal_resolution",
+      "bottleneck": "temporal resolution mismatch",
+      "root_cause": "Incompatible temporal resolution between coupled every few ocean steps, diagnostics monthly / daily and 96 min timestep in study.",
+      "evidence": {
+        "A_value": "coupled every few ocean steps, diagnostics monthly / daily",
+        "B_value": "96 min timestep in study"
+      },
+      "why_it_blocks_integration": "The models operate at different temporal resolutions, making direct integration impossible.",
+      "proposed_fix": "Resample or interpolate one of the models to match the temporal resolution of the other.",
+      "data_transform": {
+        "rules": [
+          "Resample or interpolate 96 min timestep data to coupled every few ocean steps, diagnostics monthly / daily."
+        ],
+        "example": "Use interpolation techniques to convert 96 min timestep data to coupled every few ocean steps, diagnostics monthly / daily."
+      },
+      "runtime_orchestration": {
+        "pattern": "Resampling",
+        "steps": [
+          "Convert 96 min timestep data to coupled every few ocean steps, diagnostics monthly / daily."
+        ]
+      },
+      "yaml_patches": {
+        "A": "",
+        "B": "resample_to_coupled_steps: true",
+        "AB": ""
+      },
+      "validation": [
+        "Verify the resampled data matches the expected temporal resolution."
+      ]
+    }
+  ]
+}

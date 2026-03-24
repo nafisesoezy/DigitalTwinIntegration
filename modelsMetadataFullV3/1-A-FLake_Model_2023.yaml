@@ -1,0 +1,132 @@
+FLake:
+  title: "FLake: A One-Dimensional Lake Physics Model"
+  unique_identifier: "FLake_Model_2023"
+  model_version: "2023.1"
+
+  description: >
+    FLake is a one-dimensional lake physics model simulating vertical thermal
+    structure, stratification, heat fluxes, mixing depth, and ice cover. It
+    predicts mixing regimes and thermal profiles under meteorological or climate
+    change scenarios. Outputs are used as boundary conditions for ecological
+    models such as PCLake+.
+    (PDF additions: predicts prolonged summer stratification and reduced winter
+    stratification under warming.)
+
+  keywords:
+    - Lake physics
+    - Thermal stratification
+    - Mixing depth
+    - Heat balance
+    - Climate change
+    - Aquatic modeling
+
+  model_type: "Mechanistic, process-based model"
+  scope: "Simulation of temperature dynamics and vertical mixing in freshwater lakes"
+
+  purpose_pattern:
+    purpose: "Forecast lake thermal stratification and mixing depth for climate and water quality studies"
+    pattern: "One-way data provider to ecological or water quality models"
+
+  assumptions:
+    - "Vertical processes dominate (1D structure)"
+    - "Lateral homogeneity"
+    - "Energy balance drives stratification"
+    - "Meteorological forcing sufficiently describes external conditions"
+
+  dimensionality: "1D (vertical)"
+  spatial_extent: "Single lake water column"
+  spatial_resolution: "User-defined depth layers (typically 1–20)"
+  variable_spatial_resolution: false
+
+  temporal_extent: "Days to decades"
+  temporal_resolution: "Hourly or daily"
+  variable_temporal_resolution: false
+
+  calibration_tools_data: >
+    Historical meteorological data; in-situ temperature profiles.
+
+  publications:
+    - "Kirillin et al., 2011"
+    - "Zhan et al., 2023"
+
+  conceptual_evaluation: >
+    Evaluated and validated against observed temperature profiles and mixing
+    depths in multiple studies.
+
+  validation_capabilities: "Validated against observed lake data"
+  sensitivity_analysis: "Boundary-condition sensitivity (wind, albedo, etc.)"
+  uncertainty_analysis: "Scenario-based uncertainty assessment"
+
+  # PDF additions
+  physical_findings_from_pdf:
+    mixing_regime: "Dimictic under present climate"
+    climate_change_effects:
+      - "Prolonged summer stratification"
+      - "Earlier onset of stratification"
+      - "Later termination of stratification"
+      - "Reduced occurrence of winter inverse stratification"
+
+  error_handling: "Basic input validation; logs runtime errors"
+  license: "GNU GPL"
+  landing_page: "https://github.com/aemon-j/FLakeR"
+
+  distribution_version: "2023.1"
+
+  programming_language:
+    - "Fortran (core)"
+    - "R interface"
+    - "Python interface"
+
+  software_requirements: "Fortran compiler or R/Python build environment"
+  hardware_requirements: "Standard desktop/server"
+
+  execution_instructions: >
+    Run via command line or R/Python wrappers. Config files define lake-specific parameters.
+
+  parallel_execution: false
+  implementation_verification: "Verified in peer-reviewed applications"
+  source_code_availability: true
+
+  parameters:
+    - name: "FLake_Static_Parameters"
+      description: "Lake-specific constants such as depth, albedo, sediment heat flux coefficients."
+      format: "CSV/JSON"
+      unit: "varies"
+      datatype: "float"
+      valid_range: "Depth > 0; albedo 0–1"
+      default: "User-defined"
+
+  datasets:
+    - uid: "FLake_Empirical_Climate_2023"
+      version: "2023.1"
+      access_url: "Copernicus Climate Store"
+      dependencies:
+        - "Meteorological forcing (wind, radiation, temperature, humidity)"
+
+  output:
+    format:
+      - "CSV"
+      - "NetCDF"
+    variables:
+      - "Water Temperature Profile"
+      - "Mixing Depth"
+      - "Ice Thickness"
+    units:
+      - "°C"
+      - "m"
+    verification: "Compared to observed vertical temperature data"
+    corroboration: "Matches seasonal stratification and mixing cycles"
+
+  integration:
+    pattern: 
+    submodels: ["Ecological model (e.g., PCLake+)"]
+    execution_constraints: "File-based data transfer; no feedback"
+    acknowledgment: "FLake acts as physical boundary-condition provider"
+    latency_expectations: "Batch/offline"
+    data_synchronization: "Post-run file exchange"
+
+  authors:
+    - name: "Kirillin V."
+      orcid: "https://orcid.org/0000-0002-9837-2461"
+    - name: "Zhan Q."
+      orcid: "https://orcid.org/0000-0002-7765-5155"

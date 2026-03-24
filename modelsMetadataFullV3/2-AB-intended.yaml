@@ -1,0 +1,132 @@
+Intended_Model:
+  title: "Coupled NEMO–ECWAM Ocean-Wave Modeling System"
+  unique_identifier: "NEMO_ECWAM_Coupled_Model_2015"
+  model_version: "NEMO v3.4 + ECWAM CY38R1"
+
+  description: >
+    A coupled wave–ocean modeling system integrating NEMO (ocean general circulation
+    model) and ECWAM (spectral wave model) to account for surface wave effects in
+    ocean dynamics. In the Breivik et al. (2015) configuration, ECWAM provides
+    sea-state dependent surface stress, Stokes drift, and turbulent kinetic energy
+    (TKE) flux from breaking waves to NEMO, which in turn updates upper-ocean
+    temperature, currents, and mixed layer depth. The system can be run in ocean-only
+    forced mode (NEMO forced by ECWAM fields derived from ERA-Interim) or as part of
+    a fully coupled IFS–ECWAM–NEMO configuration.
+
+  keywords:
+    - Wave–ocean interaction
+    - Stokes drift
+    - Ocean mixing
+    - Coupled modeling
+    - Surface stress
+    - TKE injection
+    - Stokes–Coriolis force
+
+  model_type: "Mechanistic"
+  scope: "Global and regional oceans with wave-affected surface layer dynamics"
+
+  purpose_pattern:
+    purpose: "Simulate realistic ocean dynamics including surface wave effects on mixing, momentum flux, and upper-ocean structure"
+    pattern: >
+      Two-way Earth-system coupling (IFS–ECWAM–NEMO) with direct flux forcing from
+      the wave model to the ocean and indirect feedback from ocean currents and SST
+      to the wave and atmospheric components.
+
+  assumptions: ""
+
+  dimensionality: "3D (ocean), 2D spectral (waves)"
+  spatial_extent: "Global ocean (ORCA1 grid) or regional domains (e.g., North Atlantic) with corresponding wave grid"
+  spatial_resolution: >
+    ~1° ORCA1 ocean grid with 42 vertical levels (10 m top level) and ECWAM at
+    ~1.5° global resolution in the reference experiments.
+  variable_spatial_resolution: true
+
+  temporal_extent: "Multi-year to multi-decadal simulations (e.g., 1979–2009 hindcasts; 7-month seasonal forecasts)"
+  temporal_resolution: "Ocean internal step ~1 h; wave step ~15 min; coupling interval ~3 h"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: ""
+
+  publications:
+    - "Breivik et al. 2015, JGR Oceans: Surface wave effects in the NEMO ocean model – Forced and coupled experiments."
+
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+
+  error_handling: >
+    Error handling is inherited from component models (NEMO, ECWAM, IFS) and
+    coupling infrastructure; includes checks on CFL stability, NaNs, flux
+    consistency, and restart capability.
+
+  license: "NEMO under CeCILL-C; ECWAM and IFS subject to ECMWF licenses; coupling configuration as in Breivik et al. 2015."
+  landing_page: "https://www.nemo-ocean.eu/"
+  distribution_version: "2015 reference configuration (ORCA1L42 + ECWAM CY38R1)"
+
+  programming_language:
+    - "Fortran (NEMO core)"
+    - "Fortran (ECWAM core)"
+  software_requirements: ""
+  hardware_requirements: "HPC cluster or high-end workstation for multi-decadal and/or high-resolution runs"
+
+  execution_instructions: ""
+
+  parallel_execution: true
+  implementation_verification: ""
+  source_code_availability: "Available for NEMO under CeCILL-C; ECWAM and IFS source under ECMWF licensing terms; coupling scripts/configs as used at ECMWF."
+
+  parameters:
+    - name: "Coupling_Params"
+      description: ""
+      format: "Fortran namelist and/or coupler configuration files"
+      unit: "various"
+      datatype: "float"
+      valid_range: "Documented in model and coupler configuration"
+      CRS: "ORCA ocean grid and ECWAM Gaussian or lat–lon grid"
+      default_values: "3-hour coupling interval; all three wave effects enabled (WAVE run)"
+
+  datasets:
+    - uid: "Wave_Ocean_Forcing_2015"
+      version: "2015"
+      access_url: ""
+      dependencies: ""
+
+  integrated_input:
+    - uid: "ECWAM_Output"
+      version: "CY38R1"
+      description: ""
+    - uid: "NEMO_Output"
+      version: "v3.4"
+      description: ""
+
+  data_evaluation: ""
+
+  output:
+    format:
+      - ""
+    variables: ""
+    units: "°C, m s^-1, m, N m^-2, W m^-2, etc."
+    verification: ""
+    corroboration: ""
+
+  integration:
+    pattern: "Loose"
+    submodels:
+      - "NEMO ocean model (ORCA1L42 + LIM2 sea ice)"
+      - "ECWAM spectral wave model"
+      - "IFS atmospheric model (in fully coupled setup)"
+    execution_constraints: ""
+    acknowledgment: >
+      NEMO Consortium and ECMWF modeling teams; coupling and experiments as
+      documented by Breivik et al. (2015) and related technical notes.
+    latency_expectations: ""
+    data_synchronization: ""
+
+  authors:
+    - name: "Øyvind Breivik"
+      orcid: "https://orcid.org/0000-0001-7016-8023"
+      role: ""
+    - name: "Jean-Marc Molines"
+      role: ""

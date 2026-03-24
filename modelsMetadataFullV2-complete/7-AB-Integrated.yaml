@@ -1,0 +1,137 @@
+AB-Integrated:
+  title: "Integrated GOTM–FABM–PCLake+ Model"
+  unique_identifier: "GOTM_FABM_PCLake_2014"
+  model_version: "1.0"
+
+  description: >
+    Modular aquatic ecosystem modeling system coupling the 1D hydrodynamic model
+    GOTM with the PCLake+ ecological model through the FABM framework. Hydrodynamics,
+    light and mixing from GOTM drive PCLake+ via FABM, while ecological feedbacks
+    (bio-optical properties, heat production and surface-drag modifiers) are returned
+    online to GOTM.
+
+  keywords:
+    - GOTM
+    - FABM
+    - PCLake+
+    - Model integration
+    - Biogeochemical modeling
+    - Hydrodynamics
+
+  model_type: "Mechanistic"
+  scope: "Lakes and coastal systems (1D vertical columns)"
+
+  # ---------- Conceptual consistency (concise, natural language) ----------
+  purpose_pattern:
+    purpose: "Simulate coupled physical and ecological dynamics in aquatic ecosystems using a shared 1D water column."
+    pattern: "Modular online coupling via FABM in a single integrated executable."
+
+  assumptions:
+    - "Vertical structure dominates system behavior (1D column)."
+    - "Hydrodynamic conditions (mixing, temperature, light) control ecological processes."
+    - "GOTM and PCLake+ share the same vertical grid and timestep via FABM."
+    - "Ecological feedbacks modify light climate and surface fluxes but do not alter external forcing."
+
+  dimensionality: "1D"
+  spatial_extent: "Single water column representing lake or coastal site."
+  spatial_resolution: "Shared adaptive vertical layers from GOTM."
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-year simulations"
+  temporal_resolution: "Seconds to hours (GOTM steps), typically hourly coupling diagnostics."
+  variable_temporal_resolution: true
+
+  calibration_tools_data: "Site-specific calibration of physical and ecological parameters against monitoring data."
+  publications:
+    - "Bruggeman and Bolding, 2014"
+  conceptual_evaluation: "Integration validated using standardized FABM case studies and documented in framework paper."
+  validation_capabilities: "Supports full-stack validation against physical and ecological time series."
+  sensitivity_analysis: "Perturbation experiments and ensemble runs via configuration changes for physics and ecology."
+  uncertainty_analysis: "Scenario-based exploration of forcing and parameter sets."
+
+  # ---------- Provenance / license ----------
+  license: "gpl"
+  landing_page: "https://fabm.net"
+  distribution_version: "1.0"
+
+  # ---------- Programming language + family ----------
+  programming_language:
+    - "Fortran"
+  programming_language_family:
+    - "Native_C_CPP_Fortran_Family"
+
+  # ---------- Software / I/O libraries ----------
+  software_specification_and_requirements:
+    - "fortran compiler"
+    - "gotm with fabm support"
+    - "fabm kernel"
+    - "netcdf"
+    - "netcdf4"
+  hardware_specification_and_requirements:
+    - "standard workstation"
+    - "hpc cluster (optional for ensembles)"
+  file_formats:
+    - "netcdf"
+    - "csv"
+
+  # ---------- Runtime / coupling meta (controlled phrases) ----------
+  communication_mechanism: >
+    in-memory direct call between GOTM and FABM plugins via FABM api;
+    shared memory within one executable; synchronous every model timestep.
+  error_handling: >
+    FABM coupling checks and GOTM time controls; diagnostic logging for invalid
+    state variables and failed exchanges.
+  execution_instructions: >
+    compile GOTM with FABM and PCLake+ enabled; configure yaml files for both
+    physics and ecology; run integrated executable via cli.
+  execution_constraints: >
+    synchronous, same timestep and vertical grid for all components; lockstep,
+    every step coupling GOTM↔FABM↔PCLake+; tight coupling within process.
+  acknowledgment_protocols: >
+    standard FABM attribution to GOTM, FABM and PCLake+ developers; citation
+    to Bruggeman & Bolding (2014) and PCLake+ publications.
+  data_synchronization: >
+    two-way, synchronous, in-memory exchange each timestep; no file-based latency;
+    same timestep and shared column structure.
+
+  parallel_execution: false
+  implementation_verification: "Validated through FABM standard test cases including coupled physics–biology scenarios."
+  source_code_availability: true
+
+  # ---------- Outputs from integrated system (mostly for diagnostics) ----------
+  output:
+    format:
+      - "netcdf"
+      - "csv"
+    variables:
+      - "physical state variables (T, S, Kz, PAR)"
+      - "nutrient concentrations"
+      - "phytoplankton biomass"
+      - "macrophyte biomass"
+      - "zooplankton biomass"
+      - "oxygen concentration"
+      - "bio-optical properties (Kd_bio)"
+      - "heat production due to light absorption (Q_bio)"
+    units: "°C, PSU, m² s⁻¹, W m⁻², mg L⁻¹, mmol m⁻³, dimensionless"
+    verification: "Joint evaluation of physical and biogeochemical profiles against observations and literature benchmarks."
+    corroboration: "Reproduces seasonal cycles and regime behaviour comparable to published PCLake+ applications."
+
+  # ---------- Integration metadata ----------
+  integration:
+    pattern: "integrated"
+    submodels:
+      - "GOTM"
+      - "FABM–PCLake+"
+    execution_constraints: >
+      integrated single executable; synchronous, same timestep and grid;
+      GOTM provides driver fields and consumes feedbacks each step.
+    acknowledgment_protocols: "Developers of GOTM, FABM and PCLake+ acknowledged in documentation and publications."
+    latency_expectations: "low latency; in-memory, real-time exchange at every step."
+    data_synchronization: "managed internally by FABM kernel as two-way synchronous exchange."
+
+  authors:
+    - name: "J. Bruggeman"
+      orcid: ""
+      role: "FABM design and integration"
+    - name: "K. Bolding"
+      orcid: ""
+      role: "GOTM development and coupling"

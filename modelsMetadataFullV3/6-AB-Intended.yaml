@@ -1,0 +1,143 @@
+Intended_Model:
+  title: "Integrated Agent-Based Land-Use and Ecosystem Services Model"
+  unique_identifier: ABM_ES_Coupled_2013
+  model_version: "1.0"
+
+  description: >
+    A spatially explicit integrated model that couples an agent-based land-use model
+    with an ecosystem services (ES) meta-model. Agents make land-use decisions on a
+    parcel-based landscape; their decisions update land cover, which is passed to the
+    ES module to compute indicators such as carbon storage, erosion control, and crop
+    yield. Updated ES scores feed back into agent decision-making in an iterative loop.
+
+  keywords:
+    - Land-use change
+    - Agent-based modeling
+    - Ecosystem services
+    - Model integration
+    - Environmental decision-making
+
+  model_type: "Mechanistic + Empirical"
+  scope: "Regional landscape systems with spatial heterogeneity"
+
+  purpose_pattern:
+    purpose: >
+      Assess how land-use dynamics impact ecosystem services under different policy,
+      behavioural, and valuation scenarios.
+    pattern: "Iterative feedback coupling (ABM → ES → ABM)"
+
+  assumptions:
+    - Land use and management fully determine ES outputs at the parcel scale.
+    - Agents incorporate ES indicators (or valuations) in their utility functions.
+    - Lookup tables or response surfaces for ES are representative of underlying processes.
+    - Policy scenarios and behavioural rules remain stationary within a simulation.
+
+  dimensionality: "2D"
+  spatial_extent: "Parcel-based regional landscape"
+  spatial_resolution: "1 ha parcels"
+  variable_spatial_resolution: false
+
+  temporal_extent: "Decadal-scale simulations"
+  temporal_resolution: "Annual decision and ES update steps"
+  variable_temporal_resolution: false
+
+  calibration_tools_data: ""
+
+  publications:
+    - "Parker et al., 2013 – Agent-based land-use and ecosystem service feedback modelling (as referenced in metadata)"
+
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+
+  license: "Academic / research use; not distributed under a standard OSI license."
+  license_incompatibility: proprietary
+
+  landing_page: ""
+  distribution_version: "1.0"
+
+  programming_language:
+    - NetLogo
+    - Python
+  programming_language_family:
+    - JVM_Family
+    - Python_R_CPP_Family
+
+  software_requirements:
+    description: ""
+    ffi_family:
+      - Python_R_CPP_Family
+    database_dependencies:
+      - sqlite
+      - postgres
+    io_libraries:
+      - CSV_Family
+      - JSON_Family
+      - Excel_Family
+      - Parquet_Family
+
+  hardware_requirements: "Standard desktop or workstation; multicore optional for batch scenario runs."
+
+  conceptual_consistency_mismatch: ""
+  provenance_and_accessibility_gap: ""
+
+  active_edge_io_checks:
+    input_formats:
+      - csv
+      - raster
+      - json
+    output_formats:
+      - csv
+      - raster
+      - json
+    whole_model_information_fields: ""
+
+  input:
+    description: "Annual parcel-based land-use/management maps and attributes from the agent-based model."
+    format:
+      - csv
+      - raster
+      - json
+    variables:
+      - land_use_class_per_parcel
+      - management_intensity
+      - parcel_area
+      - agent_id
+    units: "categorical, unitless index, ha"
+
+  integrated_input: []
+
+  output:
+    format:
+      - csv
+      - raster
+    variables:
+      - land_use_map
+      - carbon_storage
+      - erosion_control
+      - agricultural_yield
+    units: "categorical, tC/ha, t/ha, t/ha"
+    verification: ""
+    corroboration: ""
+
+  integration:
+    pattern: "embedded"
+    submodels:
+      - "Agent-Based Land-Use Model"
+      - "Ecosystem Service Meta-Model"
+    execution_constraints: ""
+    acknowledgment: ""
+    latency_expectations: ""
+    data_synchronization: ""
+
+  communication_mechanism: ""
+  error_handling: ""
+
+  authors:
+    - name: "Dawn C. Parker"
+      orcid: ""
+      role: ""
+    - name: "C. Jantz"
+      orcid: ""
+      role: ""

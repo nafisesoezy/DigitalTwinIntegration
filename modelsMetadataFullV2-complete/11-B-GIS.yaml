@@ -1,0 +1,94 @@
+PIHMgis:
+  title: "PIHMgis: GIS-Based Hydrologic Model Builder"
+  unique_identifier: "PIHMgis_GIS_Model_2009"
+  model_version: "As described in object-oriented shared data model paper"
+  description: >
+    A GIS-based model building and parameterization system that constructs the
+    unstructured mesh, river network, soil/land-cover parameters, and forcing
+    inputs for PIHM. Uses an object-oriented shared data model that allows GIS
+    and the hydrologic model to operate on consistent shared data structures.
+
+  keywords:
+    - GIS model builder
+    - shared data model
+    - mesh generation
+    - parameterization
+    - watershed delineation
+
+  model_type: "Mechanistic preprocessing / GIS-builder"
+  scope: "Watershed terrain and parameter processing"
+
+  purpose_pattern:
+    purpose: "Prepare meshes, parameters, and forcing inputs for PIHM"
+    pattern: "GIS-based model-building workflow with shared data structures"
+
+  assumptions:
+    - DEM-based watershed delineation is accurate
+    - Soil and land-cover maps represent spatial variability
+    - TIN mesh captures hydrologic connectivity
+
+  dimensionality: "2D spatial GIS layers"
+  spatial_extent: "Watershed defined by DEM"
+  spatial_resolution: "Raster resolution → mesh resolution"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Static preprocessing"
+  temporal_resolution: "N/A"
+
+  calibration_tools_data: "DEM, soils, land-cover, hydrography layers"
+
+  publications:
+    - "Bhatt et al. (2008–2009), referenced in the PIHMgis shared data model paper"
+
+  conceptual_evaluation: "Ensures consistency between GIS layers and hydrologic model state variables"
+  validation_capabilities: "Topological consistency, mesh quality checks"
+  sensitivity_analysis: "Mesh refinement, parameter perturbation"
+  uncertainty_analysis: "GIS input uncertainty propagation not explicitly handled"
+
+  error_handling: "Topology checks, layer alignment tests, projection validation"
+
+  license: "Research/academic"
+  landing_page: ""
+  distribution_version: "As implemented in the object-oriented shared data model"
+
+  programming_language:
+    - "C++"
+    - "Native_C_CPP_Fortran_Family"
+
+  software_requirements:
+    - "GDAL_Family"
+    - "SQLite"
+    - "XML_Family"
+
+  hardware_requirements: "Workstation"
+
+  execution_instructions: "Run through GUI or command-line to produce PIHM-ready inputs"
+  parallel_execution: false
+
+  implementation_verification: "Internal mesh and topology integrity checks"
+  source_code_availability: "Available via PIHMgis distribution"
+
+  input:
+    description: "Geospatial datasets consumed to produce PIHM structures"
+    format:
+      - "tif"
+      - "shapefile"
+      - "csv"
+    variables:
+      - DEM
+      - soils
+      - land cover
+      - hydrography
+    units: "various"
+
+  output:
+    format:
+      - "NetCDF"
+      - "CSV"
+    variables:
+      - mesh connectivity
+      - soil/landcover parameters
+      - river network topology
+      - forcing time series
+    units: "various"
+    verification: "Mesh–GIS consistency checks"

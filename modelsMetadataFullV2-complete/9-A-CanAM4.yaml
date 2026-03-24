@@ -1,0 +1,163 @@
+CanAM4:
+  title: "Canadian Atmospheric Model version 4 (CanAM4)"
+  unique_identifier: "CanAM4_2013"
+  model_version: "v4"
+
+  description: >
+    Spectral atmospheric general circulation model used as the atmospheric component
+    of the CanESM2 Earth system model. Simulates global atmospheric dynamics, radiation,
+    cloud microphysics, and boundary-layer processes, and exchanges surface fluxes
+    and lower-boundary fields with the ocean model NCOM1.3 via the CanESM2 internal coupler.
+
+  keywords:
+    - Atmospheric model
+    - Spectral GCM
+    - Radiation
+    - Cloud processes
+    - Climate modeling
+    - CanESM2
+
+  model_type: "Mechanistic"
+  scope: "Global atmospheric dynamics and climate"
+
+  purpose_pattern:
+    purpose: "Simulate atmospheric circulation and energy–moisture balance in an Earth system framework"
+    pattern: "Spectral dynamical core with parameterized physics and loose atmosphere–ocean coupling via coupler"
+
+  assumptions:
+    - "Hydrostatic balance in the dynamical core"
+    - "Spherical harmonics basis for the spectral core"
+    - "Radiative forcing from prescribed or interactive greenhouse gases and aerosols"
+    - "Surface lower boundary provided by an OGCM (NCOM1.3) or prescribed SST/SIC"
+
+  dimensionality: "3D"
+  spatial_extent: "Global atmosphere"
+  spatial_resolution: 'T63 (~2.8° × 2.8°)'
+  variable_spatial_resolution: false
+
+  temporal_extent: "Multi-decadal climate integrations"
+  temporal_resolution: "30 min – 1 hr"
+  variable_temporal_resolution: false
+
+  calibration_tools_data: "Tuned against observed climatology and reanalysis (e.g., winds, temperature, precipitation)"
+
+  publications:
+    - "Fyfe et al., 2013"
+
+  conceptual_evaluation: "Extensively used and evaluated within CMIP5/CanESM2 experiments"
+  validation_capabilities: "Validated against reanalyses and satellite datasets for key climate fields"
+
+  sensitivity_analysis: "Supported via parameter perturbations and multi-member ensembles"
+  uncertainty_analysis: "Scenario-based ensembles for different forcing pathways"
+
+  conceptual_consistency_mismatch: >
+    Conceptually consistent with a hydrostatic global AGCM coupled to a coarse-resolution OGCM.
+    Potential mismatches arise if used with ocean or land components running on different calendars
+    or flux conventions; energy and freshwater budget checks at the coupler are required.
+
+  provenance_and_accessibility_gap: >
+    Model configuration and coupling details are described in CanESM2 documentation and Fyfe et al. (2013),
+    but full source code and experiment namelists are institutionally controlled and not openly archived.
+
+  license: "Institutional (CCCma/Environment Canada)"
+  license_incompatibility: "proprietary"
+
+  landing_page: "https://climate-modelling.canada.ca/climatemodels/canesm2/"
+  distribution_version: "v4"
+
+  programming_language:
+    - "Fortran"
+  programming_language_family:
+    - "Native_C_CPP_Fortran_Family"
+
+  software_requirements:
+    description: "Fortran compiler, MPI, NetCDF, CanESM2 internal coupler infrastructure"
+    ffi_family:
+      - "Native_C_CPP_Fortran_Family"
+    io_libraries:
+      - "NetCDF4_Family"
+    database_libraries: []
+
+  hardware_requirements: "HPC cluster / supercomputing environment"
+
+  execution_instructions: >
+    Configure experiment via CanESM2 setup files and namelists; compile CanAM4 with MPI and NetCDF support;
+    run as the atmospheric component under the CanESM2 coupled driver (or in atmosphere-only mode with prescribed SST/SIC).
+
+  parallel_execution: true
+
+  implementation_verification: "Evaluated using CMIP protocols and CanESM2 reference experiments"
+  source_code_availability: false
+
+  active_edge_io_checks:
+    format:
+      - "netcdf"
+    whole_model_information_fields: >
+      Coupler diagnostics for global energy, freshwater, and momentum conservation; checks for
+      consistency of land/sea masks, grid remapping weights, and flux sign conventions.
+
+  data_evaluation: "Coupler-level flux conservation diagnostics and climatological comparison against reanalysis"
+
+  input:
+    description: >
+      Ocean lower-boundary and sea-ice fields from NCOM1.3 provided via the CanESM2 internal coupler
+      when running in coupled mode; prescribed SST/SIC fields when run in atmosphere-only mode.
+    format:
+      - "netcdf"
+      - "in-memory (coupler exchange)"
+    variables:
+      - "Sea surface temperature (SST)"
+      - "Sea surface salinity (SSS) OPTIONAL"
+      - "Sea ice concentration (SIC)"
+      - "Sea ice thickness (SITh) OPTIONAL"
+      - "Ocean surface currents (u_ocean, v_ocean)"
+      - "Sea surface height (SSH) OPTIONAL"
+    units: "°C, PSU, 0–1 (fraction), m, m s⁻¹, m"
+
+  output:
+    format:
+      - "netcdf"
+      - "in-memory (to coupler)"
+    variables:
+      - "Surface wind stress (tau_x, tau_y)"
+      - "10 m wind (u10, v10) OPTIONAL"
+      - "Net shortwave radiation at surface (SW_down)"
+      - "Net longwave radiation at surface (LW_down)"
+      - "Sensible heat flux (Q_sens)"
+      - "Latent heat flux (Q_lat)"
+      - "Precipitation rate (P)"
+      - "Evaporation rate (E)"
+      - "Freshwater flux (P_minus_E)"
+      - "Runoff flux (R) OPTIONAL"
+      - "Mean sea level pressure (MSLP)"
+      - "Downwelling PAR at surface OPTIONAL"
+    units: "N m⁻²; m s⁻¹; W m⁻²; W m⁻²; W m⁻²; W m⁻²; kg m⁻² s⁻¹; kg m⁻² s⁻¹; kg m⁻² s⁻¹; kg m⁻² s⁻¹; hPa; W m⁻²"
+    verification: "Compared against reanalysis-derived surface fluxes and atmospheric fields"
+
+  integration:
+    pattern: 
+    submodels:
+      - "Spectral dynamical core"
+      - "Atmospheric physics package"
+    execution_constraints: >
+      Coupling timestep aligned with ocean component (e.g., hourly–6-hourly); conservative flux remapping;
+      synchronized calendars and coupling intervals enforced by the CanESM2 coupler.
+    acknowledgment_protocols: >
+      Users should acknowledge CanESM2/CanAM4 and Fyfe et al. (2013) in publications using coupled outputs.
+    latency_expectations: "Flux and state exchange each coupling step via coupler; low to moderate latency MPI-based communication."
+    data_synchronization: >
+      Loose, coupler-mediated exchange at discrete coupling steps; atmosphere and ocean advance independently
+      between coupling calls but share fluxes and surface state via synchronous coupler barriers.
+
+  communication_mechanism: >
+    Coupler-mediated, MPI/in-memory field exchange; synchronous barrier at each coupling step; loose
+    atmosphere–ocean coupling with independent time integration between exchanges.
+
+  error_handling: >
+    Internal stability checks (CFL, divergence), coupler diagnostics for missing or NaN fields,
+    restart files for recovery from failed steps.
+
+  authors:
+    - name: "Fyfe, J.C."
+      orcid: ""
+      role: "Modeling and climate simulation"

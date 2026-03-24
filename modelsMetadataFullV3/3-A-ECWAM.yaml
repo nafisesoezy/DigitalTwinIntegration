@@ -1,0 +1,172 @@
+# 3-A-ECWAM.yaml
+ECWAM:
+  title: "ECWAM: ECMWF Wave Model"
+  unique_identifier: "ECWAM_Model_2015"
+  model_version: "CY38R1 (as used in Breivik et al. 2015)"
+  description: >
+    A third-generation spectral wave model developed by ECMWF to simulate surface
+    gravity waves. It solves the wave action balance equation in frequency–direction
+    space and computes the evolution of the wave spectrum, including energy input
+    from wind, nonlinear interactions, and dissipation by whitecapping, bottom
+    friction, and depth-induced breaking. In the Breivik et al. (2015) configuration,
+    ECWAM provides Stokes drift, water-side stress, and turbulent kinetic energy
+    (TKE) flux to NEMO.
+
+  keywords:
+    - Wave modeling
+    - Spectral wave model
+    - Stokes drift
+    - Wind-wave interaction
+    - Wave–current interaction
+    - Surface roughness
+    - Sea-state dependent stress
+    - TKE flux from breaking waves
+
+  model_type: "Mechanistic"
+  scope: "Global and regional surface wave dynamics"
+
+  purpose_pattern:
+    purpose: "Simulate the ocean surface wave spectrum and provide wave-induced parameters for air–sea and wave–ocean interaction"
+    pattern: "Standalone wave model; optionally coupled via flux/field exchange to atmosphere and/or ocean models"
+
+  assumptions:
+    - "Linear wave theory with parameterized source/sink terms"
+    - "Spectral representation in frequency–direction space"
+    - "Waves forced primarily by 10 m winds; dissipation via breaking and bottom friction"
+    - "Sea-state dependent drag formulation for air–sea momentum flux"
+
+  dimensionality: "2D spatial + 2D spectral (frequency × direction)"
+  spatial_extent: "Global or regional ocean surface"
+  spatial_resolution: "Typically 1.0°–1/4° (1.0° in ERA-Interim configuration; 1.5° in coupled seasonal runs)"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Days to multiple decades (e.g., 1979–2009 hindcasts)"
+  temporal_resolution: "Hourly to 3-hourly (e.g., 3-hourly coupling fields)"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: >
+    Operationally tuned and validated against satellite altimetry, buoy observations,
+    and reanalysis products (e.g., ERA-Interim wave reanalysis).
+
+  publications:
+    - "Janssen, P. A. E. M. 2004. The Interaction of Ocean Waves and Wind."
+    - "Breivik et al. 2015, JGR Oceans: Surface wave effects in the NEMO ocean model – Forced and coupled experiments."
+
+  conceptual_evaluation: >
+    Operational at ECMWF; physics thoroughly documented as a third-generation spectral
+    wave model. In Breivik et al. (2015), ECWAM-derived fluxes are shown to reduce SST
+    and mixed-layer biases when used to force NEMO.
+
+  validation_capabilities: >
+    Validated in hindcast and operational forecast modes versus buoy and satellite
+    significant wave height, mean period, and directional spectra.
+
+  sensitivity_analysis: >
+    Tuning of drag, dissipation, and nonlinear source terms; sensitivity to spectral
+    resolution and wind forcing products.
+
+  uncertainty_analysis: "Scenario and ensemble configurations using alternative drag/mixing parameterizations and forcings."
+
+  error_handling: >
+    Built-in diagnostics and stability checks in spectral space; flags for unphysical
+    energy growth and numerical instabilities.
+
+  license: "ECMWF license (non-commercial research use, subject to ECMWF data policy)"
+  landing_page: "https://www.ecmwf.int/en/research/modelling-and-prediction/wave-model"
+  distribution_version: "CY38R1"
+
+  programming_language:
+    - "Fortran"
+
+  software_requirements: "Fortran compiler; NetCDF I/O; MPI; ECMWF wave physics libraries"
+  hardware_requirements: "HPC or workstation (global multi-decadal hindcasts typically on HPC)"
+
+  execution_instructions: >
+    Configure spectral and spatial grids, physics options, and boundary conditions.
+    Run with wind forcing (e.g., ECMWF analyses or forecasts), grid configuration,
+    and time step settings. When coupled, ECWAM is called from the coupler or
+    atmospheric model with tight time stepping to provide sea surface roughness and
+    wave-related fields.
+
+  parallel_execution: true
+
+  implementation_verification: >
+    Benchmarked against buoy and satellite observations and used operationally in
+    ECMWF’s Integrated Forecasting System (IFS) and ERA-Interim reanalysis.
+
+  source_code_availability: false
+
+  parameters:
+    - name: "Wave_Model_Parameters"
+      description: "Growth, dissipation, and nonlinear interaction coefficients; spectral discretization controls"
+      format: "Fortran namelist"
+      unit: "various"
+      datatype: "float"
+      valid_range: "As per ECMWF documentation"
+      CRS: "Lat–lon or reduced Gaussian grid"
+      default_values: "Operational defaults at ECMWF for CY38R1"
+
+  datasets:
+    - uid: "ECWAM_Inputs_2015"
+      version: "2015"
+      access_url: "ECMWF operational input archive (e.g., ERA-Interim forcing)"
+      dependencies:
+        - "10 m wind (U10, V10)"
+        - "Sea-ice concentration (attenuation and drag regime selection)"
+        - "Bathymetry and coastlines"
+
+  input:
+    description: "Atmospheric winds, ice fields, and optional ocean/ice modifiers"
+    format: "NetCDF (or coupler interface when embedded in IFS)"
+    variables:
+      - "wind_u10                # m s^-1"
+      - "wind_v10                # m s^-1"
+      - "sea_ice_concentration   # 0–1 (optional; attenuation and drag regime)"
+      - "surface_current_u       # m s^-1 (optional; from ocean model)"
+      - "surface_current_v       # m s^-1 (optional; from ocean model)"
+    units: "As indicated inline"
+
+  integrated_input:
+    - uid: "NEMO_Model_3.4"
+      version: "v3.4"
+      description: >
+        Optional surface currents and sea-ice fraction for wave–current and wave–ice
+        effects in coupled mode (e.g., IFS–ECWAM–NEMO framework).
+
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - "significant_wave_height           # m"
+      - "stokes_drift_surface_u            # m s^-1"
+      - "stokes_drift_surface_v            # m s^-1"
+      - "stokes_drift_profile_parameters   # e-folding depth / inverse scale (m^-1)"
+      - "wave_modified_stress_to_ocean     # N m^-2 (water-side stress factor)"
+      - "wave_breaking_TKE_flux            # W m^-2"
+      - "spectral_density                  # m^2 Hz^-1 per direction bin"
+    units: "See inline comments for each variable"
+    verification: >
+      Standard diagnostics comparing significant wave height and mean period
+      against buoys and altimeters; consistency checks on stress and TKE flux
+      magnitudes under typical wind speeds.
+    corroboration: >
+      Demonstrated realistic wave energy evolution and fluxes under observed winds;
+      wave-derived fluxes improve ocean model SST and mixed-layer depth in
+      coupled experiments.
+
+  integration:
+    submodels: []
+    execution_constraints: >
+      When coupled, fields must be interpolated from the wave grid (e.g., 1.5° global)
+      to the ocean or atmospheric grid (e.g., ORCA1 for NEMO). Care is required near
+      coasts and ice edges where land–sea/ice masks differ.
+    acknowledgment: "Developed and maintained by ECMWF wave modeling team."
+    latency_expectations: "Typically produces coupling fields at 1–3-hourly cadence."
+    data_synchronization: >
+      Wave outputs are written or passed via coupler at each coupling interval and may
+      be time-interpolated to ocean model time steps.
+
+  authors:
+    - name: "Øyvind Breivik"
+      orcid: "https://orcid.org/0000-0001-7016-8023"
+      role: "Model developer; wave–ocean coupling experiments and diagnostics"

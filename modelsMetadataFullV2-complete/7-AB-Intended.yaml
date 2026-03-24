@@ -1,0 +1,120 @@
+Intended_model:
+  title: "Integrated GOTM–FABM–PCLake+ Model"
+  unique_identifier: "GOTM_FABM_PCLake_2014"
+  model_version: "1.0"
+
+  description: >
+    Modular aquatic ecosystem modeling system coupling the 1D hydrodynamic model
+    GOTM with the PCLake+ ecological model through the FABM framework. Hydrodynamics,
+    light and mixing from GOTM drive PCLake+ via FABM, while ecological feedbacks
+    (bio-optical properties, heat production and surface-drag modifiers) are returned
+    online to GOTM.
+
+  keywords:
+    - GOTM
+    - FABM
+    - PCLake+
+    - Model integration
+    - Biogeochemical modeling
+    - Hydrodynamics
+
+  model_type: "Mechanistic"
+  scope: "Lakes and coastal systems (1D vertical columns)"
+
+  purpose_pattern:
+    purpose: "Simulate coupled physical and ecological dynamics in aquatic ecosystems using a shared 1D water column."
+    pattern: "Modular online coupling via FABM in a single integrated executable."
+
+  assumptions:
+    - "Vertical structure dominates system behavior (1D column)."
+    - "Hydrodynamic conditions (mixing, temperature, light) control ecological processes."
+    - "GOTM and PCLake+ share the same vertical grid and timestep via FABM."
+    - "Ecological feedbacks modify light climate and surface fluxes but do not alter external forcing."
+
+  dimensionality: "1D"
+  spatial_extent: "Single water column representing lake or coastal site."
+  spatial_resolution: "Shared adaptive vertical layers from GOTM."
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-year simulations"
+  temporal_resolution: "Seconds to hours (GOTM steps), typically hourly coupling diagnostics."
+  variable_temporal_resolution: true
+
+  calibration_tools_data: ""
+
+  publications:
+    - "Bruggeman and Bolding, 2014"
+
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+
+  license: "gpl"
+  landing_page: "https://fabm.net"
+  distribution_version: "1.0"
+
+  programming_language:
+    - "Fortran"
+  programming_language_family:
+    - "Native_C_CPP_Fortran_Family"
+
+  software_specification_and_requirements:
+    - "fortran compiler"
+    - "gotm with fabm support"
+    - "fabm kernel"
+    - "netcdf"
+    - "netcdf4"
+
+  hardware_specification_and_requirements:
+    - "standard workstation"
+    - "hpc cluster (optional for ensembles)"
+
+  file_formats:
+    - "netcdf"
+    - "csv"
+
+  communication_mechanism: ""
+  error_handling: ""
+  execution_instructions: ""
+  execution_constraints: ""
+  acknowledgment_protocols: ""
+  data_synchronization: ""
+
+  parallel_execution: false
+  implementation_verification: ""
+  source_code_availability: true
+
+  output:
+    format:
+      - "netcdf"
+      - "csv"
+    variables:
+      - "physical state variables (T, S, Kz, PAR)"
+      - "nutrient concentrations"
+      - "phytoplankton biomass"
+      - "macrophyte biomass"
+      - "zooplankton biomass"
+      - "oxygen concentration"
+      - "bio-optical properties (Kd_bio)"
+      - "heat production due to light absorption (Q_bio)"
+    units: "°C, PSU, m² s⁻¹, W m⁻², mg L⁻¹, mmol m⁻³, dimensionless"
+    verification: ""
+    corroboration: ""
+
+  integration:
+    pattern: "integrated"
+    submodels:
+      - "GOTM"
+      - "FABM–PCLake+"
+    execution_constraints: ""
+    acknowledgment_protocols: ""
+    latency_expectations: ""
+    data_synchronization: ""
+
+  authors:
+    - name: "J. Bruggeman"
+      orcid: ""
+      role: ""
+    - name: "K. Bolding"
+      orcid: ""
+      role: ""

@@ -1,0 +1,146 @@
+ISOMIPPlus:
+  title: "ISOMIP+: Ice Shelf–Ocean Model Intercomparison Project, Phase 2"
+  unique_identifier: "ISOMIPPlus_Model_2016"
+  model_version: "2016.1"
+
+  description: >
+    Ocean-only benchmark experiments simulating sub-shelf ocean circulation,
+    thermodynamics, and melt beneath idealized ice shelves. ISOMIP+ provides
+    sub-shelf melt-rate fields that drive MISMIP+ ice-sheet models and are used
+    as the ocean component of coupled MISOMIP configurations.
+
+  keywords:
+    - Ice shelf
+    - Sub-shelf melt
+    - Ocean circulation
+    - Benchmarking
+    - Ocean cavity
+    - Marine ice sheet interaction
+
+  model_type: "Mechanistic"
+  scope: "Idealized 3D ocean cavity experiments (multi-decadal)"
+
+  purpose_pattern:
+    purpose: "Simulate sub-shelf melt rates using imposed ice draft & far-field conditions"
+    pattern: "Consumes ice geometry fields; produces melt-rate fields"
+
+  assumptions:
+    - "Ice draft geometry supplied externally (from MISMIP+)"
+    - "No atmospheric or sea-ice processes"
+    - "Far-field temperature/salinity restoring"
+    - "Idealized cavity and open-ocean boundary"
+
+  links_to_publications_and_reports:
+    - "Asay-Davis et al. (2016), Geosci. Model Dev."
+    - "Holland et al. (2008)"
+
+  conceptual_model_evaluation: "Matches expected plume behavior and melt sensitivity"
+
+  uncertainty_analysis: "Scenario-based"
+  sensitivity_analysis: "Resolution and melt formulation tests"
+
+  # ---------------------------------------------------------
+  # PDF-enriched PROTOCOL DETAILS
+  # ---------------------------------------------------------
+  protocol_domain:
+    horizontal_extent: "0–640 km (x), 0–80 km (y)"
+    ocean_extension: "Additional 160 km beyond ice front"
+
+  far_field_profiles:
+    warm_profile:
+      temperature: "+1°C above local freezing"
+      salinity: "34.65 PSU"
+    cold_profile:
+      temperature: "–1°C below warm case"
+      salinity: "34.55 PSU"
+
+  melt_formula:
+    expression: "m = γT (T - Tf)"   # standard three-equation melt physics simplified
+    boundary_condition: "Applied at ice–ocean interface"
+
+  cavity_geometry:
+    draft_from_ice_model: true
+    freeboard_offset: "Based on hydrostatic equilibrium"
+
+  resolution_requirements:
+    horizontal: "2 km recommended"
+    vertical: "≥ 30 z-levels"
+  # ---------------------------------------------------------
+
+  input:
+    description: "Ice geometry from MISMIP+ runs"
+    format: "NetCDF"
+    variables:
+      - ice_draft_geometry
+      - grounding_line_position
+    units:
+      - "m"
+
+  parameters:
+    - name: "ISOMIPPlus_Parameters"
+      description: "Thermodynamics, drag, EOS coefficients, restoring fields"
+      format: ["YAML", "NetCDF"]
+      unit: "various"
+      datatype: "float"
+      valid_range: "Protocol-defined"
+      default_values: "From experimental setup"
+
+  datasets: []
+
+  integrated_input:
+    - uid: "MISMIPPlus_Output"
+      version: "2016.1"
+      description: "Ice geometry for ocean cavity model"
+
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - melt_rate
+      - ocean_velocity
+      - temperature
+      - salinity
+    units:
+      - "m a^-1"
+      - "m s^-1"
+      - "°C"
+      - "PSU"
+    verification: "Compared to baseline steady-state plume results"
+    corroboration: "Reproduces expected overturning & melt patterns"
+
+  data_evaluation: "Check draft continuity; ensure melt ≥ 0"
+
+  dimensionality: "3D"
+  spatial_extent: "Idealized ocean cavity"
+  spatial_resolution: "2 km horizontal"
+  variable_spatial_resolution: true
+
+  temporal_extent: "1–100 years"
+  time_steps_temporal_resolution: "Hours–days"
+  variable_temporal_resolution: true
+
+  programming_language:
+    - "Fortran"
+    - "C++"
+
+  availability_of_source_code: false
+  implementation_verification: "Multi-model plume agreement"
+  error_handling: "Restart strategies for numerical instability"
+
+  software_specification_and_requirements: "Ocean model with ice-shelf cavity physics"
+  hardware_specification_and_requirements: "HPC recommended"
+  execution_instructions: "Initialize from T/S fields; apply geometry; integrate"
+
+  parallel_execution: true
+  license: "Open experimental protocol"
+  landing_page: "https://www.geosci-model-dev.net/9/2471/2016/"
+  distribution_version: "2016.1"
+
+  file_formats:
+    - "NetCDF"
+
+  authors:
+    - name: "Paul R. Holland"
+      role: "Ocean model physics and melt formulation"
+    - name: "Xylar S. Asay-Davis"
+      role: "Protocol coordination"

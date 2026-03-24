@@ -1,0 +1,192 @@
+AB_Integrated:
+  title: "Integrated Agent-Based Land-Use and Ecosystem Services Model"
+  unique_identifier: ABM_ES_Coupled_2013
+  model_version: "1.0"
+
+  description: >
+    A spatially explicit integrated model that couples an agent-based land-use model
+    with an ecosystem services (ES) meta-model. Agents make land-use decisions on a
+    parcel-based landscape; their decisions update land cover, which is passed to the
+    ES module to compute indicators such as carbon storage, erosion control, and crop
+    yield. Updated ES scores feed back into agent decision-making in an iterative loop.
+
+  keywords:
+    - Land-use change
+    - Agent-based modeling
+    - Ecosystem services
+    - Model integration
+    - Environmental decision-making
+
+  model_type: "Mechanistic + Empirical"
+  scope: "Regional landscape systems with spatial heterogeneity"
+
+  purpose_pattern:
+    purpose: >
+      Assess how land-use dynamics impact ecosystem services under different policy,
+      behavioural, and valuation scenarios.
+    pattern: "Iterative feedback coupling (ABM → ES → ABM)"
+
+  assumptions:
+    - Land use and management fully determine ES outputs at the parcel scale.
+    - Agents incorporate ES indicators (or valuations) in their utility functions.
+    - Lookup tables or response surfaces for ES are representative of underlying processes.
+    - Policy scenarios and behavioural rules remain stationary within a simulation.
+
+  dimensionality: "2D"
+  spatial_extent: "Parcel-based regional landscape"
+  spatial_resolution: "1 ha parcels"
+  variable_spatial_resolution: false
+
+  temporal_extent: "Decadal-scale simulations"
+  temporal_resolution: "Annual decision and ES update steps"
+  variable_temporal_resolution: false
+
+  calibration_tools_data: "Historical land use/cover, socio-economic data, and empirical ES valuation studies"
+
+  publications:
+    - "Parker et al., 2013 – Agent-based land-use and ecosystem service feedback modelling (as referenced in metadata)"
+
+  conceptual_evaluation: >
+    Conceptually consistent with spatial land-use theory and ES valuation frameworks;
+    supports exploratory policy analysis and spatial decision support.
+
+  validation_capabilities: >
+    Land-use trajectories and ES indicators can be compared against observed trends
+    or independent scenario studies at regional scale.
+
+  sensitivity_analysis: >
+    Parameter sweeps over ES valuation weights, agent preferences, and policy levers;
+    comparison of alternative behaviour rules.
+
+  uncertainty_analysis: >
+    Scenario-based ensembles for ES input tables, policy assumptions, and agent decision
+    heuristics (non-probabilistic).
+
+  license: "Academic / research use; not distributed under a standard OSI license."
+
+  # Controlled vocabulary: license compatibility tag
+  license_incompatibility: proprietary
+
+  landing_page: ""
+  distribution_version: "1.0"
+
+  # Programming language family (controlled vocab)
+  programming_language:
+    - NetLogo
+    - Python
+  programming_language_family:
+    - JVM_Family
+    - Python_R_CPP_Family
+
+  # Software requirements with controlled vocab hooks
+  software_requirements:
+    description: "Requires an ABM platform (e.g., NetLogo) plus a scripting/analysis environment for ES evaluation."
+    ffi_family:
+      - Python_R_CPP_Family
+    database_dependencies:
+      - sqlite        # typical small DB / file-backed storage
+      - postgres      # optional for larger case studies
+    io_libraries:
+      - CSV_Family
+      - JSON_Family
+      - Excel_Family
+      - Parquet_Family
+
+  hardware_requirements: "Standard desktop or workstation; multicore optional for batch scenario runs."
+
+  # Conceptual / provenance meta
+  conceptual_consistency_mismatch: >
+    Conceptual consistency is generally good between the land-use ABM and ES meta-model;
+    main mismatches arise where coarse ES lookup tables cannot fully reflect fine-scale
+    biophysical processes implied by agent actions.
+
+  provenance_and_accessibility_gap: >
+    Conceptual and methodological provenance is documented in Parker et al. (2013),
+    but model code, parameter tables, and scenario datasets are not maintained in a
+    curated, versioned public repository.
+
+  # Active-edge (I/O) checks – integration between ABM and ES component
+  active_edge_io_checks:
+    input_formats:
+      - csv
+      - raster
+      - json
+    output_formats:
+      - csv
+      - raster
+      - json
+    whole_model_information_fields: >
+      Land-use maps, ES indicators, and scenario identifiers are carried with run metadata;
+      internal checks ensure parcel IDs and categorical land-use classes remain consistent
+      between ABM and ES modules.
+
+  # A-side (ABM) → B-side (ES) inputs
+  input:
+    description: "Annual parcel-based land-use/management maps and attributes from the agent-based model."
+    format:
+      - csv
+      - raster
+      - json
+    variables:
+      - land_use_class_per_parcel     # categorical
+      - management_intensity          # ordinal / numeric
+      - parcel_area                   # ha
+      - agent_id                      # categorical
+    units: "categorical, unitless index, ha"
+
+  integrated_input: []
+
+  # B-side (ES) → A-side (ABM) feedback outputs
+  output:
+    format:
+      - csv
+      - raster
+    variables:
+      - land_use_map                  # categorical
+      - carbon_storage                # tC ha^-1
+      - erosion_control               # t ha^-1 (avoided loss)
+      - agricultural_yield            # t ha^-1
+    units: "categorical, tC/ha, t/ha, t/ha"
+    verification: >
+      ES outputs and spatial patterns compared with empirical benchmarks or external ES
+      models where available.
+    corroboration: >
+      Emergent trade-offs and synergies between ES under different land-use policies
+      are qualitatively consistent with literature.
+
+  # Integration meta (controlled vocab)
+  integration:
+    pattern: "embedded"
+    submodels:
+      - "Agent-Based Land-Use Model"
+      - "Ecosystem Service Meta-Model"
+    execution_constraints: >
+      Synchronous annual coupling; ABM and ES modules run in sequence each timestep
+      (ABM → ES → ABM), using the same grid and parcel identifiers.
+    acknowledgment: >
+      Use of the integrated model should acknowledge Parker et al. (2013) and any source
+      ES datasets employed.
+    latency_expectations: >
+      Low latency, batch-style exchange at annual timesteps; no real-time constraints.
+    data_synchronization: >
+      Land-use maps are exported from the ABM and ingested by the ES module each year;
+      ES scores are written back as attributes or lookup tables that modify agent utility
+      in the next decision step.
+
+  # Communication & error-handling semantics
+  communication_mechanism: >
+    File-based and in-memory exchanges depending on implementation: CSV/JSON/raster
+    outputs from the ABM are read by the ES evaluator, with ES scores returned via
+    direct calls or file/API-based integration between annual steps.
+
+  error_handling: >
+    Input validation on parcel IDs, land-use categories, and ES table lookups; invalid or
+    missing values fall back to defaults and are logged for post-run diagnostics.
+
+  authors:
+    - name: "Dawn C. Parker"
+      orcid: ""
+      role: "ABM design, ES integration, and scenario analysis"
+    - name: "C. Jantz"
+      orcid: ""
+      role: "Ecosystem services modelling and spatial data"

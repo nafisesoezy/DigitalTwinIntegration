@@ -1,0 +1,79 @@
+{
+  "summary": {
+    "group": "1",
+    "ab_kind": "INTENDED",
+    "num_rows_seen": 6,
+    "num_real_mismatches": 1,
+    "num_not_a_mismatch": 5,
+    "risk_level": "medium"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "assumptions||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The assumptions are different but not incompatible. Both models can be integrated with a clear understanding of their respective assumptions."
+    },
+    {
+      "row_ref": "description||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The descriptions are different but not incompatible. Both models can be integrated with a clear understanding of their respective descriptions."
+    },
+    {
+      "row_ref": "model version||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The model versions are the same, so it is not a mismatch."
+    },
+    {
+      "row_ref": "purpose & pattern||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The purposes and patterns are different but not incompatible. Both models can be integrated with a clear understanding of their respective purposes and patterns."
+    },
+    {
+      "row_ref": "title||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The titles are different but not incompatible. Both models can be integrated with a clear understanding of their respective titles."
+    },
+    {
+      "row_ref": "temporal_extent_coverage||temporal coverage mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The temporal coverage is incompatible, which could block integration."
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "F1",
+      "field": "temporal_extent_coverage",
+      "bottleneck": "Temporal Coverage Mismatch",
+      "root_cause": "Incompatible temporal coverage between Model A and Model B.",
+      "evidence": {
+        "A_value": "user-defined, typically days to decades",
+        "B_value": "multi-year to decadal"
+      },
+      "why_it_blocks_integration": "The temporal coverage of Model A and Model B are not aligned, which could lead to inconsistencies in the integrated model.",
+      "proposed_fix": "Resample Model A to match the temporal coverage of Model B or vice versa.",
+      "data_transform": {
+        "rules": [
+          "Resample Model A data to match the temporal coverage of Model B."
+        ],
+        "example": "If Model A data is in days, resample it to multi-year or decadal intervals to match Model B."
+      },
+      "runtime_orchestration": {
+        "pattern": "Resampling",
+        "steps": [
+          "Identify the temporal coverage of Model A and Model B.",
+          "Resample Model A data to match the temporal coverage of Model B.",
+          "Integrate the resampled data from Model A with Model B."
+        ]
+      },
+      "yaml_patches": {
+        "A": "temporal_coverage: multi-year to decadal",
+        "B": "",
+        "AB": ""
+      },
+      "validation": [
+        "Verify that the resampled data from Model A matches the temporal coverage of Model B.",
+        "Ensure that the integrated model produces consistent results with the resampled data."
+      ]
+    }
+  ]
+}

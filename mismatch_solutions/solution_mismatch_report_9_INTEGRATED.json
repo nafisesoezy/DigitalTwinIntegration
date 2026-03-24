@@ -1,0 +1,211 @@
+{
+  "summary": {
+    "group": "9",
+    "ab_kind": "INTEGRATED",
+    "num_rows_seen": 13,
+    "num_real_mismatches": 4,
+    "num_not_a_mismatch": 9,
+    "risk_level": "medium"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "data_synchronization||data synchronization",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "error_handling||error handling mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The failsafes and handling mechanisms are not compatible."
+    },
+    {
+      "row_ref": "execution_constraints||execution constraint mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "hardware_specification_and_requirements||hardware resource mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "latency_expectations||latency expectation mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "assumptions||semantic mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The assumptions about hydrostatic balance and other factors are not compatible."
+    },
+    {
+      "row_ref": "keywords||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "model_version||semantic mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The model versions do not match exactly as required."
+    },
+    {
+      "row_ref": "purpose & pattern||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "title||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "software_specification_and_requirements||software environment mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The software environments are not compatible."
+    },
+    {
+      "row_ref": "spatial_resolution||spatial resolution mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "time_steps_temporal_resolution||temporal resolution mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "F1",
+      "field": "error_handling",
+      "bottleneck": "error handling mismatch",
+      "root_cause": "Incompatible failsafes and handling mechanisms",
+      "evidence": {
+        "A_value": "failsafes for model divergence",
+        "B_value": "tracer checks, restart systems"
+      },
+      "why_it_blocks_integration": "The failsafes and handling mechanisms are not compatible, which can lead to integration failures.",
+      "proposed_fix": "Implement a common failsafe mechanism that can handle both model divergence and tracer checks.",
+      "data_transform": {
+        "rules": [
+          "Implement a common failsafe mechanism"
+        ],
+        "example": "Common failsafe mechanism for model divergence and tracer checks"
+      },
+      "runtime_orchestration": {
+        "pattern": "Synchronous",
+        "steps": [
+          "Implement common failsafe mechanism",
+          "Test integration with new failsafe mechanism"
+        ]
+      },
+      "yaml_patches": {
+        "A": "failsafes: common_failsafe_mechanism",
+        "B": "tracer_checks: common_failsafe_mechanism",
+        "AB": "failsafes: common_failsafe_mechanism"
+      },
+      "validation": [
+        "Test integration with new failsafe mechanism"
+      ]
+    },
+    {
+      "id": "F2",
+      "field": "assumptions",
+      "bottleneck": "semantic mismatch",
+      "root_cause": "Incompatible assumptions about hydrostatic balance and other factors",
+      "evidence": {
+        "A_value": "hydrostatic balance; spherical harmonics basis for spectral core; radiative forcing from ghgs, aerosols",
+        "B_value": "boussinesq, hydrostatic approximations; no tides or coastal detail in standard runs"
+      },
+      "why_it_blocks_integration": "The assumptions about hydrostatic balance and other factors are not compatible, which can lead to integration failures.",
+      "proposed_fix": "Align the assumptions about hydrostatic balance and other factors between the models.",
+      "data_transform": {
+        "rules": [
+          "Align assumptions about hydrostatic balance and other factors"
+        ],
+        "example": "Aligned assumptions about hydrostatic balance and other factors"
+      },
+      "runtime_orchestration": {
+        "pattern": "Synchronous",
+        "steps": [
+          "Align assumptions about hydrostatic balance and other factors",
+          "Test integration with aligned assumptions"
+        ]
+      },
+      "yaml_patches": {
+        "A": "assumptions: aligned_assumptions",
+        "B": "assumptions: aligned_assumptions",
+        "AB": "assumptions: aligned_assumptions"
+      },
+      "validation": [
+        "Test integration with aligned assumptions"
+      ]
+    },
+    {
+      "id": "F3",
+      "field": "model_version",
+      "bottleneck": "semantic mismatch",
+      "root_cause": "Model versions do not match exactly as required",
+      "evidence": {
+        "A_value": "v4; v1.3",
+        "B_value": "v1.3; v4"
+      },
+      "why_it_blocks_integration": "The model versions do not match exactly as required, which can lead to integration failures.",
+      "proposed_fix": "Update the model versions to match exactly as required.",
+      "data_transform": {
+        "rules": [
+          "Update model versions to match exactly as required"
+        ],
+        "example": "Updated model versions to match exactly as required"
+      },
+      "runtime_orchestration": {
+        "pattern": "Synchronous",
+        "steps": [
+          "Update model versions to match exactly as required",
+          "Test integration with updated model versions"
+        ]
+      },
+      "yaml_patches": {
+        "A": "model_version: v2",
+        "B": "model_version: v2",
+        "AB": "model_version: v2"
+      },
+      "validation": [
+        "Test integration with updated model versions"
+      ]
+    },
+    {
+      "id": "F4",
+      "field": "software_specification_and_requirements",
+      "bottleneck": "software environment mismatch",
+      "root_cause": "Incompatible software environments",
+      "evidence": {
+        "A_value": "netcdf, mpi, fortran compiler",
+        "B_value": "coupled into canesm2"
+      },
+      "why_it_blocks_integration": "The software environments are not compatible, which can lead to integration failures.",
+      "proposed_fix": "Align the software environments between the models.",
+      "data_transform": {
+        "rules": [
+          "Align software environments between the models"
+        ],
+        "example": "Aligned software environments between the models"
+      },
+      "runtime_orchestration": {
+        "pattern": "Synchronous",
+        "steps": [
+          "Align software environments between the models",
+          "Test integration with aligned software environments"
+        ]
+      },
+      "yaml_patches": {
+        "A": "software_environment: aligned_software_environment",
+        "B": "software_environment: aligned_software_environment",
+        "AB": "software_environment: aligned_software_environment"
+      },
+      "validation": [
+        "Test integration with aligned software environments"
+      ]
+    }
+  ]
+}

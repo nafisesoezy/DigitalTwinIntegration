@@ -1,0 +1,213 @@
+WOMBAT:
+  title: "WOMBAT: Whole Ocean Model of Biogeochemistry And Trophic-dynamics"
+  unique_identifier: "WOMBAT_Model_2013"
+  model_version: "2013.1"
+  description: >
+    WOMBAT is a three-dimensional NPZD-type ocean biogeochemistry module that
+    simulates nutrients, phytoplankton, zooplankton, detritus, and related
+    carbon and oxygen cycles. In Oke et al. 2013 it is embedded in OFAM3 to
+    represent large-scale biogeochemical cycling and ecosystem variability.
+
+  keywords:
+    - Biogeochemistry
+    - NPZD model
+    - Carbon cycle
+    - Nutrient cycling
+    - Phytoplankton
+    - Ocean ecosystems
+
+  model_type: "Process-based biogeochemical cycling model (NPZD-type)"
+  scope: "Simulation of nutrient cycles, primary production, and biogeochemical tracers in a global/near-global ocean context"
+
+  purpose_pattern:
+    purpose: >
+      Quantify nutrient and carbon cycling, chlorophyll distributions, and
+      ecosystem variability when embedded in a 3D ocean circulation model.
+    pattern: >
+      Embedded biogeochemical module called in-memory from the host circulation
+      model (OFAM3) at each timestep.
+
+  assumptions:
+    - "Ecosystem structure represented by a simple NPZD-type framework."
+    - "Stoichiometry is based on Redfield-like elemental ratios."
+    - "Phytoplankton growth is limited by light, nutrients (e.g., phosphate, iron), and temperature."
+    - "Air–sea gas exchange parameterized using wind speed and climatological sea-ice cover."
+
+  dimensionality: "3D (longitude, latitude, depth)"
+  spatial_extent: "Same as the host circulation model (OFAM3 near-global domain, 75°S–75°N)."
+  spatial_resolution: "Inherits 1/10° horizontal grid and z* vertical coordinate of OFAM3."
+  variable_spatial_resolution: true
+
+  temporal_extent: "Multi-decadal integrations (e.g., 32-year experiment in Oke et al. 2013)"
+  temporal_resolution: "Updated every host-model timestep; diagnostics daily to monthly"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: >
+    Iron deposition climatologies, nutrient and oxygen climatologies, observed
+    CO₂ flux products, and satellite chlorophyll-a (e.g., SeaWiFS) used for
+    tuning and evaluation as documented in Oke et al. 2013.
+
+  publications:
+    - "Oke et al., 2013, Geosci. Model Dev., 6, 591–615"
+
+  conceptual_evaluation: >
+    Evaluated in Oke et al. 2013 against observed chlorophyll-a, nutrient
+    distributions, CO₂ fluxes, and oxygen-related metrics when embedded in the
+    OFAM3 circulation model.
+
+  validation_capabilities: >
+    Yes — supports validation of global/near-global chlorophyll patterns, carbon
+    cycle estimates, and regional nutrient/oxygen profiles against observations.
+
+  sensitivity_analysis: >
+    Sensitivity to nutrient limitation, light availability, and other key rate
+    parameters can be explored via alternative WOMBAT namelist settings.
+
+  uncertainty_analysis: >
+    Uncertainty arises from parameterizations and forcing; ensemble and scenario
+    runs can be used to probe biogeochemical response to physical and chemical
+    drivers.
+
+  conceptual_consistency_mismatch: >
+    When embedded in OFAM3, conceptual mismatch is moderate: physical and
+    biogeochemical grids/timesteps align, but the NPZD structure and Redfield
+    assumptions simplify real ecosystem complexity.
+
+  provenance_and_accessibility_gap: >
+    Scientific description and evaluation are documented in Oke et al. 2013, but
+    WOMBAT source code and configuration for OFAM3 are institutionally
+    maintained, with limited public access and no stand-alone open repository.
+
+  license: "Research/institutional use (CSIRO/Bureau of Meteorology)."
+  license_incompatibility: "proprietary"
+
+  landing_page: "http://www.bom.gov.au/oceanography/forecasts/"
+  distribution_version: "2013.1"
+
+  programming_language:
+    family: "Native_C_CPP_Fortran_Family"
+    languages:
+      - "Fortran 90 (embedded WOMBAT biogeochemistry)"
+
+  software_requirements: >
+    Requires compilation and embedding within OFAM3 (MOM4p1-based) using a
+    Fortran compiler with C_ABI, MPI for parallel execution, and NetCDF4_Family
+    I/O through the host model.
+
+  hardware_requirements: >
+    Shares the HPC requirements of the host eddy-resolving circulation model
+    (e.g., OFAM3 on a distributed-memory cluster).
+
+  execution_instructions: >
+    Configure WOMBAT parameters via namelists and compile as part of the coupled
+    OFAM3 executable; runs only within the host model’s time-stepping loop and
+    is not used as a fully independent stand-alone model at 1/10° resolution.
+
+  parallel_execution: true
+
+  communication_mechanism: >
+    Embedded, in-memory direct call interface from the host circulation model on
+    each MPI rank; no separate file-based coupling layer.
+
+  error_handling: >
+    Relies on shared runtime checks with OFAM3; NaNs or unphysical tracer values
+    are detected via diagnostics, with coupled job abortion and restart from a
+    consistent NetCDF/binary state if needed.
+
+  implementation_verification: >
+    Verified indirectly through the coupled OFAM3–WOMBAT experiments in Oke
+    et al. 2013 by reproducing observed biogeochemical and carbon-cycle patterns.
+
+  source_code_availability: false
+
+  parameters:
+    - name: "WOMBAT_Config_Parameters"
+      description: >
+        Ecosystem constants (uptake rates, remineralization rates,
+        stoichiometric ratios, temperature functions) and gas-exchange
+        parameters used in the embedded OFAM3–WOMBAT configuration.
+      format: "txt (namelist)"
+      unit: "varies"
+      datatype: "float"
+      valid_range: "Biologically meaningful, positive, finite values"
+      default: "Set according to the WOMBAT configuration used in Oke et al. 2013"
+
+  datasets:
+    - uid: "SeaWiFS_Chlorophyll"
+      version: "2008"
+      access_url: "https://oceancolor.gsfc.nasa.gov/"
+      dependencies:
+        - "Chlorophyll-a products for large-scale validation"
+
+    - uid: "Iron_Deposition_Climatology"
+      version: "2011"
+      access_url: ""
+      dependencies:
+        - "Dust/iron forcing fields for nutrient limitation experiments"
+
+  integrated_input:
+    - "Physical ocean state variables (T, S, velocity, MLD) from OFAM3"
+    - "Atmospheric iron deposition climatologies"
+    - "Climatological sea-ice and CO₂ forcing fields for gas exchange"
+
+  data_evaluation: >
+    Internal checks on nutrient conservation, Redfield consistency, and
+    plausibility of CO₂ fluxes and oxygen budgets, combined with external
+    comparison to observed chlorophyll and nutrient fields.
+
+  active_edge_io:
+    formats:
+      - netcdf
+    whole_model_information_fields: >
+      Tracer fields (N, P, detritus, chlorophyll-a, oxygen, carbon pools) stored
+      in host-model NetCDF outputs and restarts; no dedicated WOMBAT-only file
+      format at runtime.
+
+  input:
+    description: >
+      Receives the evolving 3D physical fields and external forcing terms
+      (nutrient deposition, atmospheric CO₂) from OFAM3 at each timestep via
+      embedded calls.
+    format: "in-memory (OFAM3 → WOMBAT)"
+    variables:
+      - temperature_profile          # °C
+      - salinity_profile             # psu
+      - 3D_velocity_field            # m s⁻¹
+      - mixed_layer_depth            # m
+      - external_nutrient_forcing    # mmol m⁻³ or flux units
+      - atmospheric_CO2_properties   # partial pressure, wind-based gas exchange terms
+    units: "Model-consistent SI and tracer units"
+
+  output:
+    format:
+      - "netcdf"
+    variables: >
+      Nutrient concentrations, phytoplankton and zooplankton biomass, detritus,
+      chlorophyll-a, oxygen, and carbon-cycle flux diagnostics written via the
+      host OFAM3 I/O system.
+    units:
+      - "mmol m⁻³"
+      - "mg Chl a m⁻³"
+      - "µmol O₂ L⁻¹"
+      - "PgC yr⁻¹"
+    verification: >
+      Biogeochemical output compared against chlorophyll, nutrient, oxygen, and
+      CO₂ flux datasets in the evaluation described by Oke et al. 2013.
+    corroboration: >
+      Reproduces large-scale chlorophyll and CO₂ flux patterns, including ENSO
+      variability and seasonal cycles consistent with observational constraints.
+
+  integration:
+    submodels:
+      - "Host ocean circulation model (e.g., OFAM3/MOM4p1)"
+    execution_constraints: >
+      Must run in lockstep with the host model on the same grid and timestep,
+      with tracer advection and biogeochemical source–sink terms applied
+      consistently across MPI ranks.
+    acknowledgment_protocols: >
+      When using WOMBAT as embedded in OFAM3, cite Oke et al. 2013 GMD and
+      acknowledge CSIRO/BOM; consult institutional agreements for redistribution.
+    data_synchronization: >
+      In-memory, synchronous updates each timestep; tracer fields are advected
+      and updated within the host’s integration cycle and captured in shared
+      NetCDF restart and history files.

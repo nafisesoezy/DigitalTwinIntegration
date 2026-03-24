@@ -1,0 +1,120 @@
+{
+  "summary": {
+    "group": "7",
+    "ab_kind": "INTENDED",
+    "num_rows_seen": 12,
+    "num_real_mismatches": 2,
+    "num_not_a_mismatch": 10,
+    "risk_level": "medium"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "data_synchronization||data synchronization",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "execution_constraints||execution constraint mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "programming_language||programming language incompatibility",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The token similarity is above the threshold, indicating compatibility."
+    },
+    {
+      "row_ref": "description||semantic mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The descriptions are not semantically similar enough to ensure integration."
+    },
+    {
+      "row_ref": "purpose & pattern||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "title||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The values are semantically similar and can be integrated with minor adjustments."
+    },
+    {
+      "row_ref": "software_specification_and_requirements||software environment mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The software environments are not compatible."
+    },
+    {
+      "row_ref": "temporal_extent_coverage||temporal coverage mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The temporal coverage can be aligned with resampling."
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "F1",
+      "field": "description",
+      "bottleneck": "semantic mismatch",
+      "root_cause": "Incompatible descriptions",
+      "evidence": {
+        "A_value": "a 1d water column hydrodynamic model simulating vertical mixing, turbulence, hydrodynamics, providing physical driver fields for coupled biogeochemical models via fabm, receiving ecological feedback variables e.g., light attenuation, heat flux from f",
+        "B_value": "a process-based biogeochemical lake ecosystem model simulating nutrient cycling, primary production, oxygen dynamics, sediment-water interactions, implemented within the framework for aquatic biogeochemical models fabm for coupling with host hydrodyn"
+      },
+      "why_it_blocks_integration": "The descriptions are not semantically similar enough to ensure integration.",
+      "proposed_fix": "Create a unified description that encompasses both models' functionalities.",
+      "data_transform": {
+        "rules": [
+          "Combine descriptions to cover all aspects."
+        ],
+        "example": "A unified description that includes both hydrodynamic and biogeochemical aspects."
+      },
+      "runtime_orchestration": {
+        "pattern": "Sequential",
+        "steps": [
+          "Combine descriptions",
+          "Ensure all aspects are covered"
+        ]
+      },
+      "yaml_patches": {
+        "A": "description: combined description",
+        "B": "description: combined description",
+        "AB": "description: combined description"
+      },
+      "validation": [
+        "Ensure the combined description covers all aspects of both models."
+      ]
+    },
+    {
+      "id": "F2",
+      "field": "software_specification_and_requirements",
+      "bottleneck": "software environment mismatch",
+      "root_cause": "Incompatible software environments",
+      "evidence": {
+        "A_value": "netcdf, fortran compiler",
+        "B_value": "fabm environment"
+      },
+      "why_it_blocks_integration": "The software environments are not compatible.",
+      "proposed_fix": "Use a compatible software environment that supports both models.",
+      "data_transform": {
+        "rules": [
+          "Identify a compatible software environment."
+        ],
+        "example": "Use a software environment that supports both netcdf and fabm."
+      },
+      "runtime_orchestration": {
+        "pattern": "Parallel",
+        "steps": [
+          "Identify compatible software environment",
+          "Ensure both models can run in the identified environment"
+        ]
+      },
+      "yaml_patches": {
+        "A": "software_specification_and_requirements: compatible environment",
+        "B": "software_specification_and_requirements: compatible environment",
+        "AB": "software_specification_and_requirements: compatible environment"
+      },
+      "validation": [
+        "Ensure both models can run in the identified compatible software environment."
+      ]
+    }
+  ]
+}

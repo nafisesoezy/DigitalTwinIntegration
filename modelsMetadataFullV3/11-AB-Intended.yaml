@@ -1,0 +1,98 @@
+Integrated_Model:
+  title: "Integrated PIHM–PIHMgis System via Shared Data Model"
+  unique_identifier: "PIHM_PIHMgis_Shared_Integration_2009"
+  model_version: "As implemented in shared data model framework"
+
+  description: >
+    A shared-data-model–based hydrologic modeling system where the PIHM hydrologic
+    engine and PIHMgis GIS builder operate on a unified object-oriented database.
+    GIS layers, model parameters, mesh elements, and hydrologic states share the
+    same data structures, enabling consistent, non-file-based, synchronous updates
+    between GIS and hydrologic modeling components.
+
+  keywords:
+    - shared data model
+    - GIS–hydrology coupling
+    - object-oriented integration
+    - PIHM
+    - PIHMgis
+
+  model_type: "Mechanistic + integrated GIS-model system"
+  scope: "Unified GIS–hydrologic modeling environment"
+
+  purpose_pattern:
+    purpose: "Enable consistent, real-time data sharing between GIS and hydrologic model components"
+    pattern: "Shared-state integration via unified object-oriented database"
+
+  assumptions:
+    - GIS and hydrologic components can operate on a unified schema
+    - Internal database reflects spatial and hydrologic topology consistently
+    - No file-based coupling required at runtime
+
+  dimensionality: "3D hydrologic + 2D GIS layers (shared schema)"
+  spatial_extent: "Watershed domain defined by DEM"
+  spatial_resolution: "TIN mesh with shared GIS backing"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Event to multi-year hydrologic runs"
+  temporal_resolution: "Sub-hourly to hourly"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: ""
+
+  publications:
+    - "Bhatt et al. (2008–2009): Object-oriented shared data model for GIS–based hydrologic modeling"
+
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+
+  license: "Research/academic"
+  landing_page: ""
+  distribution_version: "Shared-data-model PIHM–PIHMgis framework"
+
+  programming_language:
+    - "C"
+    - "C++"
+    - "Native_C_CPP_Fortran_Family"
+
+  software_requirements: ""
+
+  hardware_requirements: "Workstation"
+
+  execution_instructions: >
+    GIS layers, mesh, and parameters are stored in a shared object-oriented
+    database. PIHM executables access this shared structure directly, avoiding
+    file-based transfer. PIHMgis updates propagate immediately to PIHM state
+    definitions.
+
+  parallel_execution: false
+
+  implementation_verification: ""
+  source_code_availability: "Described in the PIHMgis publication"
+
+  integrated_input:
+    - uid: "PIHM_Hydrologic_Model_2009"
+    - uid: "PIHMgis_GIS_Model_2009"
+
+  integration:
+    pattern: "shared"
+    submodels:
+      - "PIHM hydrologic core"
+      - "PIHMgis GIS builder"
+    communication_mechanism: "shared memory / shared-object database"
+    execution_constraints: ""
+    acknowledgment_protocols: ""
+    latency_expectations: ""
+    data_synchronization: ""
+
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - hydrologic states
+      - GIS-consistent spatial fields
+    units: "various"
+    verification: ""

@@ -1,0 +1,137 @@
+SoilFeedback:
+  title: "Cellular Automaton-Based Soil Feedback Model"
+  unique_identifier: "SoilFeedback_Model_2017"
+  model_version: "1.0"
+
+  description: >
+    A cellular automaton modeling plant-induced soil autotoxicity, decay, and
+    diffusion. Designed to capture conspecific negative feedback (PSNF) at the
+    spatial scales documented in Vincenot 2017. Soil toxicity accumulates based
+    on local plant biomass/density and decays exponentially over time.
+
+  keywords:
+    - Soil feedback
+    - Cellular automaton
+    - Plant–soil interaction
+    - Negative feedback
+    - Ecological memory
+
+  model_type: "Mechanistic"
+  scope: "Patch- to landscape-scale soil feedback"
+
+  purpose_pattern:
+    purpose: "Simulate soil toxicity accumulation, decay, and spread"
+    pattern: "Grid-based updates driven by IBM plant density/biomass"
+
+  assumptions:
+    - Soil modified proportionally to plant biomass/density
+    - Conspecific inhibition reduces germination probability
+    - Soil memory decays exponentially (time constant from Vincenot 2017)
+    - Toxicity remains non-negative
+    - Effects are species-specific
+
+  dimensionality: "2D"
+  spatial_extent: "Same grid as IBM"
+  spatial_resolution: "1 m²"
+  variable_spatial_resolution: false
+
+  temporal_extent: "Multi-year"
+  temporal_resolution: "Annual with optional sub-annual decay"
+  variable_temporal_resolution: false
+
+  calibration_tools_data: >
+    Pattern calibration to match PSNF-generated vegetation mosaics described in
+    Vincenot 2017.
+
+  publications:
+    - "Vincenot et al., 2017, Oikos"
+
+  conceptual_evaluation: >
+    Model generates inhibition zones, patch dynamics, and feedback strengths
+    consistent with ecological theory.
+
+  validation_capabilities: >
+    Patterns match spatial phenomena such as Janzen–Connell gaps.
+
+  sensitivity_analysis: >
+    Conducted for decay rate, diffusion radius, feedback strength, and
+    species-specific sensitivity.
+
+  uncertainty_analysis: "Scenario-based"
+
+  error_handling: "Prevents negative toxicity values; grid consistency checks"
+
+  license: "CC BY"
+  landing_page: "http://christian.vincenot.biz/models.html"
+  distribution_version: "1.0"
+
+  programming_language:
+    - "C++"
+    - "NetLogo"
+
+  software_requirements: "Grid-based CA platform or custom code"
+  hardware_requirements: "Standard workstation"
+
+  execution_instructions: >
+    Run after IBM each timestep, updating soil maps with new biomass/density
+    inputs.
+
+  parallel_execution: false
+  implementation_verification: >
+    Produces PSNF patterns matching those described in Vincenot 2017.
+
+  source_code_availability: false
+
+  input:
+    description: "Annual plant biomass and density maps from IBM"
+    format: "CSV or memory structure"
+    variables:
+      - plant_biomass_per_cell
+      - plant_density_per_cell
+      - species_identity_per_cell
+    units:
+      - "g m⁻²"
+      - "count m⁻²"
+
+  integrated_input:
+    - uid: "IBM_Vegetation_Model_2017"
+      version: "1.0"
+      description: "Provides plant biomass/density maps"
+
+  parameters:
+    - name: "Soil feedback parameters"
+      description: "Decay rate, feedback strength, diffusion radius, species sensitivity"
+      format: "Table"
+      unit: "varies"
+      datatype: "float"
+      valid_range: "Positive ecological bounds"
+
+  output:
+    format:
+      - "CSV"
+      - "Text"
+    variables:
+      - soil_toxicity_per_cell
+      - modified_germination_prob_per_cell
+    units:
+      - "dimensionless"
+      - "probability (0–1)"
+
+    verification: >
+      Spatial toxicity gradients match PSNF theory and Vincenot 2017 examples.
+
+    corroboration: >
+      Soil patterns produce patchiness and coexistence consistent with plant–soil
+      negative feedback theory.
+
+  integration:
+    submodels: []
+    execution_constraints: "Must run after IBM each timestep"
+    acknowledgment: "Vincenot et al., 2017"
+    latency_expectations: "Annual coupling"
+    data_synchronization: "Aligned grids required"
+
+  authors:
+    - name: "Vincent Vincenot"
+      orcid: "http://orcid.org/0000-0002-2386-1626"
+      role: "Model development"

@@ -1,0 +1,155 @@
+LIM:
+  title: "LIM: Louvain-la-Neuve Sea-Ice Model"
+  unique_identifier: "LIM_UCL_1997_1999"
+  model_version: "dynamic–thermodynamic LIM (ORCA2-LIM configuration)"
+
+  description: >
+    A dynamic–thermodynamic sea-ice model with multilayer thermodynamics (1 snow + 2 ice layers)
+    and viscous–plastic (VP) rheology. Includes thickness redistribution, Prather advection,
+    and parameterized lead formation and closure. In ORCA2-LIM it is compiled and integrated
+    in-memory with OPA 8.2, exchanging momentum, heat, and freshwater fluxes synchronously
+    every ocean timestep group.
+
+  keywords:
+    - Sea-ice dynamics
+    - VP rheology
+    - Multilayer thermodynamics
+    - Lead formation
+    - Ridging
+    - Ice–ocean coupling
+    - High-latitude processes
+
+  model_type: Mechanistic
+  scope: High-latitude global sea-ice cover (Arctic + Antarctic)
+
+  purpose_pattern:
+    purpose: Simulate sea-ice drift, extent, thickness, ridging, and thermodynamic evolution
+    pattern: "VP continuum mechanics + multilayer thermodynamics with direct ocean–ice flux coupling"
+
+  assumptions:
+    - Sea ice treated as a 2-D continuum with VP rheology
+    - Subgrid ice-thickness distribution approximated implicitly through h0 and assumptions on conductivity
+    - Albedo parameterized using surface conditions (snow, melt, thickness)
+    - Snow–ice formation triggered when snow depresses freeboard below sea level
+
+  dimensionality: "2D + multilayer vertical thermodynamics"
+  spatial_extent: "Global ocean sea-ice regions when coupled with OPA"
+  spatial_resolution: "Follows host ocean grid (ORCA2 ≈ 2°)"
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-decadal integrations"
+  temporal_resolution: "Coupling every N ocean steps; diagnostics daily–monthly"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: "Ice strength P*, h0 tuning, albedo options tuned for ORCA2-LIM realism"
+
+  publications:
+    - "Fichefet & Morales Maqueda 1997"
+    - "Fichefet & Morales Maqueda 1999"
+    - "Goosse & Fichefet 1999"
+    - "Timmermann et al. 2005"
+
+  conceptual_evaluation: >
+    Based on standard VP rheology and multilayer thermodynamics; ORCA2-LIM applications
+    reproduce major hemispheric sea-ice patterns and seasonal cycles.
+
+  validation_capabilities: >
+    Satellite ice concentration, ice drift (SSM/I, AVHRR), submarine/ULS thickness,
+    and climatological seasonal cycles.
+
+  conceptual_consistency_mismatch: >
+    Minor regional biases (e.g., Fram Strait throughput, Antarctic coastal thickness)
+    but no structural inconsistency with OPA.
+
+  provenance_and_accessibility_gap: >
+    Documented in peer-reviewed literature; distributed historically as part of ORCA2-LIM
+    rather than a modern standalone repository.
+
+  license: "Unspecified (historical OPA/LIM distribution)"
+  license_incompatibility: "proprietary"
+
+  distribution_version: "ORCA2-LIM (2005 application)"
+
+  programming_language:
+    - Fortran
+  programming_language_family: Native_C_CPP_Fortran_Family
+
+  software_requirements: >
+    Fortran compiler; NetCDF4_Family I/O; HDF5 backend; compiled in a shared executable with OPA.
+  hardware_requirements: "Workstation to HPC"
+  parallel_execution: true
+
+  software_integration:
+    ffi_family: C_ABI
+    io_libraries:
+      - netcdf4
+      - libhdf5
+    databases: []
+
+  execution_instructions: >
+    Compile LIM and OPA into a single coupled executable. Configure rheology and
+    thermodynamics via namelists. Run with synchronous, every-step ocean–ice coupling.
+
+  error_handling: >
+    CFL checks, physical bound checks (non-negative thickness), abort on instability,
+    restart-file support.
+
+  input:
+    description: "OPA-provided surface fields and fluxes (in-memory)"
+    format: netcdf
+    variables:
+      - sea_surface_temperature
+      - sea_surface_salinity
+      - ocean_surface_currents_u
+      - ocean_surface_currents_v
+      - ocean_mixed_layer_depth
+      - downwelling_shortwave_radiation
+      - downwelling_longwave_radiation
+    units: "°C, PSU, m/s, m, W m⁻²"
+
+  active_edge_io:
+    format:
+      - netcdf
+    whole_model_information_fields: >
+      ORCA2 grid metadata, experiment labels, atmospheric forcing IDs, and LIM/OPA
+      configuration tags.
+
+  integrated_input:
+    - uid: "OPA_IPSL_8.2_1999"
+      version: "8.2"
+      description: "Physical ocean state and fluxes"
+
+  output:
+    format:
+      - netcdf
+    variables:
+      - ice_concentration
+      - ice_thickness
+      - snow_thickness
+      - ice_drift_u
+      - ice_drift_v
+      - surface_albedo
+      - ice_ocean_freshwater_flux
+      - ice_ocean_heat_flux
+      - ice_ocean_momentum_stress
+    verification: "Compared against satellite concentration, ULS, and drift climatologies"
+
+  integration:
+    pattern:
+    communication_mechanism: >
+      In-memory direct-call interface; synchronous, barrier-synchronized coupling every N ocean timesteps.
+    submodels: []
+    execution_constraints: >
+      Shared ORCA2 grid; consistent timestep hierarchy; joint compilation in one executable.
+    acknowledgment_protocols: >
+      Cite ORCA2-LIM (Timmermann et al. 2005), OPA reference manual, and LIM papers.
+    latency_expectations: "Low latency, lockstep"
+    data_synchronization: >
+      Bidirectional flux/state exchange each coupling interval.
+
+  authors:
+    - name: Thierry Fichefet
+      role: Sea-ice model development
+    - name: Luis A. Morales Maqueda
+      role: Thermodynamics and dynamics formulation
+    - name: Ralph Timmermann
+      role: ORCA2-LIM configuration and analysis

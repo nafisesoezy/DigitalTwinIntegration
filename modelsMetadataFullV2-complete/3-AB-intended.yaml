@@ -1,0 +1,121 @@
+Intended_Model:
+  title: "User-Defined Coupled Ocean–Surface Wave Modeling Framework"
+  unique_identifier: ""
+  model_version: ""
+  description: >
+    A conceptual loose-coupling plan between a spectral wave model and an ocean circulation model.
+    Wave fields (e.g., Stokes drift, wave-modified stress, breaking-induced TKE flux) are provided
+    to the ocean; the ocean can return surface currents and sea-ice fraction to the wave model.
+    Exchanges occur via files or a coupler at a coarse cadence (no in-memory synchronization).
+  keywords:
+    - Wave–ocean coupling
+    - Stokes drift
+    - Sea-state dependent stress
+    - Upper-ocean mixing
+    - NetCDF exchange
+    - Coupler
+  model_type: "Mechanistic (intended)"
+  scope: "Regional or global upper-ocean systems influenced by surface waves"
+  purpose_pattern:
+    purpose: "Simulate bidirectional interactions between waves and ocean mixing/circulation"
+    pattern: "Modular integration of wave model with ocean model via file/coupler exchange"
+
+  assumptions:
+    - "Components expose required variables (drift, stress, fluxes, currents, sea-ice)"
+    - "Cadence allows lagged feedback without every-step sync"
+    - "Units, sign conventions, and grids can be harmonized (remapping as needed)"
+
+  dimensionality: ""
+  spatial_extent: ""
+  spatial_resolution: ""
+  variable_spatial_resolution: ""
+  temporal_extent: ""
+  temporal_resolution: ""
+  variable_temporal_resolution: ""
+
+  calibration_tools_data: ""
+  publications: []
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+  error_handling: ""
+
+  license: ""
+  landing_page: ""
+  distribution_version: ""
+  programming_language: ""
+  software_requirements: "NetCDF I/O; optional coupler (e.g., OASIS-MCT); regridding tools"
+  hardware_requirements: ""
+  execution_instructions: "Run wave and ocean components per coupling schedule; exchange files via coupler or I/O"
+  parallel_execution: "Co-run or sequential per coupling cycle"
+  implementation_verification: ""
+  source_code_availability: ""
+
+  parameters: []
+
+  datasets:
+    - uid: ""
+      version: ""
+      access_url: ""
+      dependencies: []
+
+  integrated_input:
+    - uid: "ECWAM_Model_2015"
+      version: "CY38R1"
+      description: "Provides stokes_drift, wave-modified stress, wave-breaking TKE flux to the ocean"
+    - uid: "NEMO_Model_3.4"
+      version: "v3.4"
+      description: "Provides surface currents and sea-ice concentration back to the wave model (optional)"
+
+  data_evaluation: "Automated checks on units, sign conventions, and grid remapping consistency"
+
+  output:
+    format:
+      - "NetCDF"
+    variables: "Coupled history of wave and ocean exchange fields per coupling interval"
+    units: "m s^-1, N m^-2, W m^-2, m, PSU (as applicable)"
+    verification: "Consistency with benchmark behaviors in forced vs. coupled experiments"
+    corroboration: "Upper-ocean mixing and SST responses aligned with literature"
+
+  integration:
+    pattern: "Loose"
+    submodels:
+      - "Wave model (e.g., ECWAM)"
+      - "Ocean model (e.g., NEMO)"
+    execution_constraints: "Coordinate coupling interval (e.g., hourly–3-hourly); remap grids as needed; no requirement for same timestep"
+    acknowledgment: "Cite wave–ocean coupling literature (e.g., Breivik et al. 2015)"
+    latency_expectations: "Exchange at coarse cadence (hourly–3-hourly typical)"
+    data_synchronization: "File/coupler-based, lagged exchange (no in-memory sync)"
+
+  # Helpful for automatic detection
+  coupling_contract:
+    A_to_B:   # Wave → Ocean
+      variables:
+        - name: stokes_drift_surface_u
+          unit: "m s^-1"
+        - name: stokes_drift_surface_v
+          unit: "m s^-1"
+        - name: stokes_profile_scale
+          unit: "1 m^-1"
+        - name: wave_modified_stress_to_ocean
+          unit: "N m^-2"
+        - name: wave_breaking_TKE_flux
+          unit: "W m^-2"
+      format: "NetCDF or coupler fields"
+      cadence: "hourly–3-hourly"
+    B_to_A:   # Ocean → Wave (optional)
+      variables:
+        - name: surface_current_u
+          unit: "m s^-1"
+        - name: surface_current_v
+          unit: "m s^-1"
+        - name: sea_ice_concentration
+          unit: "0–1"
+      format: "NetCDF or coupler fields"
+      cadence: "hourly–3-hourly"
+
+  authors:
+    - name: ""
+      orcid: ""
+      role: "Integration designer / user"

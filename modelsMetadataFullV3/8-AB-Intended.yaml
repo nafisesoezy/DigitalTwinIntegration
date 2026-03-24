@@ -1,0 +1,114 @@
+Intended_Model:
+  title: "Integrated NEMO–PlankTOM10 Ocean Biogeochemical Model"
+  unique_identifier: "NEMO_PlankTOM10_2010"
+  model_version: "v3.3"
+
+  description: >
+    Integrated ocean modeling system combining the NEMO physical circulation model
+    with the PlankTOM10 biogeochemical model. Simulates hydrodynamics, nutrients,
+    plankton functional types, and DMS production with interactive tracer exchange.
+
+  keywords:
+    - Ocean biogeochemistry
+    - Coupled modeling
+    - Dimethylsulphide
+    - Climate modeling
+    - NEMO
+    - PlankTOM10
+
+  model_type: "Mechanistic"
+  scope: "Global marine ecosystems"
+
+  purpose_pattern:
+    purpose: "Simulate coupled physical and biogeochemical processes including DMS"
+    pattern: "Online tracer coupling within shared NEMO grid"
+
+  assumptions:
+    - Dynamic tracer exchange each timestep
+    - Plankton processes depend on light and temperature
+    - DMS emissions affect surface fluxes (optional feedback)
+
+  dimensionality: "3D"
+  spatial_extent: "Global ocean"
+  spatial_resolution: "Shared NEMO grid"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Multi-year"
+  temporal_resolution: "Hourly to daily"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: ""
+
+  publications:
+    - "Vogt et al., 2010"
+
+  conceptual_evaluation: "Captures seasonal DMS patterns and ecosystem structure"
+  validation_capabilities: "Satellite and climatology comparisons supported"
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+
+  conceptual_consistency_mismatch: ""
+  provenance_and_accessibility_gap: ""
+
+  license: "CeCILL"
+
+  programming_language:
+    - Fortran 90
+  programming_language_family:
+    - Native_C_CPP_Fortran_Family
+
+  software_requirements:
+    ffi:
+      - C_ABI
+    database: []
+    io_libraries:
+      - NetCDF4_Family
+      - HDF5_Family
+
+  hardware_requirements: "HPC cluster"
+  implementation_verification: "Validated against DMS climatology"
+
+  execution_instructions: >
+    Activate PlankTOM10 via NEMO namelist_trc; compile with TOP-PISCES/Tracers build.
+
+  parallel_execution: true
+  error_handling: "Tracer CFL checks, NaN trapping, restart dumps"
+  execution_constraints: ""
+
+  input:
+    description: "Physical ocean fields from NEMO used to drive PlankTOM10"
+    format: ""
+    variables:
+      - temperature
+      - salinity
+      - velocities
+      - MLD
+      - light_at_depth
+      - sea_ice_fields
+    units: "various"
+
+  output:
+    format:
+      - netcdf
+    variables:
+      - temperature
+      - salinity
+      - nutrients
+      - DMS
+      - chlorophyll
+      - plankton_biomass
+    units: "standard oceanographic units"
+    verification: ""
+
+  integration:
+    pattern: "Loose"
+    submodels:
+      - NEMO
+      - PlankTOM10
+    communication_mechanism: "direct call (internal), synchronous, in-memory"
+    data_synchronization: "Timestep-level tracer exchange"
+    execution_constraints: ""
+
+  authors:
+    - name: "Vogt, M."
+      role: "Biogeochemical model integration"

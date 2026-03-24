@@ -1,0 +1,160 @@
+MISMIPPlus:
+  title: "MISMIP+: Marine Ice Sheet Model Intercomparison Project, Phase 3"
+  unique_identifier: "MISMIPPlus_Model_2016"
+  model_version: "2016.1"
+
+  description: >
+    Idealized benchmark experiments to evaluate grounding-line migration,
+    buttressing, and ice-shelf response under perturbed sub-shelf melt rates.
+    MISMIP+ defines a standard idealized domain, bedrock geometry, friction laws,
+    and melt-rate forcing designed to isolate grounding-line physics and compare
+    performance across ice-sheet models. Used as the ice component receiving
+    ocean-driven melt from ISOMIP+ and producing updated ice geometry for
+    coupled MISOMIP experiments.
+
+  keywords:
+    - Marine ice sheets
+    - Grounding line
+    - Ice shelves
+    - Ice dynamics
+    - Sea-level rise
+    - Intercomparison
+    - Grounding-line numerics
+
+  model_type: "Mechanistic"
+  scope: "Idealized marine ice sheet experiments at decadal to millennial scales"
+
+  purpose_pattern:
+    purpose: "Benchmark grounding-line behavior and sensitivity to ocean-induced melting"
+    pattern: "Consumes sub-shelf melt-rate fields to update ice geometry"
+
+  assumptions:
+    - "Models may use SSA, SIA, hybrid, or full-Stokes formulations"
+    - "Fixed bedrock geometry and accumulation/precipitation fields"
+    - "Prescribed basal friction law and ice rheology from protocol"
+    - "Synthetic idealized ice-shelf configuration"
+
+  links_to_publications_and_reports:
+    - "Asay-Davis et al. (2016), Geosci. Model Dev."
+    - "Pattyn et al. (2013), The Cryosphere"
+
+  conceptual_model_evaluation: >
+    Validated through multi-model intercomparison and comparison to
+    semi-analytical grounding-line solutions.
+
+  uncertainty_analysis: "Scenario-based melt-rate perturbations and friction laws"
+  sensitivity_analysis: "Resolution sensitivity and parameter perturbations"
+
+  # ---------------------------------------------------------
+  # PDF-enriched PROTOCOL DETAILS
+  # ---------------------------------------------------------
+  protocol_domain:
+    horizontal_extent: "0–640 km (x), 0–80 km (y)"
+    grounding_line_target: "450 ± 10 km steady-state"
+    bedrock_geometry_equation: >
+      B(x, y) = B0 + B2x*(x/Lx)^2 + B2y*(y/Ly)^2 + Ba*sin(2πx/Lx)*sin(2πy/Ly)
+    bedrock_parameters:
+      B0: -1000      # m
+      B2x: -1000     # m
+      B2y: 500       # m
+      Ba: 50         # m
+
+  melt_rate_forcing:
+    source: "ISOMIP+ experimental melt"
+    parameterization: >
+      m = γT (T - Tf)
+    cutoff_depth: -100   # m
+    notes: "Applied only beneath floating ice shelf"
+
+  friction_law:
+    description: "Weertman-type power-law sliding"
+    equation: "τ_b = C |u_b|^(1/m) u_b"
+    default_exponents:
+      m: 1/3
+
+  calving_criterion:
+    rule: "Calving occurs if ice thickness < 100 m"
+    threshold: 100
+
+  resolution_requirements:
+    grounding_line_recommended: "≤ 500 m"
+    grid_type: "Structured or unstructured"
+
+  # ---------------------------------------------------------
+
+  input:
+    description: "Sub-shelf melt-rate fields from ISOMIP+"
+    format: "NetCDF"
+    variables:
+      - melt_rate
+    units: "m a^-1"
+
+  parameters:
+    - name: "MISMIPPlus_Parameters"
+      description: "Topography, ice rheology, sliding laws, bed parameters"
+      format: ["YAML", "NetCDF"]
+      unit: "various"
+      datatype: "float"
+      valid_range: "Given by protocol"
+      default_values: "Intercomparison protocol defaults"
+
+  datasets: []
+
+  integrated_input:
+    - uid: "ISOMIPPlus_Output"
+      version: "2016.1"
+      description: "Sub-shelf melt rates used as forcing"
+
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - ice_draft_geometry
+      - grounding_line_position
+      - ice_thickness
+      - volume_above_flotation
+    units:
+      - "m"
+      - "m"
+      - "m"
+      - "m^3"
+    verification: "Compared with multi-model ensemble and analytical expectations"
+    corroboration: "Reproduces expected grounding-line retreat/advance"
+
+  data_evaluation: "Protocol-specified checks for physical consistency"
+
+  dimensionality: "2D or 3D"
+  spatial_extent: "Idealized domain"
+  spatial_resolution: "0.25–1 km recommended"
+  variable_spatial_resolution: true
+
+  temporal_extent: "100–1000 years"
+  time_steps_temporal_resolution: "Annual or sub-annual"
+  variable_temporal_resolution: true
+
+  programming_language:
+    - "Fortran"
+    - "C++"
+    - "Python"
+
+  availability_of_source_code: false
+  implementation_verification: "Consensus steady-state & perturbation behavior"
+  error_handling: "Model-specific logs and checks"
+
+  software_specification_and_requirements: "Ice-sheet model with grounding-line capability"
+  hardware_specification_and_requirements: "Workstation to HPC"
+  execution_instructions: "Initialize, apply prescribed melt forcing, run forward"
+
+  parallel_execution: true
+  license: "Open experimental protocol"
+  landing_page: "https://www.geosci-model-dev.net/9/2471/2016/"
+  distribution_version: "2016.1"
+
+  file_formats:
+    - "NetCDF"
+
+  authors:
+    - name: "Stephen L. Cornford"
+      role: "Ice sheet model design and coordination"
+    - name: "Xylar S. Asay-Davis"
+      role: "Design of MISMIP+ protocol"

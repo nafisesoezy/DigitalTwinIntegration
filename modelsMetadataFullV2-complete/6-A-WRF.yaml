@@ -1,0 +1,191 @@
+WRF:
+  title: "Weather Research and Forecasting Model (ARW core) with Embedded 1-D Lake Scheme"
+  unique_identifier: "WRF_ARW_v3.6_Lake_2016"
+  model_version: "3.6+"
+  description: >
+    Nonhydrostatic mesoscale atmospheric model providing near-surface meteorology,
+    radiation, and turbulent flux drivers to an embedded 1-D lake–ice–snow column.
+    The lake scheme returns prognostic lake surface temperature, ice, snow, and
+    fluxes as a lower boundary condition to WRF’s surface layer. Improvements from
+    Xiao et al. (2016) include dynamic albedo, enhanced eddy diffusivity, and
+    snow-over-ice processes, reducing lake-surface-temperature and ice biases.
+
+  keywords:
+    - Regional atmosphere
+    - Boundary layer
+    - Surface fluxes
+    - Radiation
+    - Lake–atmosphere interaction
+    - WRF-lake
+
+  model_type: "Mechanistic"
+  scope: "Continental to regional atmospheric modeling over lake districts"
+
+  purpose_pattern:
+    purpose: "Simulate atmospheric circulation and air–lake energy/moisture exchange"
+    pattern: "Embedded tile-based coupling between atmospheric physics and 1-D lake column"
+
+  assumptions:
+    - Hydrostatic or nonhydrostatic depending on namelist configuration
+    - Terrain-following eta coordinate
+    - Horizontally homogeneous 1-D lake columns at water grid points
+
+  dimensionality: "3D atmosphere + embedded 1D lake"
+  spatial_extent: "WRF regional domain"
+  spatial_resolution: "1–10 km (horizontal) with ~30–60 vertical atmospheric levels"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Event to multi-season"
+  temporal_resolution: "Seconds (dynamics), 5–30 min (physics)"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: "Reanalysis forcing (e.g., NARR), buoy lake temperature profiles, satellite ice cover"
+
+  publications:
+    - "Xiao et al., 2016 (JAMES)"
+
+  conceptual_evaluation: >
+    Demonstrates improved WRF performance over lake-rich regions when using dynamic
+    albedo, enhanced eddy diffusivity, and explicit snow-over-ice thermodynamics.
+
+  validation_capabilities: "Buoys, precipitation analyses, ice phenology, LST profiles"
+
+  sensitivity_analysis: "Diffusivity factors, albedo options, snow/ice configurations, physics suite variations"
+
+  uncertainty_analysis: "Scenario ensembles"
+
+  # ---------------------------
+  # CONTROLLED VOCABULARY FIELDS
+  # ---------------------------
+
+  license: "gpl"      # WRF license family
+  provenance_and_accessibility_gap: ""
+  conceptual_consistency_mismatch: ""
+
+  communication_mechanism: 
+    - "in-memory"
+    - "direct call"
+    - "synchronous"
+    - "lockstep"
+    - "every step"
+
+  error_handling:
+    - "numerical stability checks"
+    - "restart mechanism"
+    - "boundary-condition consistency checks"
+
+  execution_instructions:
+    - "compile with lake physics enabled"
+    - "run real.exe for IC/LBC generation"
+    - "execute wrf.exe with embedded lake tile"
+    - "in-memory lower-boundary exchange each physics step"
+
+  execution_constraints:
+    - "synchronous timestep with lake tile"
+    - "identical grid cell ownership for water points"
+    - "requires stable physics timestep for lake–atmosphere fluxes"
+
+  acknowledgment_protocols:
+    - "embedded component attribution"
+    - "cite Xiao et al. (2016) for lake improvements"
+
+  data_synchronization:
+    - "two-way"
+    - "in-memory"
+    - "synchronous"
+    - "every physics step"
+
+  # ---------------------------
+  # PROGRAMMING LANGUAGE FAMILY
+  # ---------------------------
+
+  programming_language:
+    - "Native_C_CPP_Fortran_Family"
+    - "Python_R_CPP_Family"   # for WPS/Python utilities
+
+  # ---------------------------
+  # SOFTWARE & I/O REQUIREMENTS
+  # ---------------------------
+
+  software_requirements:
+    FFI_family:
+      - "C_ABI"      # WRF+CLM lake compiled directly
+      - "Python_C_Ext"  # WPS/pywrf processing
+    database:
+      - ""           # none used
+    io_libraries:
+      - "NetCDF4_Family"
+
+  hardware_requirements: "HPC cluster or large workstation"
+
+  implementation_verification: >
+    Lake-enabled benchmarks and Great Lakes case studies confirm improved LST and ice skill.
+
+  source_code_availability: true
+
+  # ---------------------------
+  # INPUT / OUTPUT
+  # ---------------------------
+
+  input:
+    description: "Embedded lake column → WRF surface layer (B → A)"
+    format: "in-memory"
+    variables:
+      - lake_skin_temperature
+      - lake_ice_fraction
+      - lake_ice_thickness
+      - lake_surface_albedo
+      - surface_roughness_length_water
+      - upward_sensible_heat_flux
+      - upward_latent_heat_flux
+      - upward_longwave_radiation
+      - reflected_shortwave_radiation
+      - surface_evaporation_rate
+      - lake_snow_depth
+    units: "K, dimensionless, m, W m^-2, kg m^-2 s^-1"
+
+  integrated_input:
+    - uid: "CLM4.5_Lake_LISSS_WRF_2016"
+      version: "CLM4.5 lake"
+      description: "1-D lake column embedded in WRF"
+
+  output:
+    format:
+      - "netcdf"
+      - "in-memory"
+    variables:
+      - air_temperature_2m
+      - specific_humidity_2m
+      - wind_u10
+      - wind_v10
+      - surface_pressure
+      - downwelling_shortwave_radiation
+      - downwelling_longwave_radiation
+      - precipitation_rain_rate
+      - precipitation_snow_rate
+      - near_surface_air_density
+    units: "various"
+    verification: "Buoy comparisons, reanalysis agreement"
+
+  # ---------------------------
+  # INTEGRATION
+  # ---------------------------
+
+  integration:
+    pattern: 
+    submodels:
+      - "Surface-layer physics"
+      - "Embedded 1-D lake column"
+    execution_constraints:
+      - "synchronous timestep"
+      - "shared grid ownership"
+    acknowledgment: "WRF team; Xiao et al. (2016)"
+    latency_expectations: "low"
+    data_synchronization:
+      - "two-way"
+      - "every physics step"
+      - "in-memory exchange"
+
+  authors:
+    - name: "Skamarock et al."
+      role: "WRF core development"

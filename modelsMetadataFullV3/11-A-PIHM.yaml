@@ -1,0 +1,94 @@
+PIHM:
+  title: "Penn State Integrated Hydrologic Model (PIHM)"
+  unique_identifier: "PIHM_Hydrologic_Model_2009"
+  model_version: "As described in PIHMgis integration paper"
+  description: >
+    A fully coupled, multi-process hydrologic model solving surface–subsurface flow,
+    channel routing, interception, snow, evapotranspiration, and groundwater dynamics
+    using a semi-discrete finite-volume formulation on an unstructured mesh.
+    Used as the core hydrologic engine integrated via a shared data model in PIHMgis.
+
+  keywords:
+    - hydrologic model
+    - surface–subsurface coupling
+    - finite-volume
+    - watershed modeling
+    - unstructured mesh
+
+  model_type: "Mechanistic"
+  scope: "Watershed to basin-scale hydrologic simulation"
+
+  purpose_pattern:
+    purpose: "Simulate the coupled surface, subsurface, and channel hydrology of a watershed"
+    pattern: "Multi-process hydrologic core running on an unstructured mesh"
+
+  assumptions:
+    - Variably saturated subsurface flow solved via Richards equation
+    - Overland and channel flow follow diffusive/kinematic wave approximations
+    - Snow, ET, canopy processes are spatially aggregated per mesh element
+    - Watershed is represented via a triangular irregular network (TIN)
+
+  dimensionality: "3D subsurface + 2D surface + 1D channel network"
+  spatial_extent: "Watershed/basin domain defined by DEM"
+  spatial_resolution: "Unstructured triangular mesh"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Event to multi-year simulations"
+  temporal_resolution: "Sub-hourly to hourly timesteps"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: "Streamflow, soil moisture, groundwater levels"
+
+  publications:
+    - "Bhatt et al. (2008–2009), PIHM papers referenced in PIHMgis integration paper"
+
+  conceptual_evaluation: "Validated through PIHM standard test cases"
+  validation_capabilities: "Streamflow, water table depth, soil moisture"
+  sensitivity_analysis: "Hydraulic conductivity, Manning’s parameters, ET parameters"
+  uncertainty_analysis: "Scenario-based hydrologic forcing perturbations"
+
+  error_handling: "Timestep control, mass-balance checks, solver convergence verification"
+
+  license: "Research/academic (per PIHM community)"
+  landing_page: ""
+  distribution_version: "PIHM version used in PIHMgis paper"
+
+  programming_language:
+    - "C"
+    - "C-family"
+
+  software_requirements:
+    - "NetCDF4_Family"
+    - "C_ABI"
+
+  hardware_requirements: "Workstation"
+
+  execution_instructions: "Run using PIHM executables with mesh and parameter files"
+  parallel_execution: false
+
+  implementation_verification: "Cross-checked with PIHM standard examples"
+  source_code_availability: "Publicly available from PIHM developers"
+
+  input:
+    description: "Mesh, parameters, and forcing assembled by PIHMgis"
+    format:
+      - "NetCDF"
+      - "text"
+    variables:
+      - precipitation
+      - temperature
+      - landcover-based ET parameters
+      - soil hydraulic parameters
+      - channel geometry
+    units: "various"
+
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - surface runoff
+      - soil moisture
+      - groundwater storage
+      - stream discharge
+    units: "mm, m³/s, etc."
+    verification: "Hydrograph and water balance checks"

@@ -1,0 +1,225 @@
+OFAM3:
+  title: "OFAM3: Ocean Forecasting Australian Model, version 3"
+  unique_identifier: "OFAM3_Model_2013"
+  model_version: "3.0"
+  description: >
+    OFAM3 is a near-global, eddy-resolving ocean general circulation model based
+    on MOM4p1. It resolves mesoscale variability and large-scale circulation and
+    can run with WOMBAT embedded for biogeochemistry. The published configuration
+    uses z* coordinates, eddy-resolving 1/10° horizontal resolution, and 51
+    vertical levels with 5–10 m spacing in the upper 200 m, forced by 3-hourly
+    ERA-Interim surface fluxes.
+
+  keywords:
+    - Ocean circulation
+    - Eddy-resolving
+    - Climate modeling
+    - Biogeochemistry
+    - Ocean forecasting
+    - Mesoscale variability
+
+  model_type: "Mechanistic, process-based general circulation model (GCM)"
+  scope: "Simulation of physical ocean dynamics and (optionally) embedded biogeochemical processes at near-global scale"
+
+  purpose_pattern:
+    purpose: >
+      Hindcast and forecast upper-ocean circulation, mesoscale eddies, and
+      physical drivers of biogeochemical variability.
+    pattern: >
+      Embedded physical core that can call WOMBAT biogeochemistry in-memory at
+      each timestep when enabled.
+
+  assumptions:
+    - "Ocean represented using z* vertical coordinate system on a 1/10° grid."
+    - "Forced by 1.5° ERA-Interim 3-hourly heat, freshwater, and momentum fluxes."
+    - "Surface temperature and salinity restored toward observed climatologies."
+    - "No explicit sea-ice model in the OFAM3 configuration of Oke et al. 2013."
+
+  dimensionality: "3D (longitude, latitude, depth)"
+  spatial_extent: "Near-global ocean (75°S–75°N, all longitudes)"
+  spatial_resolution: "1/10° horizontal; 5 m vertical at the surface increasing to 10 m by 200 m depth and thicker layers below"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Multi-decadal integrations (32-year experiment: 14-year spin-up + 18-year analysis period)"
+  temporal_resolution: "Model timestep minutes; typical diagnostics daily to monthly"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: >
+    ERA-Interim atmospheric forcing, climatological temperature and salinity,
+    observed large-scale transports (ACC, boundary currents), satellite altimetry
+    sea level anomaly, and satellite/reanalysis SST for surface restoring and
+    evaluation.
+
+  publications:
+    - "Oke et al., 2013, Geosci. Model Dev., 6, 591–615"
+
+  conceptual_evaluation: >
+    Demonstrated skill for large-scale circulation, mesoscale eddies, ENSO
+    indices, and upper-ocean structure when evaluated against satellite SST and
+    SLA, in situ transports, and mixed layer depth climatologies.
+
+  validation_capabilities: >
+    Yes — validated extensively against observed SST, SLA, MLD, large-scale
+    transports, and variability indices using the configuration documented in
+    Oke et al. 2013.
+
+  sensitivity_analysis: >
+    Sensitivity tested for vertical mixing schemes, restoring timescales, and
+    details of atmospheric forcing and freshwater balance.
+
+  uncertainty_analysis: >
+    Scenario-based hindcasts and comparisons against multiple observational
+    datasets; uncertainty explored via forcing choices and parameter perturbation
+    experiments.
+
+  conceptual_consistency_mismatch: >
+    Low within the documented configuration: physical dynamics, forcing, and
+    embedded biogeochemistry share the same 3D grid and timestep; main risks are
+    resolution mismatches with coarse forcing and observational products.
+
+  provenance_and_accessibility_gap: >
+    Scientific configuration and input data sources are well documented in Oke
+    et al. 2013, but full model code, namelists, and operational workflows are
+    maintained institutionally (CSIRO/Bureau of Meteorology) rather than in a
+    public repository.
+
+  license: "Research/institutional use (CSIRO/Bureau of Meteorology; not an OSI open-source license)."
+  license_incompatibility: "proprietary"
+
+  landing_page: "http://www.bom.gov.au/oceanography/forecasts/"
+  distribution_version: "3.0"
+
+  programming_language:
+    family: "Native_C_CPP_Fortran_Family"
+    languages:
+      - "Fortran 90 (MOM4p1 core and OFAM3 configuration)"
+
+  software_requirements: >
+    Fortran compiler with C_ABI toolchain, MPI for distributed-memory
+    parallelism, NetCDF4_Family (e.g., netcdf4/nco) for I/O; batch scheduler on
+    an HPC system.
+
+  hardware_requirements: "High-performance computing (HPC) environment required due to eddy-resolving 1/10° resolution."
+
+  execution_instructions: >
+    Configure OFAM3/MOM4p1 via namelist text files, compile with MPI and NetCDF
+    support, and launch via mpirun on an HPC system; integrations are typically
+    submitted as batch jobs with periodic NetCDF history and restart output.
+
+  parallel_execution: true
+
+  communication_mechanism: >
+    Distributed-memory MPI for domain decomposition; in-memory direct calls
+    between MOM4p1 physics and embedded modules (e.g., WOMBAT) plus NetCDF
+    history/restart files for offline analysis.
+
+  error_handling: >
+    Runtime logging with CFL and instability checks; synchronous abort on
+    failure and restart from the latest NetCDF/binary restart file (no automated
+    recovery logic).
+
+  implementation_verification: >
+    Peer-reviewed comparison with observed circulation, variability indices, and
+    biogeochemical fields (when WOMBAT is enabled) in Oke et al. 2013.
+
+  source_code_availability: false
+
+  parameters:
+    - name: "OFAM3_Config_Parameters"
+      description: >
+        Model grid, vertical resolution, viscosity, mixing scheme, surface
+        restoring strengths, and forcing options for the OFAM3 configuration
+        described in Oke et al. 2013.
+      format: "txt (namelist)"
+      unit: "varies"
+      datatype: "float, integer, logical"
+      valid_range: "Physically meaningful ranges for ocean state and parameter values"
+      default: "Set according to OFAM3 published configuration in Oke et al. 2013"
+
+  datasets:
+    - uid: "ERA_Interim_Forcing"
+      version: "2009"
+      access_url: "https://www.ecmwf.int/en/forecasts/datasets/reanalysis-datasets/era-interim"
+      dependencies:
+        - "Surface heat, freshwater, and momentum fluxes (3-hourly 1.5° fields)"
+
+    - uid: "CNES_CLS09_Mean_Sea_Level"
+      version: "v1.1"
+      access_url: "https://www.aviso.altimetry.fr/"
+      dependencies:
+        - "Satellite altimetry for SLA validation and mean sea level reference"
+
+  integrated_input:
+    - "Atmospheric reanalysis (ERA-Interim surface fluxes and related fields)"
+    - "Climatological salinity/temperature datasets for restoring and initialization"
+    - "Biogeochemical initial conditions and tracer fields when WOMBAT is embedded"
+
+  data_evaluation: >
+    Pre-run checks for completeness and physical plausibility of forcing fields,
+    volume-flux closure via a small uniform “drizzle” correction, and multi-year
+    spin-up stability tests; post-run comparison with SST, SLA, and transport
+    observations.
+
+  active_edge_io:
+    formats:
+      - netcdf
+    whole_model_information_fields: >
+      NetCDF history, restart, and diagnostic files describing 3D velocity,
+      temperature, salinity, mixed layer depth, sea level, and (when enabled)
+      biogeochemical tracers.
+
+  input:
+    description: >
+      3-hourly ERA-Interim surface heat, freshwater, and momentum fluxes plus
+      monthly climatological SST and SSS fields used for surface restoring; when
+      coupled, also receives atmospheric CO₂ and other fields required by
+      embedded WOMBAT.
+    format: "netcdf"
+    variables:
+      - surface_heat_fluxes          # W m⁻²
+      - surface_freshwater_fluxes    # kg m⁻² s⁻¹
+      - surface_momentum_fluxes      # N m⁻²
+      - 10m_wind_speed               # m s⁻¹
+      - 2m_air_temperature           # K
+      - 2m_specific_humidity         # kg kg⁻¹
+      - downward_longwave_radiation  # W m⁻²
+      - precipitation_rate           # kg m⁻² s⁻¹
+      - restoring_SST_climatology    # K
+      - restoring_SSS_climatology    # psu
+    units: "W m⁻², kg m⁻² s⁻¹, N m⁻², K, psu"
+
+  output:
+    format:
+      - "netcdf"
+    variables: >
+      Sea level, 3D temperature and salinity, currents, mixed layer depth,
+      large-scale transports, ENSO indices, and (when WOMBAT is enabled)
+      chlorophyll-a and other tracers.
+    units:
+      - "°C"
+      - "psu"
+      - "m"
+      - "m s⁻¹"
+      - "Sv"
+      - "mg Chl a m⁻³"
+    verification: >
+      Time series and climatologies compared against SST and SLA products,
+      transport estimates, and other observational/reanalysis datasets as in Oke
+      et al. 2013.
+    corroboration: >
+      ENSO signals, transports, and mesoscale variability patterns reproduced
+      within observational uncertainty; near-global circulation consistent with
+      altimetry and SST climatologies.
+
+  integration:
+    submodels:
+      - "Embedded WOMBAT biogeochemistry (when enabled)"
+    execution_constraints: >
+      Requires stable CFL conditions on a 1/10° grid; baroclinic timestep and
+      embedded WOMBAT calls must remain synchronous across all MPI ranks.
+    acknowledgment_protocols: >
+      Cite Oke et al. 2013 GMD and acknowledge CSIRO/Bureau of Meteorology when
+      using OFAM3 or derivative configurations.
+    data_synchronization: >
+      Internal state synchronized across MPI ranks by MOM4p1; history and restart
+      NetCDF files written at scheduled intervals for analysis and continuation runs.

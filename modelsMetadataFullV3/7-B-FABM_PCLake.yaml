@@ -1,0 +1,146 @@
+
+FABM_PCLake:
+  title: "PCLake+ Integrated via FABM"
+  unique_identifier: "FABM_PCLake_2023"
+  model_version: "2023.1"
+
+  description: >
+    Process-based lake ecosystem model (PCLake+) implemented as a FABM plugin.
+    Simulates nutrient cycling, primary production, oxygen dynamics and sediment–
+    water interactions, driven by physical state variables from a host hydrodynamic
+    model (e.g. GOTM) and providing bio-optical and flux feedbacks back to the host.
+
+  keywords:
+    - Nutrient cycling
+    - Ecological modeling
+    - Lake ecosystems
+    - PCLake+
+    - FABM
+
+  model_type: "Mechanistic"
+  scope: "Shallow and stratified lakes in 1D column configuration"
+
+  # ---------- Conceptual consistency ----------
+  purpose_pattern:
+    purpose: "Simulate ecological dynamics in response to nutrient inputs, physical mixing and climate-related drivers within a 1D lake column."
+    pattern: "FABM plugin with ecological processes driven by host hydrodynamic state variables and returning feedbacks."
+
+  assumptions:
+    - "Ecology responds to physical drivers (light, mixing, temperature) supplied by the host model."
+    - "Trophic groups and sediments are represented mechanistically without horizontal heterogeneity."
+    - "Vertical column shares grid and timestep with the host hydrodynamic model."
+    - "Feedbacks (light attenuation, heat production, drag modifications) are aggregated at the grid-cell scale."
+
+  dimensionality: "1D"
+  spatial_extent: "Lake water column"
+  spatial_resolution: "Matches hydrodynamic vertical grid (shared layers)."
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-year to decadal simulations"
+  temporal_resolution: "Ecological processes typically updated each hydrodynamic step; diagnostics daily."
+  variable_temporal_resolution: false
+
+  calibration_tools_data: "Biological monitoring data, nutrient load records and case-study calibration datasets."
+  publications:
+    - "Janssen et al., 2019"
+  conceptual_evaluation: "Well-established PCLake+ formulation with documented FABM implementation and validations."
+  validation_capabilities: "Validated on multiple lakes worldwide using long-term nutrient and biomass records."
+  sensitivity_analysis: "Supports manual and automated parameter sensitivity tools within the PCLake+ / FABM environment."
+  uncertainty_analysis: "Scenario and ensemble runs with perturbed forcings and parameters."
+
+  # ---------- Provenance / license ----------
+  license: "gpl"
+  landing_page: "https://github.com/fabm-model/fabm"
+  distribution_version: "2023.1"
+
+  # ---------- Programming language + family ----------
+  programming_language:
+    - "Fortran"
+    - "C++"
+  programming_language_family:
+    - "Native_C_CPP_Fortran_Family"
+
+  # ---------- Software / I/O libraries ----------
+  software_specification_and_requirements:
+    - "fabm environment"
+    - "fortran compiler"
+    - "c++ compiler"
+    - "netcdf"
+    - "netcdf4"
+  hardware_specification_and_requirements:
+    - "standard workstation"
+  file_formats:
+    - "netcdf"
+    - "csv"
+
+  # ---------- Runtime / coupling meta ----------
+  communication_mechanism: >
+    in-memory plugin loaded by FABM; direct call via FABM api inside host model;
+    synchronous execution at the same timestep as hydrodynamics.
+  error_handling: >
+    input checking and diagnostics via FABM; consistency checks for state variables;
+    logging of invalid values and failed updates.
+  execution_instructions: >
+    configure PCLake+ as a FABM plugin; specify parameters and state variables in
+    FABM configuration; build and run within a FABM-enabled host model (e.g. GOTM).
+  execution_constraints: >
+    same timestep and vertical grid as GOTM or other host; ecological updates executed
+    in lockstep every step; tight coupling within process.
+  acknowledgment_protocols: >
+    FABM configuration and documentation reference PCLake+ developers and FABM team;
+    users instructed to cite relevant PCLake+ and FABM publications.
+  data_synchronization: >
+    receives host drivers and returns feedbacks through FABM kernel in synchronous,
+    in-memory exchange each timestep.
+
+  parallel_execution: false
+  implementation_verification: "Tested within FABM standard cases and published PCLake+ applications."
+  source_code_availability: true
+
+  # ---------- I/O for FABM plugin ----------
+  input:
+    description: "Physical and chemical drivers provided by GOTM or another FABM-enabled host via in-memory FABM api."
+    format:
+      - "in-memory"
+    variables:
+      - "temperature profile"
+      - "turbulent mixing coefficients (Kz)"
+      - "scalar irradiance / PAR"
+      - "salinity profile (where relevant)"
+    units: "°C, m² s⁻¹, W m⁻², PSU"
+
+  integrated_input:
+    - uid: "GOTM_FABM_2014"
+      version: "5.0"
+      description: "Physical hydrodynamic and optical drivers from GOTM via FABM api."
+
+  output:
+    format:
+      - "netcdf"
+      - "csv"
+      - "in-memory"
+    variables:
+      - "nutrient concentrations (N, P, Si)"
+      - "phytoplankton biomass"
+      - "macrophyte biomass"
+      - "zooplankton biomass"
+      - "oxygen concentration"
+      - "bio-optical properties (Kd_bio)"
+      - "heat production due to light absorption (Q_bio)"
+      - "surface albedo / drag modifiers"
+    units: "mg L⁻¹, mmol m⁻³, m⁻¹, W m⁻², dimensionless"
+    verification: "Compared against long-term lake monitoring datasets and published PCLake+ benchmarks."
+    corroboration: "Reproduces known seasonal nutrient and biomass cycles, regime shifts and hysteresis patterns."
+
+  # ---------- Integration metadata ----------
+  integration:
+    pattern: 
+    submodels:
+      - "PCLake+ ecological processes"
+    execution_constraints: >
+      time step and vertical grid must exactly match the host hydrodynamic model;
+      physical drivers updated each coupling step; feedbacks applied immediately.
+    data_synchronization: "receives GOTM drivers and returns bio-feedbacks via FABM api each timestep."
+
+  authors:
+    - name: "Arie B.G. Janssen"
+      role: "Ecological model development and FABM implementation"

@@ -1,0 +1,73 @@
+{
+  "summary": {
+    "group": "2",
+    "ab_kind": "INTEGRATED",
+    "num_rows_seen": 5,
+    "num_real_mismatches": 1,
+    "num_not_a_mismatch": 4,
+    "risk_level": "medium"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "assumptions||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The differences in assumptions are complementary and do not block integration."
+    },
+    {
+      "row_ref": "description||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The descriptions are complementary and do not block integration."
+    },
+    {
+      "row_ref": "purpose & pattern||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The purposes and patterns are complementary and do not block integration."
+    },
+    {
+      "row_ref": "scope||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The scopes are complementary and do not block integration."
+    },
+    {
+      "row_ref": "software_specification_and_requirements||software environment mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The software specifications are incompatible and block integration."
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "F1",
+      "field": "software_specification_and_requirements",
+      "bottleneck": "Software Environment Mismatch",
+      "root_cause": "Incompatible software specifications",
+      "evidence": {
+        "A_value": "ice sheet model with grounding-line tracking",
+        "B_value": "ocean model with ice-shelf cavity capability"
+      },
+      "why_it_blocks_integration": "The software specifications are not compatible, preventing integration.",
+      "proposed_fix": "Develop a common interface or adapter to bridge the differences in software specifications.",
+      "data_transform": {
+        "rules": [
+          "Create a common interface for ice sheet and ocean models."
+        ],
+        "example": "Develop a middleware that translates between the ice sheet and ocean model interfaces."
+      },
+      "runtime_orchestration": {
+        "pattern": "Adapter",
+        "steps": [
+          "Implement an adapter layer that translates between the ice sheet and ocean model interfaces.",
+          "Ensure the adapter handles data conversion and communication between the models."
+        ]
+      },
+      "yaml_patches": {
+        "A": "update software specification to include common interface",
+        "B": "update software specification to include common interface",
+        "AB": "define common interface for integration"
+      },
+      "validation": [
+        "Test the adapter layer with sample data to ensure compatibility.",
+        "Validate the integrated system with benchmark experiments."
+      ]
+    }
+  ]
+}

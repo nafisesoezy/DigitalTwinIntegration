@@ -1,0 +1,130 @@
+Integrated_Model:
+  title: "Integrated SHYFEM–WASP5 Hydrodynamic–Water Quality Model (Venice Lagoon)"
+  unique_identifier: "SHYFEM_WASP5_Coupled_2003"
+  model_version: "1.0"
+
+  description: >
+    A coupled lagoon modeling system integrating SHYFEM (3D finite-element hydrodynamics)
+    with WASP5 (water-quality/ecological model). SHYFEM outputs hydrodynamics, salinity,
+    temperature, and transport fields that are mapped to WASP5 compartments through
+    offline file-based exchange, enabling simulation of nutrient cycling and phytoplankton
+    dynamics in the Venice Lagoon.
+
+  keywords:
+    - Coupled hydrodynamics–biogeochemistry
+    - SHYFEM
+    - WASP5
+    - Lagoon ecology
+    - Nutrient cycling
+    - Offline coupling
+
+  model_type: Mechanistic
+  scope: Venice Lagoon ecosystem
+
+  purpose_pattern:
+    purpose: Simulate lagoon circulation, nutrient dynamics, water quality, and phytoplankton
+    pattern: Offline sequential coupling (SHYFEM → WASP5)
+
+  assumptions:
+    - One-way coupling (no biogeochemical feedback into hydrodynamics)
+    - WASP5 compartments derived from SHYFEM mesh
+    - Hydrodynamic fields drive nutrient transport and transformation
+
+  dimensionality: "3D (SHYFEM) + 0D/1D compartments (WASP5)"
+  spatial_extent: "Venice Lagoon"
+  spatial_resolution: "Finite-element mesh; compartmental WASP5 groups"
+  variable_spatial_resolution: true
+  temporal_extent: "Tidal to seasonal"
+  temporal_resolution: "Hourly–daily"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: >
+    Hydrodynamic validation (currents, water level); nutrient and chlorophyll field data.
+
+  publications:
+    - "Solidoro et al. 2003"
+
+  conceptual_evaluation: >
+    Reproduces major lagoon gradients in nutrients and chlorophyll; good agreement with
+    circulation patterns and seasonal trends.
+
+  validation_capabilities: >
+    Chlorophyll, dissolved oxygen, nutrients, currents, and water levels.
+
+  conceptual_consistency_mismatch: >
+    One-way offline coupling may miss feedbacks where water quality affects density or mixing.
+
+  provenance_and_accessibility_gap: >
+    Coupling scripts not distributed as unified repo; methods described in Solidoro et al. 2003.
+
+  license: "Mixed academic and public licenses (SHYFEM + WASP5)"
+  license_incompatibility: "proprietary"
+
+  distribution_version: "1.0"
+
+  programming_language:
+    - Fortran
+  programming_language_family: Native_C_CPP_Fortran_Family
+
+  software_requirements: >
+    SHYFEM executable; WASP5 executable; grid compartmentization tools; NetCDF4_Family;
+    CSV utilities.
+  hardware_requirements: "Workstation or small cluster"
+  parallel_execution: false
+
+  software_integration:
+    ffi_family: C_ABI
+    io_libraries:
+      - netcdf4
+      - csv
+    databases: []
+
+  execution_instructions: >
+    Run SHYFEM over the target period; export hydrodynamics to NetCDF/CSV; process fields
+    into WASP5 compartment input files; run WASP5 in batch mode for biogeochemistry.
+
+  error_handling: >
+    Input validation and range checks; WASP5 mass balance diagnostics; abort on inconsistent
+    hydrodynamic–compartment mapping.
+
+  parameters: []
+  datasets: []
+
+  active_edge_io:
+    format:
+      - netcdf
+      - csv
+    whole_model_information_fields: >
+      Mesh IDs, compartment mapping, time axes, forcing scenario identifiers.
+
+  data_evaluation: >
+    Comparison of simulated vs. measured lagoon water quality and hydrodynamics.
+
+  output:
+    format:
+      - netcdf
+      - csv
+    variables: "Hydrodynamics, nutrients, phytoplankton, dissolved oxygen"
+    units: "various"
+    verification: "Validated with Venice Lagoon monitoring data"
+
+  integration:
+    pattern: "integrated"
+    communication_mechanism: >
+      File-based offline exchange: SHYFEM writes fields; WASP5 reads and interpolates them.
+    submodels:
+      - SHYFEM
+      - WASP5
+    execution_constraints: >
+      Time resolution of WASP5 must resolve SHYFEM output; mesh-to-compartment mapping required.
+    acknowledgment_protocols: >
+      Cite Solidoro et al. (2003), SHYFEM developers, WASP5 developers.
+    latency_expectations: "Low (offline batch)"
+    data_synchronization: >
+      Daily or hourly export; WASP5 internal time interpolation if required.
+
+  authors:
+    - name: Caterina Solidoro
+      role: Model coupling and ecological validation
+    - name: Giuseppe Umgiesser
+      role: SHYFEM hydrodynamics

@@ -1,0 +1,114 @@
+{
+  "summary": {
+    "group": "3",
+    "ab_kind": "INTEGRATED",
+    "num_rows_seen": 6,
+    "num_real_mismatches": 2,
+    "num_not_a_mismatch": 4,
+    "risk_level": "medium"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "dimensionality||dimensionality mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "A_value and B_value have incompatible dimensions for integration."
+    },
+    {
+      "row_ref": "license||license incompatibility",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "License incompatibility does not necessarily block integration if usage complies with both licenses."
+    },
+    {
+      "row_ref": "assumptions||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Semantic differences can be managed through careful mapping and transformation."
+    },
+    {
+      "row_ref": "model version||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Version differences can be reconciled through configuration and parameter adjustments."
+    },
+    {
+      "row_ref": "purpose & pattern||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Purpose and pattern differences can be managed through orchestration and field mapping."
+    },
+    {
+      "row_ref": "temporal_extent_coverage||temporal coverage mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "Temporal coverage mismatch can affect the integration of time-series data."
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "F1",
+      "field": "dimensionality",
+      "bottleneck": "dimensionality mismatch",
+      "root_cause": "Incompatible dimensions between A and B",
+      "evidence": {
+        "A_value": "2d spatial + 2d spectral frequency × direction",
+        "B_value": "3d"
+      },
+      "why_it_blocks_integration": "Different dimensions can lead to incompatible data structures and processing requirements.",
+      "proposed_fix": "Resample or interpolate data to match dimensions.",
+      "data_transform": {
+        "rules": [
+          "Resample A_value to 3d",
+          "Interpolate B_value to 2d spatial + 2d spectral frequency × direction"
+        ],
+        "example": "Use linear interpolation to convert 3d data to 2d spatial + 2d spectral frequency × direction."
+      },
+      "runtime_orchestration": {
+        "pattern": "Resampling",
+        "steps": [
+          "Resample A_value to 3d",
+          "Interpolate B_value to 2d spatial + 2d spectral frequency × direction"
+        ]
+      },
+      "yaml_patches": {
+        "A": "dimensionality: 3d",
+        "B": "dimensionality: 2d spatial + 2d spectral frequency × direction",
+        "AB": "dimensionality: compatible"
+      },
+      "validation": [
+        "Verify resampled data matches expected dimensions.",
+        "Check interpolated data for accuracy."
+      ]
+    },
+    {
+      "id": "F2",
+      "field": "temporal_extent_coverage",
+      "bottleneck": "temporal coverage mismatch",
+      "root_cause": "Incompatible temporal coverage between A and B",
+      "evidence": {
+        "A_value": "days to decades",
+        "B_value": "multi-decadal to centennial"
+      },
+      "why_it_blocks_integration": "Different temporal coverage can lead to misaligned time-series data.",
+      "proposed_fix": "Resample or interpolate data to match temporal coverage.",
+      "data_transform": {
+        "rules": [
+          "Resample A_value to multi-decadal to centennial",
+          "Interpolate B_value to days to decades"
+        ],
+        "example": "Use linear interpolation to convert days to decades data to multi-decadal to centennial."
+      },
+      "runtime_orchestration": {
+        "pattern": "Resampling",
+        "steps": [
+          "Resample A_value to multi-decadal to centennial",
+          "Interpolate B_value to days to decades"
+        ]
+      },
+      "yaml_patches": {
+        "A": "temporal_extent_coverage: multi-decadal to centennial",
+        "B": "temporal_extent_coverage: days to decades",
+        "AB": "temporal_extent_coverage: compatible"
+      },
+      "validation": [
+        "Verify resampled data matches expected temporal coverage.",
+        "Check interpolated data for accuracy."
+      ]
+    }
+  ]
+}

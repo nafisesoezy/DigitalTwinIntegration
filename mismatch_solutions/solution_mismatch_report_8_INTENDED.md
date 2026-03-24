@@ -1,0 +1,124 @@
+# Solution for mismatch_report_8_INTENDED
+
+```json
+{
+  "summary": {
+    "group": "8",
+    "ab_kind": "INTENDED",
+    "num_rows_seen": 12,
+    "num_real_mismatches": 2,
+    "num_not_a_mismatch": 10,
+    "risk_level": "medium"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "hardware_specification_and_requirements||hardware resource mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "A_value and B_value are incompatible due to different hardware specifications."
+    },
+    {
+      "row_ref": "description||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The descriptions are semantically similar and cover overlapping domains."
+    },
+    {
+      "row_ref": "keywords||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The keywords are related and cover overlapping domains."
+    },
+    {
+      "row_ref": "purpose & pattern||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The purposes are semantically similar and cover overlapping domains."
+    },
+    {
+      "row_ref": "software_specification_and_requirements||software environment mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "A_value and B_value are incompatible due to different software specifications."
+    },
+    {
+      "row_ref": "spatial_extent_coverage||spatial coverage mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The spatial extents are semantically similar and cover overlapping domains."
+    },
+    {
+      "row_ref": "spatial_resolution||spatial resolution mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The spatial resolutions are semantically similar and cover overlapping domains."
+    },
+    {
+      "row_ref": "temporal_extent_coverage||temporal coverage mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The temporal extents are semantically similar and cover overlapping domains."
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "F1",
+      "field": "hardware_specification_and_requirements",
+      "bottleneck": "Hardware Resource Mismatch",
+      "root_cause": "Different hardware specifications",
+      "evidence": {
+        "A_value": "hpc system",
+        "B_value": "same as nemo"
+      },
+      "why_it_blocks_integration": "The hardware specifications are incompatible, which can lead to performance issues or failures in integration.",
+      "proposed_fix": "Standardize the hardware specifications to ensure compatibility.",
+      "data_transform": {
+        "rules": [
+          "Standardize hardware specifications to a common set."
+        ],
+        "example": "Both models should use the same hardware specifications."
+      },
+      "runtime_orchestration": {
+        "pattern": "Standardization",
+        "steps": [
+          "Identify common hardware specifications.",
+          "Update both models to use the common hardware specifications."
+        ]
+      },
+      "yaml_patches": {
+        "A": "hardware_specification_and_requirements: common_hardware",
+        "B": "hardware_specification_and_requirements: common_hardware",
+        "AB": ""
+      },
+      "validation": [
+        "Verify that both models can run on the common hardware specifications."
+      ]
+    },
+    {
+      "id": "F2",
+      "field": "software_specification_and_requirements",
+      "bottleneck": "Software Environment Mismatch",
+      "root_cause": "Different software specifications",
+      "evidence": {
+        "A_value": "netcdf, mpi, fortran compiler",
+        "B_value": "runs within nemo framework"
+      },
+      "why_it_blocks_integration": "The software specifications are incompatible, which can lead to integration issues or failures.",
+      "proposed_fix": "Standardize the software specifications to ensure compatibility.",
+      "data_transform": {
+        "rules": [
+          "Standardize software specifications to a common set."
+        ],
+        "example": "Both models should use the same software specifications."
+      },
+      "runtime_orchestration": {
+        "pattern": "Standardization",
+        "steps": [
+          "Identify common software specifications.",
+          "Update both models to use the common software specifications."
+        ]
+      },
+      "yaml_patches": {
+        "A": "software_specification_and_requirements: common_software",
+        "B": "software_specification_and_requirements: common_software",
+        "AB": ""
+      },
+      "validation": [
+        "Verify that both models can run on the common software specifications."
+      ]
+    }
+  ]
+}
+```

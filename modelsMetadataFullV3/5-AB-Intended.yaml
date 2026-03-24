@@ -1,0 +1,110 @@
+Intended_Model:
+  title: "Integrated SHYFEM–WASP5 Hydrodynamic–Water Quality Model (Venice Lagoon)"
+  unique_identifier: "SHYFEM_WASP5_Coupled_2003"
+  model_version: "1.0"
+
+  description: >
+    A coupled lagoon modeling system integrating SHYFEM (3D finite-element hydrodynamics)
+    with WASP5 (water-quality/ecological model). SHYFEM outputs hydrodynamics, salinity,
+    temperature, and transport fields that are mapped to WASP5 compartments through
+    offline file-based exchange, enabling simulation of nutrient cycling and phytoplankton
+    dynamics in the Venice Lagoon.
+
+  keywords:
+    - Coupled hydrodynamics–biogeochemistry
+    - SHYFEM
+    - WASP5
+    - Lagoon ecology
+    - Nutrient cycling
+    - Offline coupling
+
+  model_type: Mechanistic
+  scope: Venice Lagoon ecosystem
+
+  purpose_pattern:
+    purpose: Simulate lagoon circulation, nutrient dynamics, water quality, and phytoplankton
+    pattern: Offline sequential coupling (SHYFEM → WASP5)
+
+  assumptions:
+    - One-way coupling (no biogeochemical feedback into hydrodynamics)
+    - WASP5 compartments derived from SHYFEM mesh
+    - Hydrodynamic fields drive nutrient transport and transformation
+
+  dimensionality: "3D (SHYFEM) + 0D/1D compartments (WASP5)"
+  spatial_extent: "Venice Lagoon"
+  spatial_resolution: "Finite-element mesh; compartmental WASP5 groups"
+  variable_spatial_resolution: true
+  temporal_extent: "Tidal to seasonal"
+  temporal_resolution: "Hourly–daily"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: ""
+
+  publications:
+    - "Solidoro et al. 2003"
+
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+
+  conceptual_consistency_mismatch: ""
+  provenance_and_accessibility_gap: ""
+
+  license: "Mixed academic and public licenses (SHYFEM + WASP5)"
+  license_incompatibility: "proprietary"
+
+  distribution_version: "1.0"
+
+  programming_language:
+    - Fortran
+  programming_language_family: Native_C_CPP_Fortran_Family
+
+  software_requirements: ""
+  hardware_requirements: "Workstation or small cluster"
+  parallel_execution: false
+
+  software_integration:
+    ffi_family: C_ABI
+    io_libraries:
+      - netcdf4
+      - csv
+    databases: []
+
+  execution_instructions: ""
+
+  error_handling: ""
+
+  parameters: []
+  datasets: []
+
+  active_edge_io:
+    format:
+      - netcdf
+      - csv
+    whole_model_information_fields: ""
+
+  data_evaluation: ""
+
+  output:
+    format:
+      - netcdf
+      - csv
+    variables: ""
+    units: "various"
+    verification: ""
+
+  integration:
+    pattern: "integrated"
+    communication_mechanism: ""
+    submodels:
+      - SHYFEM
+      - WASP5
+    execution_constraints: ""
+    acknowledgment_protocols: ""
+    latency_expectations: ""
+    data_synchronization: ""
+
+  authors:
+    - name: Caterina Solidoro
+      role: ""
+    - name: Giuseppe Umgiesser
+      role: ""

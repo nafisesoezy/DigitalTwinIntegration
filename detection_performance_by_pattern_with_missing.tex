@@ -1,0 +1,36 @@
+\begin{table}[h]
+\centering
+\caption{Detection performance comparison between the rule-based baseline and the LLM-assisted detector(with missing).}
+\label{tab:detection_performance}
+\footnotesize
+\begin{tabular}{lcccc}
+\hline
+\textbf{Method} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} \\
+\hline
+Embedded-Rule-based (Static) & 0.73 & 0.66 & 0.77 & 0.68 \\
+Embedded-OpenAI GPT-OSS-120B & 0.91 & 0.89 & 0.86 & 0.85 \\
+Embedded-Mistral Small 3.2 24B Instruct & 0.86 & 0.77 & 0.83 & 0.79 \\
+Embedded-default-text-large & 0.81 & 0.70 & 0.79 & 0.73 \\
+\hline
+Integrated-Rule-based (Static) & 0.67 & 0.56 & 0.71 & 0.55 \\
+Integrated-OpenAI GPT-OSS-120B & 0.88 & 0.86 & 0.79 & 0.78 \\
+Integrated-Mistral Small 3.2 24B Instruct & 0.80 & 0.60 & 0.76 & 0.64 \\
+Integrated-default-text-large & 0.77 & 0.58 & 0.75 & 0.61 \\
+\hline
+Loose-Rule-based (Static) & 0.82 & 0.66 & 0.82 & 0.69 \\
+Loose-OpenAI GPT-OSS-120B & 0.94 & 0.84 & 0.87 & 0.85 \\
+Loose-Mistral Small 3.2 24B Instruct & 0.93 & 0.77 & 0.83 & 0.80 \\
+Loose-default-text-large & 0.91 & 0.73 & 0.86 & 0.78 \\
+\hline
+One-Way-Rule-based (Static) & 0.84 & 0.44 & 0.62 & 0.47 \\
+One-Way-OpenAI GPT-OSS-120B & 0.95 & 0.44 & 0.66 & 0.50 \\
+One-Way-Mistral Small 3.2 24B Instruct & 0.95 & 0.44 & 0.66 & 0.50 \\
+One-Way-default-text-large & 0.93 & 0.44 & 0.65 & 0.49 \\
+\hline
+Shared-Rule-based (Static) & 0.84 & 0.79 & 0.93 & 0.80 \\
+Shared-OpenAI GPT-OSS-120B & 0.98 & 0.93 & 0.99 & 0.96 \\
+Shared-Mistral Small 3.2 24B Instruct & 0.93 & 0.86 & 0.90 & 0.87 \\
+Shared-default-text-large & 0.91 & 0.82 & 0.89 & 0.85 \\
+\hline
+\end{tabular}
+\end{table}

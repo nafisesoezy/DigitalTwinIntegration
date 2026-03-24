@@ -1,0 +1,138 @@
+xNEMO:
+  title: "NEMO Ocean Circulation Model"
+  unique_identifier: "NEMO_v3.3_2010"
+  model_version: "v3.3"
+
+  description: >
+    A 3D hydrostatic, primitive-equation ocean circulation model simulating dynamics,
+    mixing, thermohaline structure, sea ice, and surface fluxes. Provides physical
+    drivers to biogeochemical models such as PlankTOM10, which may return optical or
+    radiative feedback fields.
+
+  keywords:
+    - Ocean circulation
+    - Hydrodynamics
+    - Sea ice
+    - NEMO
+    - Climate modeling
+
+  model_type: "Mechanistic"
+  scope: "Global and regional ocean domains"
+
+  purpose_pattern:
+    purpose: "Simulate physical ocean state and circulation"
+    pattern: "3D structured-grid hydrostatic ocean model with parameterized mixing"
+
+  assumptions:
+    - Hydrostatic approximation
+    - Boussinesq approximation
+    - Finite-difference discretization
+    - Time-split barotropic/baroclinic modes
+
+  dimensionality: "3D"
+  spatial_extent: "Global ocean"
+  spatial_resolution: "1/2° to 1/12°"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Multi-decadal"
+  temporal_resolution: "Hourly to daily"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: "Ocean reanalysis (GLORYS, ORAS), Argo profiles, satellite SST/SSH"
+  
+  publications:
+    - "Madec et al., 2008"
+    - "Vogt et al., 2010"
+
+  conceptual_evaluation: "Widely validated in CMIP configurations; strong physical basis"
+  validation_capabilities: "Climatology and reanalysis comparisons available"
+
+  sensitivity_analysis: "Parameter sets allow sensitivity to mixing, drag, EOS"
+  uncertainty_analysis: "Ensemble forcing and parameter perturbations"
+
+  # --- Controlled Vocabulary ---
+  conceptual_consistency_mismatch: >
+    Physical–biogeochemical feedbacks may be simplified when optical back-effects
+    from PlankTOM10 are disabled. Biogeochemical influence on mixing is not explicit.
+
+  provenance_and_accessibility_gap: >
+    Full reproducibility depends on access to configuration-specific NEMO input data,
+    grids, and namelists which are not always archived with publications.
+
+  license: "CeCILL"
+
+  distribution_version: "v3.3"
+
+  programming_language:
+    - Fortran 90
+  programming_language_family:
+    - Native_C_CPP_Fortran_Family
+
+  software_requirements:
+    ffi:
+      - C_ABI
+    database: []
+    io_libraries:
+      - NetCDF4_Family
+      - HDF5_Family
+
+  hardware_requirements: "HPC cluster"
+
+  execution_instructions: "Compile via makenemo; configure using reference configs and namelists"
+  parallel_execution: true
+
+  error_handling: >
+    CFL limit checks, NaN trapping, restart dumps, timestep reduction.
+
+  execution_constraints: >
+    Requires stable baroclinic/barotropic splitting, MPI domain consistency.
+
+  implementation_verification: "Reference test cases (ORCA2/ORCA1) reproduced"
+  source_code_availability: true
+
+  input:
+    description: >
+      Initial and boundary conditions for the physical ocean state. Optionally
+      receives biological optical feedbacks from PlankTOM10.
+    format: "netcdf"
+    variables:
+      - bathymetry
+      - initial_temperature
+      - initial_salinity
+      - surface_forcing_fields
+      - biological_optical_feedback    # Kd_bio (optional)
+      - gas_exchange_modifiers         # optional DMS-driven radiative fields
+    units: "various"
+
+  integrated_input:
+    - uid: "PlankTOM10_2010"
+      version: "2010"
+      description: "Biogeochemical feedback influencing optics or air–sea fluxes"
+
+  output:
+    format:
+      - "netcdf"
+    variables:
+      - temperature
+      - salinity
+      - u_velocity
+      - v_velocity
+      - w_velocity
+      - mixed_layer_depth
+      - sea_ice_cover
+      - sea_ice_thickness
+      - shortwave_radiation_at_depth
+    units: "°C, PSU, m/s, m, W/m²"
+    verification: "Compared against climatologies and reanalysis"
+
+  integration:
+    pattern: 
+    submodels:
+      - "Ocean physics core"
+    communication_mechanism: "in-memory, synchronous"
+    data_synchronization: "Physical state transferred each timestep to PlankTOM10"
+    execution_constraints: "Shared grid, timestep consistency with tracer package"
+
+  authors:
+    - name: "G. Madec"
+      role: "Lead developer"

@@ -1,0 +1,127 @@
+Intended_Model:
+  title: "Integrated CanESM2 Climate Modeling System"
+  unique_identifier: "CanESM2_CanAM4_NCOM1.3_2013"
+  model_version: "v2"
+
+  description: >
+    The Canadian Earth System Model version 2 (CanESM2) integrates the CanAM4 atmospheric model
+    with the NCOM1.3 ocean model via an internal coupler. The coupled system simulates global climate
+    dynamics, including the surface response to stratospheric aerosol changes, by exchanging fluxes
+    and state variables between the atmosphere and ocean components on synchronized coupling intervals.
+
+  keywords:
+    - Earth system model
+    - Climate modeling
+    - Atmosphere–ocean coupling
+    - Stratospheric aerosols
+    - Surface temperature
+    - CanESM2
+
+  model_type: "Mechanistic"
+  scope: "Global coupled atmosphere–ocean climate system"
+
+  purpose_pattern:
+    purpose: "Simulate climate response to internal variability and external forcings in a coupled AOGCM framework"
+    pattern: "Integrated atmosphere–ocean coupling via internal coupler with loose component integration"
+
+  assumptions: ""
+    - "Ocean and atmosphere share a common calendar and coupling period"
+
+  dimensionality: "3D"
+  spatial_extent: "Global"
+  spatial_resolution: "Atmosphere: T63 (~2.8°); Ocean: ~1.4° × 1.4°"
+  variable_spatial_resolution: false
+
+  temporal_extent: "Multi-decadal to centennial integrations"
+  temporal_resolution: "30 min (atmosphere) to daily (coupling and diagnostics)"
+  variable_temporal_resolution: false
+
+  calibration_tools_data: ""
+
+  publications:
+    - "Fyfe et al., 2013"
+
+  conceptual_evaluation: ""
+  validation_capabilities: ""
+  sensitivity_analysis: ""
+  uncertainty_analysis: ""
+
+  conceptual_consistency_mismatch: ""
+
+  provenance_and_accessibility_gap: ""
+
+  license: "Institutional CCCma"
+  license_incompatibility: "proprietary"
+
+  landing_page: "https://climate-modelling.canada.ca/"
+  distribution_version: "v2"
+
+  programming_language:
+    - "Fortran"
+  programming_language_family:
+    - "Native_C_CPP_Fortran_Family"
+
+  software_requirements:
+    description: "NCOM1.3 and CanAM4 components, CanESM2 coupler, NetCDF, MPI"
+    ffi_family:
+      - "Native_C_CPP_Fortran_Family"
+    io_libraries:
+      - "NetCDF4_Family"
+    database_libraries: []
+
+  hardware_requirements: "Supercomputing clusters required for multi-decadal ensemble simulations"
+
+  execution_instructions: >
+    Configure predefined CanESM2 experiments (historical, scenario runs) via experiment scripts and namelists;
+    compile all components with MPI and NetCDF; run under the coupled CanESM2 driver that orchestrates
+    atmosphere–ocean coupling through the internal coupler.
+
+  parallel_execution: true
+
+  implementation_verification: ""
+  source_code_availability: false
+
+  active_edge_io_checks:
+    format:
+      - ""
+    whole_model_information_fields: ""
+
+  data_evaluation: ""
+
+  input:
+    description: >
+      External forcing datasets (GHGs, aerosols, solar, land use) and initialization fields for atmosphere
+      and ocean; internal two-way flux and state exchange between CanAM4 and NCOM1.3 via coupler.
+    format:
+      - "netcdf"
+    variables:
+      - "External forcings (GHGs, aerosols, solar, land use)"
+      - "Initial 3D atmosphere fields"
+      - "Initial ocean T/S and currents"
+    units: "Standard CMIP forcing and state units"
+
+  output:
+    format:
+      - "netcdf"
+    variables: "Atmospheric fields, SST, sea ice, ocean heat content, fluxes, and other CMIP variables"
+    units: "Standard CMIP units"
+    verification: ""
+    corroboration: ""
+
+  integration:
+    pattern: "Loose"
+    submodels:
+      - "CanAM4"
+      - "NCOM1.3"
+    execution_constraints: ""
+    acknowledgment: "Canadian Centre for Climate Modelling and Analysis (CCCma), CanESM2 and component model developers"
+    latency_expectations: ""
+    data_synchronization: ""
+
+  communication_mechanism: ""
+  error_handling: ""
+
+  authors:
+    - name: "Fyfe, J.C."
+      orcid: ""
+      role: "Earth system modeling and analysis"

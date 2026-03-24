@@ -1,0 +1,164 @@
+{
+  "summary": {
+    "group": "7",
+    "ab_kind": "INTEGRATED",
+    "num_rows_seen": 9,
+    "num_real_mismatches": 3,
+    "num_not_a_mismatch": 6,
+    "risk_level": "medium"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "data_synchronization||data synchronization",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Both models can be integrated through the fabm kernel, which manages the synchronization internally."
+    },
+    {
+      "row_ref": "error_handling||error handling mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Error handling can be managed through fabm coupling checks and gotm time controls."
+    },
+    {
+      "row_ref": "execution_constraints||execution constraint mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Both models can be synchronized through the fabm kernel."
+    },
+    {
+      "row_ref": "programming_language||programming language incompatibility",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Both models support fortran, which can be used for integration."
+    },
+    {
+      "row_ref": "assumptions||semantic mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The assumptions about horizontal homogeneity and turbulence drivers are incompatible."
+    },
+    {
+      "row_ref": "description||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The descriptions are similar enough to be integrated through the fabm framework."
+    },
+    {
+      "row_ref": "model_version||model version",
+      "decision": "REAL_MISMATCH",
+      "justification": "The model versions do not match exactly, which could cause compatibility issues."
+    },
+    {
+      "row_ref": "software_specification_and_requirements||software environment mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The software specifications and requirements are not compatible."
+    },
+    {
+      "row_ref": "temporal_extent_coverage||temporal coverage mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Both models can be aligned to multi-year temporal coverage."
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "F1",
+      "field": "Assumptions",
+      "bottleneck": "Semantic Mismatch",
+      "root_cause": "Incompatible assumptions about horizontal homogeneity and turbulence drivers.",
+      "evidence": {
+        "A_value": "horizontal homogeneity; turbulence driven by wind, buoyancy, bottom shear; 1d vertical structure",
+        "B_value": "ecology responds to physical drivers light, mixing, temperature; trophic groups, sediment modeled mechanistically; no horizontal heterogeneity"
+      },
+      "why_it_blocks_integration": "The incompatible assumptions about horizontal homogeneity and turbulence drivers prevent seamless integration.",
+      "proposed_fix": "Reconcile the assumptions by adopting a common set of assumptions that both models can work with.",
+      "data_transform": {
+        "rules": [
+          "Adopt a common set of assumptions for horizontal homogeneity and turbulence drivers."
+        ],
+        "example": "Assume horizontal homogeneity and turbulence driven by wind, buoyancy, and bottom shear."
+      },
+      "runtime_orchestration": {
+        "pattern": "Adaptive",
+        "steps": [
+          "Identify common assumptions.",
+          "Reconcile differences.",
+          "Implement common assumptions in both models."
+        ]
+      },
+      "yaml_patches": {
+        "A": "assumptions: horizontal homogeneity; turbulence driven by wind, buoyancy, bottom shear; 1d vertical structure",
+        "B": "assumptions: horizontal homogeneity; turbulence driven by wind, buoyancy, bottom shear; 1d vertical structure",
+        "AB": "assumptions: horizontal homogeneity; turbulence driven by wind, buoyancy, bottom shear; 1d vertical structure"
+      },
+      "validation": [
+        "Verify that both models can operate with the common assumptions.",
+        "Test the integrated model to ensure it behaves as expected."
+      ]
+    },
+    {
+      "id": "F2",
+      "field": "Model Version",
+      "bottleneck": "Semantic Mismatch",
+      "root_cause": "Model versions do not match exactly.",
+      "evidence": {
+        "A_value": "5.0",
+        "B_value": "2023.1; 5.0"
+      },
+      "why_it_blocks_integration": "Incompatible model versions can cause compatibility issues and unexpected behavior.",
+      "proposed_fix": "Upgrade or downgrade the models to a common version that is compatible with the integration specification.",
+      "data_transform": {
+        "rules": [
+          "Upgrade or downgrade the models to a common version."
+        ],
+        "example": "Upgrade Model A to version 2023.1."
+      },
+      "runtime_orchestration": {
+        "pattern": "Sequential",
+        "steps": [
+          "Identify a common version.",
+          "Upgrade or downgrade the models.",
+          "Test the integrated model to ensure compatibility."
+        ]
+      },
+      "yaml_patches": {
+        "A": "version: 2023.1",
+        "B": "version: 2023.1",
+        "AB": "version: 2023.1"
+      },
+      "validation": [
+        "Verify that both models are running the same version.",
+        "Test the integrated model to ensure it behaves as expected."
+      ]
+    },
+    {
+      "id": "F3",
+      "field": "software_specification_and_requirements",
+      "bottleneck": "Software Environment Mismatch",
+      "root_cause": "Incompatible software specifications and requirements.",
+      "evidence": {
+        "A_value": "netcdf, fortran compiler",
+        "B_value": "fabm environment"
+      },
+      "why_it_blocks_integration": "Incompatible software environments can prevent the models from running together.",
+      "proposed_fix": "Ensure both models can run in a common software environment by installing the necessary libraries and compilers.",
+      "data_transform": {
+        "rules": [
+          "Install necessary libraries and compilers."
+        ],
+        "example": "Install netcdf libraries and a fortran compiler in the fabm environment."
+      },
+      "runtime_orchestration": {
+        "pattern": "Parallel",
+        "steps": [
+          "Identify common software requirements.",
+          "Install necessary libraries and compilers.",
+          "Test the integrated model to ensure compatibility."
+        ]
+      },
+      "yaml_patches": {
+        "A": "software_specification_and_requirements: netcdf, fortran compiler, fabm environment",
+        "B": "software_specification_and_requirements: netcdf, fortran compiler, fabm environment",
+        "AB": "software_specification_and_requirements: netcdf, fortran compiler, fabm environment"
+      },
+      "validation": [
+        "Verify that both models can run in the common software environment.",
+        "Test the integrated model to ensure it behaves as expected."
+      ]
+    }
+  ]
+}

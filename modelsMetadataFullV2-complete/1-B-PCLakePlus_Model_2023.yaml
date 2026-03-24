@@ -1,0 +1,128 @@
+PCLakePlus:
+  title: "PCLake+: A Process-Based Ecological Model for Lakes"
+  unique_identifier: "PCLakePlus_Model_2023"
+  model_version: "2023.1"
+
+  description: >
+    A mechanistic ecological model simulating nutrient cycling, phytoplankton,
+    zooplankton, fish, macrophytes, detritus, sediment processes, and wetland
+    interactions. Supports vertical stratification. PDF additions include:
+    wetland purification, ES module extension, and hourly meteorological forcing.
+
+  keywords:
+    - Lake ecology
+    - Eutrophication
+    - Nutrient cycling
+    - Water quality
+    - Ecosystem services
+    - Restoration
+    - Food webs
+
+  model_type: "Mechanistic"
+  scope: "Freshwater lakes (shallow and deep)"
+
+  purpose_pattern:
+    purpose: "Simulate ecological responses to nutrients, climate, and restoration"
+    pattern: "Consumes boundary conditions from external physical models"
+
+  assumptions:
+    - "1D vertical structure is sufficient"
+    - "External loads dominate nutrient inputs"
+    - "No feedback to physical model"
+
+  dimensionality: "1D"
+  spatial_extent: "Lake water column"
+  spatial_resolution: "Discrete vertical layers"
+  variable_spatial_resolution: false
+
+  temporal_extent: "Multi-year to decadal"
+  temporal_resolution: "Daily"
+  variable_temporal_resolution: false
+
+  calibration_tools_data: >
+    Empirical calibration with observed nutrients, water quality, biology;
+    PDF study uses Dutch generic calibration to avoid overfitting.
+
+  publications:
+    - "Janse 2005"
+    - "Janse et al. 2010"
+    - "Janssen et al. 2019"
+    - "Zhan et al. 2023"
+
+  conceptual_evaluation: "Extensively validated in >50 lakes"
+  validation_capabilities: >
+    Validated with long-term data; PDF validation metrics include:
+      - O2 R²=0.36, TN R²=0.40,
+      - Total Chl-a R²=0.44.
+
+  sensitivity_analysis: "Manual or automated sensitivity tests"
+  uncertainty_analysis: "Scenarios and Monte Carlo"
+
+  error_handling: "Input validation, logging"
+  license: "GNU GPL"
+  landing_page: "https://github.com/pcmodel/PCModel"
+  distribution_version: "2023.1"
+
+  programming_language:
+    - "C++"
+    - "R wrapper"
+
+  software_requirements: "C++ compiler, PCModel R package"
+  hardware_requirements: "Standard desktop/server"
+
+  execution_instructions: >
+    Run via C++ binary or R script with YAML/JSON configs.
+
+  parallel_execution: false
+  implementation_verification: "Peer-reviewed validation"
+
+  source_code_availability: true
+
+  parameters:
+    - name: "PCLakePlus_Static_Parameters"
+      description: "Constants for biogeochemistry, food webs, sediments"
+      format: "CSV/JSON"
+      unit: "various"
+      datatype: "float"
+      valid_range: "Documented per parameter"
+      default_values: "Literature-based"
+
+  datasets:
+    - uid: "PCLakePlus_Input_2023"
+      version: "2023.1"
+      dependencies:
+        - "Meteorological data (hourly in PDF)"
+        - "Nutrient load data"
+        - "Bathymetry"
+        - "Hydrology"
+
+  integrated_input:
+    - uid: "FLake_Model_2023"
+      description: "Temperature profile + mixing depth from FLake"
+
+  output:
+    format:
+      - "CSV"
+      - "NetCDF"
+    variables:
+      - "Nutrients"
+      - "Phytoplankton groups"
+      - "Macrophytes"
+      - "Oxygen"
+      - "Ecosystem service indicators"
+    verification: "Field data comparisons"
+    corroboration: "Peer-reviewed studies"
+
+  integration:
+    pattern: 
+    submodels:
+      - "Physical lake model (FLake)"
+    execution_constraints: "Consumes FLake outputs; no return flow"
+    latency_expectations: "Batch/offline"
+    data_synchronization: "File-based"
+
+  authors:
+    - name: "Janse J.H."
+      orcid: "https://orcid.org/0000-0003-1636-679X"
+    - name: "Janssen A.B.G."
+    - name: "Zhan Q."

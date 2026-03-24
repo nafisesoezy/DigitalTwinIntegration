@@ -1,0 +1,37 @@
+# Solution for mismatch_report_4_INTEGRATED
+
+```json
+{
+  "summary": {
+    "group": "4",
+    "ab_kind": "INTEGRATED",
+    "num_rows_seen": 4,
+    "num_real_mismatches": 0,
+    "num_not_a_mismatch": 4,
+    "risk_level": "low"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "assumptions||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The differences in assumptions are complementary and can be integrated with proper mapping."
+    },
+    {
+      "row_ref": "description||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The descriptions are complementary and can be integrated with proper mapping."
+    },
+    {
+      "row_ref": "purpose & pattern||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The purposes and patterns are complementary and can be integrated with proper mapping."
+    },
+    {
+      "row_ref": "scope||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The scopes are complementary and can be integrated with proper mapping."
+    }
+  ],
+  "mismatches": []
+}
+```

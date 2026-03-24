@@ -1,0 +1,123 @@
+Integrated_FLake_PCLake_ES:
+  title: "Integrated FLake → PCLake+ → Ecosystem Services Framework"
+  unique_identifier: "FLake_PCLake_ES_Integrated_2023"
+  model_version: "1.0"
+
+  description: >
+    A climate–ecology–ecosystem-services modeling framework. FLake simulates
+    stratification and thermal structure under climate scenarios. Its outputs
+    (mixing depth, temperature profile) force PCLake+, which simulates nutrient
+    cycling, phytoplankton groups, macrophytes, oxygen, and food web dynamics.
+    An ecosystem services (ES) module converts ecological states into ES
+    provisioning scores using threshold-based suitability functions.
+
+  keywords:
+    - Coupled modeling
+    - Stratification
+    - Eutrophication
+    - Ecosystem services
+    - Climate scenarios
+    - Restoration scenarios
+
+  scope: "Lakes and artificial water bodies"
+
+  purpose_pattern:
+    purpose: >
+      Simulate the combined physical, ecological, and ecosystem-service response
+      of lakes to climate change and management interventions.
+    pattern: "One-way sequential coupling (physical → ecological → ES)"
+
+  assumptions:
+    - "Physical processes drive ecological responses"
+    - "No feedback from ecology to physics"
+    - "Threshold-based ES suitability is representative of real conditions"
+
+  dimensionality: "1D"
+  spatial_extent: "Vertical lake column"
+  spatial_resolution: "Layered structure inherited from FLake and PCLake+"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Historical + 2050 climate projections"
+  temporal_resolution: "Hourly to daily"
+  variable_temporal_resolution: true
+
+  calibration_tools_data: >
+    Uses validated Dutch PCLake+ calibration and forcing from measured meteorology.
+
+  publications:
+    - "Study PDF (2024), extracted content"
+
+  conceptual_evaluation: >
+    Supports regime-shift prediction, ES assessment, and multi-parameter scenario evaluation.
+
+  validation_capabilities: >
+    Validated through comparison with in situ measurements (PCLake+ validation),
+    and stratification compared with observed patterns (FLake validation).
+
+  sensitivity_analysis: >
+    Multi-parameter sensitivity for scenarios: nutrient load reduction,
+    wetland creation, and climate warming.
+
+  uncertainty_analysis: "Scenario-based evaluation under climate and restoration uncertainty"
+
+  error_handling: "Handled by individual model components"
+
+  license: ""
+  landing_page: ""
+
+  programming_language:
+    - "Fortran (FLake)"
+    - "C++ (PCLake+)"
+    - "R, Python (wrappers)"
+
+  software_requirements:
+    - "FLake compiled environment"
+    - "PCModel R package"
+    - "PCLake+ C++ binary"
+
+  execution_instructions: >
+    1) Run FLake under baseline or climate scenario.
+    2) Export mixing depth and temperature profiles.
+    3) Import into PCLake+ as forcing.
+    4) Run PCLake+.
+    5) Feed ecological outputs into ES module.
+
+  parallel_execution: false
+  implementation_verification: "Verified in the integrated PDF-based study"
+  source_code_availability: true
+
+  datasets:
+    - uid: "KNMI_Hourly_Meteorology"
+      description: "Hourly weather data for forcing FLake and PCLake+"
+
+
+  output:
+    format:
+      - "CSV"
+      - "NetCDF"
+    variables:
+      - "Thermal structure"
+      - "Mixing depth"
+      - "Nutrient concentrations"
+      - "Phytoplankton groups"
+      - "Macrophytes"
+      - "Oxygen"
+      - "Ecosystem service scores (0–1)"
+    units: "mixed"
+    verification: "Compared to field data (PCLake+)"
+    corroboration: "ES predictions based on multi-lake thresholds"
+
+  integration:
+    pattern: "one-way"
+    submodels:
+      - "FLake"
+      - "PCLake+"
+      - "Ecosystem services module"
+    execution_constraints: "Sequential; common timestep"
+    acknowledgment: "From study PDF"
+    latency_expectations: "Synchronous/stepwise file transfer"
+    data_synchronization: "Sequential forcing"
+
+  authors:
+    - name: "Extracted from PDF study"
+      role: "Model integration and analysis"

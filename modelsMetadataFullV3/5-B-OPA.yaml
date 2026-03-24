@@ -1,0 +1,143 @@
+OPA:
+  title: "OPA 8.2 Ocean General Circulation Model"
+  unique_identifier: "OPA_IPSL_8.2_1999"
+  model_version: "8.2"
+
+  description: >
+    Hydrostatic, Boussinesq primitive-equation OGCM with free surface. Uses a z-level grid,
+    Gent–McWilliams isopycnal mixing, level-1.5 TKE vertical mixing, double diffusion, and
+    a bottom boundary-layer scheme. In ORCA2-LIM applications, OPA and LIM are compiled
+    into a single integrated executable with synchronous in-memory coupling.
+
+  keywords:
+    - OGCM
+    - Ocean circulation
+    - Vertical mixing
+    - Free surface
+    - Gent–McWilliams
+    - TKE closure
+    - ORCA2 grid
+
+  model_type: Mechanistic
+  scope: Global ocean circulation
+
+  purpose_pattern:
+    purpose: Simulate large-scale ocean dynamics, stratification, and circulation
+    pattern: "z-level finite-difference OGCM with parameterized eddy mixing"
+
+  assumptions:
+    - Hydrostatic and Boussinesq approximations
+    - Nonlinear thermodynamic equation of state
+    - Mesoscale eddies parameterized (GM90)
+    - Prognostic TKE vertical mixing
+
+  dimensionality: 3D
+  spatial_extent: "78°S–90°N (ORCA2)"
+  spatial_resolution: "≈2° ORCA2 tripolar grid"
+  variable_spatial_resolution: true
+  temporal_extent: "Multi-decadal"
+  temporal_resolution: "≈96 min timestep"
+
+  calibration_tools_data: >
+    SSS restoring to PHC; combined reanalysis/climatology atmospheric forcing; runoff climatologies.
+
+  publications:
+    - "Madec et al. 1999"
+    - "Timmermann et al. 2005"
+
+  conceptual_evaluation: >
+    Validated in tropics and high latitudes; ORCA2-LIM reproduces large-scale hydrography,
+    convection sites, and ACC transport.
+
+  validation_capabilities: >
+    PHC hydrography, ARGO-like profiles, MLD depth, ACC transport, sea-ice-linked metrics.
+
+  conceptual_consistency_mismatch: >
+    Coarse grid limits boundary current fidelity, sea-ice–edge detail, and overflow pathways.
+
+  provenance_and_accessibility_gap: >
+    OPA 8.x predates NEMO; historical releases not maintained in modern repositories.
+
+  license: "Unspecified (historical OPA distribution)"
+  license_incompatibility: "proprietary"
+
+  distribution_version: "8.2"
+
+  programming_language:
+    - Fortran 90/95
+  programming_language_family: Native_C_CPP_Fortran_Family
+
+  software_requirements: >
+    Fortran compiler; MPI; NetCDF4_Family; HDF5; ORCA2 grid tools.
+  hardware_requirements: "Workstation to HPC"
+  parallel_execution: true
+
+  software_integration:
+    ffi_family: C_ABI
+    io_libraries:
+      - netcdf4
+      - libhdf5
+    databases: []
+
+  execution_instructions: >
+    Configure ORCA2 grid; initialize from PHC; compile OPA+LIM into one executable;
+    apply atmospheric forcing; run with 96 min timestep.
+
+  error_handling: >
+    CFL monitoring, NaN detection, static instability checks, restart dumps.
+
+  input:
+    description: "Sea-ice fields and ice–ocean fluxes from LIM (in-memory)"
+    format: netcdf
+    variables:
+      - ice_concentration
+      - ice_thickness
+      - snow_thickness
+      - ice_ocean_freshwater_flux
+      - ice_ocean_heat_flux
+      - ice_ocean_momentum_stress
+    units: "%, m, m, m/s, W m⁻², N m⁻²"
+
+  active_edge_io:
+    format:
+      - netcdf
+    whole_model_information_fields: >
+      ORCA2 grid metadata, forcing IDs, experiment labels, GM/TKE settings, spinup stage.
+
+  integrated_input:
+    - uid: "LIM_UCL_1997_1999"
+      version: "dynamic–thermodynamic LIM"
+      description: "Sea-ice state and fluxes"
+
+  output:
+    format:
+      - netcdf
+    variables:
+      - sea_surface_temperature
+      - sea_surface_salinity
+      - ocean_surface_currents_u
+      - ocean_surface_currents_v
+      - mixed_layer_depth
+      - downwelling_shortwave_radiation
+      - downwelling_longwave_radiation
+    verification: >
+      Compared against PHC, vertical profiles, MLD, convection sites, and ACC transport.
+
+  integration:
+    pattern: "integrated"
+    communication_mechanism: >
+      In-memory direct-call interface to LIM; synchronous coupling every N ocean steps.
+    submodels: []
+    execution_constraints: >
+      ORCA2 grid consistency; SSS restoring tuned for Southern Ocean stability.
+    acknowledgment_protocols: >
+      Cite ORCA2-LIM (Timmermann 2005) and OPA reference manual.
+    latency_expectations: "Low; lockstep"
+    data_synchronization: >
+      Synchronous exchange of sea-ice fields and ocean state fields.
+
+  authors:
+    - name: Gurvan Madec
+      role: OPA development
+    - name: Ralph Timmermann
+      role: ORCA2-LIM high-latitude evaluation

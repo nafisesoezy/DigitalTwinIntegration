@@ -1,0 +1,144 @@
+{
+  "summary": {
+    "group": "10",
+    "ab_kind": "INTENDED",
+    "num_rows_seen": 11,
+    "num_real_mismatches": 2,
+    "num_not_a_mismatch": 9,
+    "risk_level": "medium"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "direction||data schema mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Different output variables do not necessarily indicate a mismatch as long as the integration specification allows for the combination of these variables."
+    },
+    {
+      "row_ref": "data_synchronization||data synchronization",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The difference in state variables and tracer fields can be managed through proper mapping and synchronization strategies."
+    },
+    {
+      "row_ref": "hardware_specification_and_requirements||hardware resource mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Both models require a high-performance computing environment, so this is not a real mismatch."
+    },
+    {
+      "row_ref": "license||license incompatibility",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The licenses are compatible for research and institutional use, so this is not a real mismatch."
+    },
+    {
+      "row_ref": "programming_language||programming language incompatibility",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "Both models use Fortran and can be coupled with MOM4p1, so this is not a real mismatch."
+    },
+    {
+      "row_ref": "assumptions||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The assumptions can be aligned through proper integration and mapping strategies."
+    },
+    {
+      "row_ref": "keywords||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The keywords can be aligned through proper integration and mapping strategies."
+    },
+    {
+      "row_ref": "purpose & pattern||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The purposes and patterns can be aligned through proper integration and mapping strategies."
+    },
+    {
+      "row_ref": "software_specification_and_requirements||software environment mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The software environments can be aligned through proper integration and mapping strategies."
+    },
+    {
+      "row_ref": "error_handling||error handling mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "The error handling mechanisms are significantly different and need to be addressed for integration."
+    },
+    {
+      "row_ref": "parallel_execution||parallel execution incompatibility",
+      "decision": "REAL_MISMATCH",
+      "justification": "The parallel execution requirements are not declared, which is critical for integration."
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "F1",
+      "field": "error_handling",
+      "bottleneck": "error handling mismatch",
+      "root_cause": "Different error handling mechanisms",
+      "evidence": {
+        "A_value": "runtime logging, constraints applied via restoring terms, no automated recovery",
+        "B_value": "basic validation of boundary conditions, runtime checks in coupled execution with ofam3"
+      },
+      "why_it_blocks_integration": "The different error handling mechanisms can lead to inconsistencies and failures during integration.",
+      "proposed_fix": "Implement a unified error handling mechanism that combines the strengths of both models.",
+      "data_transform": {
+        "rules": [
+          "Standardize error logging formats",
+          "Implement common runtime checks"
+        ],
+        "example": "Unified error logging format: [TIMESTAMP] [SEVERITY] [SOURCE] [MESSAGE]"
+      },
+      "runtime_orchestration": {
+        "pattern": "Sequential",
+        "steps": [
+          "Initialize unified error handling",
+          "Execute Model A with unified error handling",
+          "Execute Model B with unified error handling",
+          "Synchronize error logs"
+        ]
+      },
+      "yaml_patches": {
+        "A": "error_handling: unified",
+        "B": "error_handling: unified",
+        "AB": "error_handling: unified"
+      },
+      "validation": [
+        "Verify unified error handling works for both models",
+        "Check for consistency in error logs"
+      ]
+    },
+    {
+      "id": "F2",
+      "field": "parallel_execution",
+      "bottleneck": "parallel execution incompatibility",
+      "root_cause": "Parallel execution requirements not declared",
+      "evidence": {
+        "A_value": "true",
+        "B_value": "true"
+      },
+      "why_it_blocks_integration": "The lack of declared parallel execution requirements can lead to performance issues and inconsistencies during integration.",
+      "proposed_fix": "Declare and implement parallel execution requirements for both models.",
+      "data_transform": {
+        "rules": [
+          "Declare parallel execution requirements",
+          "Implement parallel execution strategies"
+        ],
+        "example": "Parallel execution declaration: parallel_execution: true"
+      },
+      "runtime_orchestration": {
+        "pattern": "Parallel",
+        "steps": [
+          "Declare parallel execution requirements",
+          "Initialize parallel execution environment",
+          "Execute Model A in parallel",
+          "Execute Model B in parallel",
+          "Synchronize results"
+        ]
+      },
+      "yaml_patches": {
+        "A": "parallel_execution: true",
+        "B": "parallel_execution: true",
+        "AB": "parallel_execution: true"
+      },
+      "validation": [
+        "Verify parallel execution works for both models",
+        "Check for performance and consistency"
+      ]
+    }
+  ]
+}

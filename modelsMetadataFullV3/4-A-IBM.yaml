@@ -1,0 +1,138 @@
+IBM:
+  title: "Individual-Based Plant Model (IBM)"
+  unique_identifier: "IBM_Vegetation_Model_2017"
+  model_version: "1.0"
+
+  description: >
+    A spatially explicit individual-based vegetation model simulating plant
+    establishment, growth, mortality, dispersal, and competition at the level of
+    individual agents. Each plant interacts locally with neighbors and with
+    spatially heterogeneous soil feedback states. Designed to capture plant–soil
+    negative feedback (PSNF), spatial clustering, and coexistence patterns.
+
+  keywords:
+    - Individual-based model
+    - Vegetation dynamics
+    - Spatial ecology
+    - Conspecific negative feedback
+    - Dispersal
+    - Competition
+
+  model_type: "Mechanistic"
+  scope: "Local to landscape-scale plant populations"
+
+  purpose_pattern:
+    purpose: "Simulate spatial vegetation dynamics under competition, dispersal, and soil feedback"
+    pattern: "Agent-based simulation of plant life cycle with externally provided soil conditions"
+
+  assumptions:
+    - Plants are discrete individuals
+    - Local interactions drive competition and PSNF
+    - Life-history traits are homogeneous within species
+    - Soil feedback from SoilFeedback model determines germination and early survival
+    - Negative feedback acts at local scales (1–5 m), consistent with Vincenot 2017
+
+  dimensionality: "2D"
+  spatial_extent: "Grid of landscape cells (e.g., 100×100)"
+  spatial_resolution: "1 m² cells"
+  variable_spatial_resolution: false
+
+  temporal_extent: "Decades"
+  temporal_resolution: "Annual cycles with daily internal steps"
+  variable_temporal_resolution: false
+
+  calibration_tools_data: >
+    Tested using theoretical PSNF benchmarks reproduced in Vincenot 2017:
+    spatial clustering, conspecific inhibition zones, and coexistence patterns.
+
+  publications:
+    - "Vincenot et al., 2017, Oikos"
+
+  conceptual_evaluation: >
+    Model reproduces known PSNF-driven vegetation patterns such as patchiness,
+    Janzen–Connell gaps, and stable coexistence predicted by ecological theory.
+
+  validation_capabilities: >
+    Verified by reproducing spatial patterns, size distributions, and coexistence
+    mechanisms demonstrated in Vincenot 2017.
+
+  sensitivity_analysis: >
+    Explored for demographic traits, dispersal kernels, local interaction radius,
+    and strength of soil feedback.
+
+  uncertainty_analysis: "Scenario-based parameter exploration"
+
+  error_handling: "Basic input validation and conflict resolution in events"
+
+  license: "CC BY"
+  distribution_version: "1.0"
+
+  programming_language:
+    - "C++"
+    - "NetLogo"
+
+  software_requirements: "Standard compiler or agent-based modeling platform"
+  hardware_requirements: "Standard workstation"
+
+  execution_instructions: >
+    Compile/run using configuration files specifying species traits, grid setup,
+    dispersal kernels, and soil feedback parameters.
+
+  parallel_execution: false
+  implementation_verification: >
+    Reproduces emergent PSNF spatial patterns described in Vincenot 2017.
+
+  source_code_availability: false
+
+  input:
+    description: "Environmental soil feedback fields provided by SoilFeedback model"
+    format: "CSV or memory structure"
+    variables:
+      - soil_toxicity_per_cell
+      - feedback_modified_germination_prob
+    units:
+      - "dimensionless"
+      - "probability (0–1)"
+
+  integrated_input:
+    - uid: "SoilFeedback_Model_2017"
+      version: "1.0"
+      description: "Provides soil toxicity affecting plant establishment and growth"
+
+  parameters:
+    - name: "Plant life history parameters"
+      description: "Species growth, mortality, reproduction, dispersal kernels"
+      format: "Table"
+      unit: "varies"
+      datatype: "float"
+      valid_range: "Biologically plausible"
+
+  output:
+    format:
+      - "CSV"
+      - "Text"
+    variables:
+      - plant_biomass_per_cell
+      - plant_density_per_cell
+      - species_identity_per_cell
+    units:
+      - "g m⁻²"
+      - "count m⁻²"
+
+    verification: >
+      Plant spatial patterns checked against PSNF theory and Vincenot 2017 results.
+
+    corroboration: >
+      Reproduces emergent clustering, inhibition gaps, coexistence, and density-dependent feedback.
+
+  integration:
+    submodels: []
+    execution_constraints: "Requires SoilFeedback outputs in coupled mode"
+    acknowledgment: "Vincenot et al., 2017"
+    latency_expectations: "Annual coupling"
+    data_synchronization: "Grids must be aligned"
+
+  authors:
+    - name: "Vincent Vincenot"
+      orcid: ""
+      role: "Model design and implementation"

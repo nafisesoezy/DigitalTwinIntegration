@@ -1,0 +1,163 @@
+MISOMIP1_Integrated_Model:
+  title: "MISOMIP1: Coupled Marine Ice Sheet–Ocean Intercomparison Framework"
+  unique_identifier: "MISOMIP1_Model_2016"
+  model_version: "2016.1"
+
+  description: >
+    MISOMIP1 integrates the MISMIP+ ice-sheet and ISOMIP+ ocean experiments into
+    a coupled modeling framework to evaluate ice–ocean feedbacks, grounding-line
+    migration under ocean warming, and sub-shelf melt sensitivity in idealized
+    Antarctic-like domains.
+
+  keywords:
+    - Marine ice sheet
+    - Ice–ocean coupling
+    - Sub-shelf melt
+    - Grounding-line retreat
+    - Sea-level rise
+    - Coupled modeling
+    - Intercomparison
+
+  model_type: "Mechanistic"
+  scope: "Idealized Antarctic marine-terminating glacier systems"
+
+  purpose_pattern:
+    purpose: "Evaluate coupled ice–ocean dynamics and feedbacks under perturbations"
+    pattern: "Loose coupling between ice (MISMIP+) and ocean (ISOMIP+) models"
+
+  assumptions:
+    - "Shared geometry and bedrock domain"
+    - "Ocean melt drives grounding-line migration"
+    - "Simplified thermal forcing"
+    - "No atmospheric or sea-ice processes"
+    - "Idealized boundary conditions from protocol"
+
+  dimensionality: "2D ice, 3D ocean"
+  spatial_extent: "640×80 km ice domain + 160 km ocean extension"
+  spatial_resolution: "0.5–2 km"
+  variable_spatial_resolution: true
+
+  temporal_extent: "Centennial to millennial"
+  temporal_resolution: "Daily (ocean) / annual (ice)"
+  variable_temporal_resolution: true
+
+  # ---------------------------------------------------------
+  # PDF-enriched PROTOCOL DETAILS
+  # ---------------------------------------------------------
+  coupling_strategy:
+    type: "Loose"
+    interval: "Annual exchange (recommended ≤ 6 months)"
+    workflow:
+      - "Ocean model computes melt using ice draft"
+      - "Ice model updates geometry using melt"
+      - "New geometry passed back to ocean model"
+
+  coupling_quantities:
+    from_ocean:
+      - melt_rate
+      - basal_temperature
+    from_ice:
+      - ice_draft_geometry
+      - grounding_line_position
+
+  initialization:
+    ice: "MISMIP+ steady-state configuration targeting GL ≈ 450 km"
+    ocean: "ISOMIP+ warm/cold restoring profiles"
+
+  experiment_families:
+    - name: "MISOMIP experiment group 1"
+      description: "Ocean-driven retreat under warm-water intrusion"
+    - name: "MISOMIP experiment group 2"
+      description: "Coupling hysteresis experiments"
+    - name: "MISOMIP experiment group 3"
+      description: "Sensitivity to coupling intervals"
+  # ---------------------------------------------------------
+
+  calibration_tools_data: "Steady-state grounding-line tuning; ocean restoring profiles"
+  publications:
+    - "Asay-Davis et al. 2016, Geosci. Model Dev."
+
+  conceptual_evaluation: "Marine ice sheet instability theory; plume melting theory"
+  validation_capabilities: "Cross-model comparison with reference ensemble"
+
+  sensitivity_analysis: >
+    Supports perturbations in temperature profiles, friction laws, coupling
+    intervals, and melt parameterizations.
+
+  uncertainty_analysis: "Scenario-based; not probabilistic"
+  error_handling: "Component models responsible for internal checks"
+
+  license: "Open protocol specification"
+  landing_page: "https://www.geosci-model-dev.net/9/2471/2016/"
+  distribution_version: "2016.1"
+
+  programming_language:
+    - "Fortran"
+    - "C++"
+    - "Python"
+
+  software_requirements: "Ice-sheet + ocean model infrastructure with NetCDF I/O"
+  hardware_requirements: "HPC cluster recommended"
+
+  execution_instructions: >
+    Run MISMIP+ and ISOMIP+ standalone steady-state tests. Use ice-draft geometry
+    and melt rates to initialize MISOMIP1. Perform annual coupling exchange and
+    run forward for centuries.
+
+  parallel_execution: true
+  implementation_verification: "Cross-model benchmarking (e.g., BISICLES + MITgcm)"
+  source_code_availability: false
+
+  parameters:
+    - name: "CoupledModel_Forcing_Parameters"
+      description: "Ocean thermal forcing, melt parameterization, coupling interval"
+      format: ["NetCDF", "YAML"]
+      unit: "various"
+      datatype: "float"
+      valid_range: "Protocol-defined"
+      default_values: "MISOMIP1 protocol"
+
+  datasets:
+    - uid: "MISOMIP1_Initial_Conditions"
+      version: "2016.1"
+      access_url: "https://www.geosci-model-dev.net/9/2471/2016/"
+      dependencies:
+        - "MISMIP+ steady-state geometry"
+        - "ISOMIP+ T/S profiles"
+
+  integrated_input:
+    - uid: "MISMIPPlus_Output"
+      description: "Ice geometry and grounding line"
+    - uid: "ISOMIPPlus_Output"
+      description: "Ocean melt rates"
+
+  data_evaluation: "Cross-validation of ice–ocean feedback behavior"
+
+  output:
+    format:
+      - "NetCDF"
+    variables:
+      - grounding_line_position
+      - melt_rate
+      - ice_thickness
+      - ocean_temperature
+      - ocean_velocity
+    units: ["m", "m a^-1", "m", "°C", "m/s"]
+
+  integration:
+    pattern: "Loose"
+    submodels:
+      - "MISMIP+ ice sheet model"
+      - "ISOMIP+ ocean cavity model"
+    execution_constraints: "Fixed interval coupling"
+    latency_expectations: "Low; annual exchange"
+    data_synchronization: "Ice and ocean fields exchanged at coupling step"
+
+  authors:
+    - name: "Xylar S. Asay-Davis"
+      orcid: "https://orcid.org/0000-0002-2358-2020"
+      role: "Lead coordinator"
+    - name: "Stephen L. Cornford"
+      role: "Ice model design"
+    - name: "Paul R. Holland"
+      role: "Ocean model physics"

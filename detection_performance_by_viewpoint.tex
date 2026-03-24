@@ -1,0 +1,36 @@
+\begin{table}[h]
+\centering
+\caption{Detection performance comparison between the rule-based baseline and the LLM-assisted detector (per viewpoint).}
+\label{tab:detection_performance_by_viewpoint}
+\footnotesize
+\begin{tabular}{lcccc}
+\hline
+\textbf{Method} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} \\
+\hline
+domain-Rule-based (Static) & 0.70 & 0.10 & 0.57 & 0.17 \\
+domain-default-text-large & 0.96 & 1.00 & 0.29 & 0.44 \\
+domain-Mistral Small 3.2 24B Instruct & 0.95 & 0.67 & 0.29 & 0.40 \\
+domain-OpenAI GPT-OSS-120B & 0.97 & 0.80 & 0.57 & 0.67 \\
+\hline
+information-Rule-based (Static) & 0.83 & 0.23 & 1.00 & 0.38 \\
+information-default-text-large & 0.83 & 0.23 & 1.00 & 0.38 \\
+information-Mistral Small 3.2 24B Instruct & 1.00 & 1.00 & 1.00 & 1.00 \\
+information-OpenAI GPT-OSS-120B & 1.00 & 1.00 & 1.00 & 1.00 \\
+\hline
+computational-Rule-based (Static) & 1.00 & 0.00 & 0.00 & 0.00 \\
+computational-default-text-large & 1.00 & 0.00 & 0.00 & 0.00 \\
+computational-Mistral Small 3.2 24B Instruct & 1.00 & 0.00 & 0.00 & 0.00 \\
+computational-OpenAI GPT-OSS-120B & 1.00 & 0.00 & 0.00 & 0.00 \\
+\hline
+engineering-Rule-based (Static) & 0.80 & 0.00 & 0.00 & 0.00 \\
+engineering-default-text-large & 0.80 & 0.00 & 0.00 & 0.00 \\
+engineering-Mistral Small 3.2 24B Instruct & 0.80 & 0.00 & 0.00 & 0.00 \\
+engineering-OpenAI GPT-OSS-120B & 1.00 & 0.00 & 0.00 & 0.00 \\
+\hline
+technology-Rule-based (Static) & 0.88 & 0.46 & 1.00 & 0.63 \\
+technology-default-text-large & 0.90 & 0.52 & 1.00 & 0.69 \\
+technology-Mistral Small 3.2 24B Instruct & 0.93 & 0.61 & 1.00 & 0.76 \\
+technology-OpenAI GPT-OSS-120B & 1.00 & 1.00 & 1.00 & 1.00 \\
+\hline
+\end{tabular}
+\end{table}

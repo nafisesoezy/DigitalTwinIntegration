@@ -1,0 +1,166 @@
+NCOM1.3:
+  title: "NCAR Community Ocean Model version 1.3 (NCOM1.3)"
+  unique_identifier: "NCOM1.3_2013"
+  model_version: "v1.3"
+
+  description: >
+    Three-dimensional ocean general circulation model simulating currents, temperature, salinity, mixing,
+    and sea ice in the CanESM2 framework. Acts as the ocean component coupled to CanAM4 via the internal
+    CanESM2 coupler, receiving atmospheric surface forcing and returning sea surface state and sea-ice fields.
+
+  keywords:
+    - Ocean model
+    - OGCM
+    - Climate model
+    - CanESM2
+    - Marine processes
+
+  model_type: "Mechanistic"
+  scope: "Global ocean circulation"
+
+  purpose_pattern:
+    purpose: "Simulate large-scale oceanic processes and storage of heat and freshwater in coupled climate modeling"
+    pattern: "Grid-based ocean GCM with vertical mixing schemes and loose coupling to atmosphere via coupler"
+
+  assumptions:
+    - "Boussinesq and hydrostatic approximations"
+    - "No explicit tides or coastal fine-scale processes in standard global configurations"
+    - "Bulk formulae for air–sea fluxes received from atmosphere via coupler"
+
+  dimensionality: "3D"
+  spatial_extent: "Global ocean"
+  spatial_resolution: "1.4° × 1.4°, 40 vertical levels"
+  variable_spatial_resolution: false
+
+  temporal_extent: "Multi-decadal climate integrations"
+  temporal_resolution: "Hourly to daily model time steps"
+  variable_temporal_resolution: false
+
+  calibration_tools_data: "Tuned against ocean reanalysis products, climatological temperature/salinity, and heat-content observations"
+
+  publications:
+    - "Fyfe et al., 2013"
+
+  conceptual_evaluation: "Used as the ocean component in CanESM2 CMIP5 simulations"
+  validation_capabilities: "Evaluated against observed ocean heat content, SST, and large-scale circulation patterns"
+
+  sensitivity_analysis: "Supported via coupled perturbation experiments and parameter variations"
+  uncertainty_analysis: "Exploration of long-term variability under different forcing scenarios"
+
+  conceptual_consistency_mismatch: >
+    Consistent with a coarse-resolution OGCM coupled to a hydrostatic AGCM via bulk fluxes. Potential
+    mismatches appear if flux conventions, masks, or sea-ice treatments differ between atmosphere and
+    ocean grids without proper coupler adjustments.
+
+  provenance_and_accessibility_gap: >
+    Described in CanESM2 and Fyfe et al. (2013) documentation; however, detailed source, namelists,
+    and coupling configuration files are institutionally controlled and not openly distributed.
+
+  license: "Institutional (CCCma/NCAR as embedded in CanESM2)"
+  license_incompatibility: "proprietary"
+
+  landing_page: "https://climate-modelling.canada.ca/"
+  distribution_version: "v1.3"
+
+  programming_language:
+    - "Fortran"
+  programming_language_family:
+    - "Native_C_CPP_Fortran_Family"
+
+  software_requirements:
+    description: "Compiled as part of CanESM2 with MPI, NetCDF, and internal coupler support"
+    ffi_family:
+      - "Native_C_CPP_Fortran_Family"
+    io_libraries:
+      - "NetCDF4_Family"
+    database_libraries: []
+
+  hardware_requirements: "HPC / supercomputing system required for long coupled runs"
+
+  execution_instructions: >
+    Run as the ocean component of CanESM2 under the coupled driver; configuration and forcing
+    supplied via CanESM2 experiment setup scripts and namelists.
+
+  parallel_execution: true
+
+  implementation_verification: "Validated within CanESM2 Earth system simulations and long control runs"
+  source_code_availability: false
+
+  active_edge_io_checks:
+    format:
+      - "netcdf"
+    whole_model_information_fields: >
+      Conservation checks for heat, freshwater, and momentum; consistency checks for sea-ice
+      concentration/thickness and mixed-layer depth; coupler diagnostics at the ocean–atmosphere interface.
+
+  data_evaluation: >
+    Comparison of SST, SSS, ocean heat content, and large-scale currents to reanalysis datasets and
+    observational products; monitoring of drift and long-term stability.
+
+  input:
+    description: >
+      Atmospheric surface forcing from CanAM4 exchanged via the CanESM2 internal coupler, including
+      momentum, heat, and freshwater fluxes and related surface fields.
+    format:
+      - "netcdf"
+      - "in-memory (coupler exchange)"
+    variables:
+      - "Surface wind stress (tau_x, tau_y)"
+      - "10 m wind (u10, v10) OPTIONAL"
+      - "Net shortwave radiation at surface (SW_down)"
+      - "Net longwave radiation at surface (LW_down)"
+      - "Sensible heat flux (Q_sens)"
+      - "Latent heat flux (Q_lat)"
+      - "Precipitation rate (P)"
+      - "Evaporation rate (E)"
+      - "Freshwater flux (P_minus_E)"
+      - "Runoff flux (R) OPTIONAL"
+      - "Mean sea level pressure (MSLP)"
+      - "Downwelling PAR at surface OPTIONAL"
+    units: "N m⁻²; m s⁻¹; W m⁻²; W m⁻²; W m⁻²; W m⁻²; kg m⁻² s⁻¹; kg m⁻² s⁻¹; kg m⁻² s⁻¹; kg m⁻² s⁻¹; hPa; W m⁻²"
+
+  integrated_input:
+    - uid: "CanAM4_2013"
+      version: "v4"
+      description: "Atmospheric surface fluxes and pressure forcing for ocean surface boundary conditions via CanESM2 coupler"
+
+  output:
+    format:
+      - "netcdf"
+      - "in-memory (to coupler)"
+    variables:
+      - "Sea surface temperature (SST)"
+      - "Sea surface salinity (SSS)"
+      - "Ocean surface currents (u_ocean, v_ocean)"
+      - "Sea surface height (SSH)"
+      - "Sea ice concentration (SIC)"
+      - "Sea ice thickness (SITh)"
+    units: "°C, PSU, m s⁻¹, m, 0–1 (fraction), m"
+    verification: "Compared with reanalysis ocean datasets and climatologies"
+    corroboration: ""
+
+  integration:
+    pattern: 
+    submodels: []
+    execution_constraints: >
+      Consistent coupling timestep with CanAM4; conservative flux coupling; identical calendars
+      and simulation periods; ocean advances on its own timestep between coupling calls.
+    acknowledgment: >
+      Users should acknowledge CCCma/CanESM2 and Fyfe et al. (2013) when using coupled ocean results.
+    latency_expectations: "Exchange each coupling step via internal coupler; MPI-based, low latency relative to model timestep."
+    data_synchronization: >
+      Loose, coupler-mediated synchronization: ocean receives atmospheric fluxes and returns surface
+      state at each coupling barrier; fields are remapped between atmospheric and oceanic grids.
+
+  communication_mechanism: >
+    MPI/in-memory communication through the CanESM2 coupler with synchronous barriers at each
+    coupling interval; components integrate independently between coupler calls.
+
+  error_handling: >
+    Tracer bounds checks, CFL and stability diagnostics, and restart capability; coupler aborts or
+    warnings if flux or state fields contain NaNs or inconsistencies.
+
+  authors:
+    - name: "Fyfe, J.C."
+      orcid: ""
+      role: "Coupled modeling"

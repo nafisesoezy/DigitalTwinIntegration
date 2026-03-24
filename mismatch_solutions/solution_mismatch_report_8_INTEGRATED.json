@@ -1,0 +1,119 @@
+{
+  "summary": {
+    "group": "8",
+    "ab_kind": "INTEGRATED",
+    "num_rows_seen": 8,
+    "num_real_mismatches": 2,
+    "num_not_a_mismatch": 6,
+    "risk_level": "medium"
+  },
+  "mismatch_triage": [
+    {
+      "row_ref": "hardware_specification_and_requirements||hardware resource mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "A_value and B_value are incompatible due to different hardware specifications."
+    },
+    {
+      "row_ref": "software_specification_and_requirements||software environment mismatch",
+      "decision": "REAL_MISMATCH",
+      "justification": "A_value and B_value are incompatible due to different software requirements."
+    },
+    {
+      "row_ref": "assumptions||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The differences in assumptions are not incompatible for integration."
+    },
+    {
+      "row_ref": "model version||semantic mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The version differences are minor and do not affect integration."
+    },
+    {
+      "row_ref": "spatial_extent_coverage||spatial coverage mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The spatial coverage is compatible for integration."
+    },
+    {
+      "row_ref": "spatial_resolution||spatial resolution mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The spatial resolution is compatible for integration."
+    },
+    {
+      "row_ref": "temporal_extent_coverage||temporal coverage mismatch",
+      "decision": "NOT_A_MISMATCH",
+      "justification": "The temporal coverage is compatible for integration."
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "F1",
+      "field": "hardware_specification_and_requirements",
+      "bottleneck": "hardware resource mismatch",
+      "root_cause": "Different hardware specifications",
+      "evidence": {
+        "A_value": "hpc system",
+        "B_value": "hpc recommended for global runs"
+      },
+      "why_it_blocks_integration": "The hardware specifications are not compatible, which can lead to performance issues or failures in integration.",
+      "proposed_fix": "Standardize the hardware specifications to ensure compatibility.",
+      "data_transform": {
+        "rules": [
+          "Standardize hardware specifications"
+        ],
+        "example": "Use a common hardware configuration for both models."
+      },
+      "runtime_orchestration": {
+        "pattern": "Standardization",
+        "steps": [
+          "Identify common hardware configuration",
+          "Update hardware specifications",
+          "Test integration with new configuration"
+        ]
+      },
+      "yaml_patches": {
+        "A": "hardware_specification_and_requirements: hpc recommended for global runs",
+        "B": "hardware_specification_and_requirements: hpc recommended for global runs",
+        "AB": ""
+      },
+      "validation": [
+        "Test performance with standardized hardware",
+        "Ensure compatibility with both models"
+      ]
+    },
+    {
+      "id": "F2",
+      "field": "software_specification_and_requirements",
+      "bottleneck": "software environment mismatch",
+      "root_cause": "Different software requirements",
+      "evidence": {
+        "A_value": "netcdf, mpi, fortran compiler",
+        "B_value": "runs within nemo framework"
+      },
+      "why_it_blocks_integration": "The software requirements are not compatible, which can lead to integration failures or performance issues.",
+      "proposed_fix": "Standardize the software requirements to ensure compatibility.",
+      "data_transform": {
+        "rules": [
+          "Standardize software requirements"
+        ],
+        "example": "Use a common software configuration for both models."
+      },
+      "runtime_orchestration": {
+        "pattern": "Standardization",
+        "steps": [
+          "Identify common software configuration",
+          "Update software specifications",
+          "Test integration with new configuration"
+        ]
+      },
+      "yaml_patches": {
+        "A": "software_specification_and_requirements: runs within nemo framework",
+        "B": "software_specification_and_requirements: runs within nemo framework",
+        "AB": ""
+      },
+      "validation": [
+        "Test integration with standardized software",
+        "Ensure compatibility with both models"
+      ]
+    }
+  ]
+}
