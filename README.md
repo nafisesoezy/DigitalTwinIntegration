@@ -42,9 +42,6 @@ Results*.py
 figs/ and Figures/
     Generated evaluation figures and visualizations.
 
-removed/
-    Earlier candidate metadata descriptions retained for provenance and not
-    included in the evaluated corpus.
 ```
 
 Earlier implementation and analysis scripts are retained for provenance. The files listed above represent the main components corresponding to the current framework and evaluation.
