@@ -6,7 +6,9 @@ hybrid_evaluate.py
 Replaces `llm_mismatch_solver_basedonMismatchReport_v3.py` (aka
 `all_llm_triage.py` in the README). Implements Stage 2 of Algorithm 1
 ("Pattern-aware and LLM-assisted compatibility assessment", Section 4.3)
-properly:
+as the two GENUINELY SEPARATE LLM calls shown in Fig. `lst:compatibility_prompt`
+("Two-stage prompt templates for LLM-assisted compatibility evaluation,
+explanation, and adaptation recommendation"):
 
   * Every instantiated constraint's EvaluationMode is PREDEFINED by its
     ConstraintTemplate (constraint_templates.py) -- Deterministic or
@@ -19,21 +21,27 @@ properly:
     No LLM call is needed to determine it. By default the local, rule-
     generated explanation/adaptation are kept (cheap, always available);
     set REASON_DETERMINISTIC_VIA_LLM=1 to additionally run these rows
-    through the LLM-Assisted Reasoner for a more natural-language
-    explanation -- this can never change the verdict (Algorithm 1, line
-    "LLM_AssistedReason(r, ctx_r, v)" has no verdict field to return).
+    through the SAME Stage 2 prompt used below, for a more natural-language
+    explanation -- this can never change the verdict (Stage 2 is only ever
+    given a fixed verdict to explain, and has no way to return a different
+    one).
 
-  * LLMAssisted-mode rows: the LLM independently determines Match / Mismatch
-    / Gap FROM THE EVIDENCE (constraint template + A/B/AB values), not by
-    re-triaging a rule-based guess. This is the key behavioral difference
-    from the old all_llm_triage.py, which only ever confirmed-or-overturned
-    rows the rule engine had already labeled "Mismatch", never touched
-    rule-labeled "Match" rows, and never produced "Gap" at all.
-    The evaluator call and the reasoner call are combined into ONE JSON
-    request per row for efficiency (same retry/chunking machinery as the
-    original script), but the response schema keeps `verdict` (evaluator)
-    and `explanation`/`adaptation` (reasoner) as separate fields so the
-    conceptual separation in Algorithm 1 is still visible in the output.
+  * LLMAssisted-mode rows go through two SEPARATE calls, matching the
+    figure exactly:
+      Stage 1 - Compatibility Evaluation: given constraint, criterion,
+        model_a_evidence, model_b_evidence, is_requirements, returns ONLY
+        a verdict (Match/Mismatch/Gap). Nothing else is asked for or
+        returned at this stage.
+      Stage 2 - Explanation and Adaptation: given the SAME evidence PLUS
+        the fixed verdict from Stage 1, returns an explanation and (for
+        Mismatch) an adaptation / (for Gap) the missing information
+        required / (for Match) "no adaptation required".
+    Stage 2 cannot change the verdict Stage 1 produced -- it is not even
+    given the option to return one. This is the key behavioral difference
+    from the earlier combined-call design (and from the original
+    all_llm_triage.py, which only ever confirmed-or-overturned rows the
+    rule engine had already labeled "Mismatch", never touched rule-labeled
+    "Match" rows, and never produced "Gap" at all).
 
   * "Execution Constraint Compatibility" (Appendix Table, RuntimeLevel,
     LLMAssisted) and "Execution Ordering Compatibility" (Deterministic) both
@@ -43,6 +51,12 @@ properly:
     additional LLMAssisted "Execution Constraint Compatibility" row from the
     same evidence, per constraint_templates.EXTRA_LLM_TEMPLATES below.
 
+Field names sent to the LLM match the figure literally: `constraint`,
+`criterion`, `model_a_evidence`, `model_b_evidence`, `is_requirements` (Stage
+2 additionally receives `verdict`). `pattern` is also included as extra
+context (the figure omits it, but Section 4's pattern-aware instantiation
+depends on it) -- it does not appear in either stage's OUTPUT.
+
 Env vars (same names/semantics as the script this replaces):
   LLM_BASE_URL, LLM_API_KEY, LLM_CHAT_ENDPOINT
   MATCH_REPORT_PATH            (default: match_report.csv -- the enriched
@@ -51,15 +65,15 @@ Env vars (same names/semantics as the script this replaces):
   LLM_CHUNK_SIZE, LLM_TIMEOUT_S, LLM_MAX_RETRIES
   LLM_MODELS                   (optional comma-separated override)
   REASON_DETERMINISTIC_VIA_LLM (default "0"; set "1" to also run
-                                 Deterministic-mode rows through the LLM
-                                 reasoner for a natural-language explanation)
+                                 Deterministic-mode rows through the Stage 2
+                                 prompt for a natural-language explanation)
 
 Output columns added per model <m>:
-  LLM-result-<m>        verdict:      Match | Mismatch | Gap | Error
-  LLM-explanation-<m>   reasoner output (why)
-  LLM-suggestion-<m>    reasoner output (candidate adaptation) -- kept under
-                        this name for backward compatibility with scripts
-                        that already read "LLM-suggestion-*"
+  LLM-result-<m>        Stage 1 verdict:  Match | Mismatch | Gap | Error
+  LLM-explanation-<m>   Stage 2 output (why)
+  LLM-suggestion-<m>    Stage 2 output (adaptation / required information) --
+                        kept under this name for backward compatibility with
+                        scripts that already read "LLM-suggestion-*"
 """
 
 import os
@@ -104,67 +118,61 @@ EXTRA_LLM_TEMPLATES: List[Tuple[str, str, str]] = [
 
 
 # =========================
-# Prompt: LLM-Assisted Evaluator + Reasoner, combined per row
+# Prompts: Stage 1 (evaluation) and Stage 2 (explanation + adaptation),
+# genuinely separate calls, matching Fig. lst:compatibility_prompt.
 # =========================
-EVAL_PROMPT_TEMPLATE = """You are a Digital Twin integration engineer applying ONE predefined \
-compatibility constraint template to evidence extracted from two candidate models (A, B) and an \
-integration specification/realized model (AB). The constraint's evaluation mode has ALREADY been \
-decided to be LLM-assisted (semantic/contextual interpretation required) -- you are not choosing \
-whether to use a rule or an LLM, you ARE the evaluator for this constraint.
+STAGE1_PROMPT_TEMPLATE = """Stage 1 - Compatibility Evaluation
 
-For each row you are given:
-  - constraint_template: the name of the compatibility condition to assess
-  - field / required_check: what the condition requires
-  - A_value / B_value / AB_value: the relevant evidence extracted from each model's metadata
-  - pattern: the selected integration pattern (One-Way, Loose, Shared, Integrated, Embedded)
+You are assessing the compatibility of two models for an intended Digital Twin integration.
 
-Assess the compatibility condition using ONLY the supplied evidence. Do not infer or assume
-model properties that are not provided. If the evidence needed to decide is missing or
-insufficient, you MUST return "Gap" -- never guess a Match or Mismatch to fill the gap.
+Each item below gives:
+  constraint: the compatibility condition to assess
+  criterion: the evaluation criterion
+  model_a_evidence: the relevant evidence extracted from Model A's metadata
+  model_b_evidence: the relevant evidence extracted from Model B's metadata
+  is_requirements: the relevant requirement from the integration specification / realized model
+  pattern: the selected integration pattern (context only; not part of the verdict rule)
 
-Task, for EACH row:
-1) Determine a verdict:
-   - "Match": the evidence is sufficient and shows the condition IS satisfied.
-   - "Mismatch": the evidence is sufficient and shows the condition is NOT satisfied.
-   - "Gap": the evidence is absent or insufficient to decide either way.
-   Only classify "Mismatch" when the values are genuinely incompatible for the stated
-   constraint (not merely differently worded). If A_value or B_value is empty/missing,
-   that is normally a "Gap", not a "Mismatch".
-2) Give a short (1-2 sentence) explanation for the verdict.
-3) If (and only if) the verdict is "Mismatch", give a concrete candidate adaptation
-   (a mediation/conversion/orchestration step that would resolve it). For "Match" say
-   "No adaptation required." For "Gap" say what missing metadata is needed.
+Assess the compatibility condition using only the supplied evidence.
+Do not infer or assume model properties that are not provided. If the evidence
+needed to decide is missing or insufficient, you MUST return "Gap" -- never
+guess a Match or Mismatch to fill the gap.
 
-The verdict you return is authoritative for this constraint (this is the LLM-Assisted
-Evaluator step). The explanation/adaptation are the LLM-Assisted Reasoner step, reported
-alongside it -- they never change a verdict that was fixed elsewhere; here there is no
-other verdict since this row's evaluation mode is LLM-assisted.
+Return:
+- Match: sufficient evidence shows the condition is satisfied.
+- Mismatch: sufficient evidence shows the condition is not satisfied.
+- Gap: evidence is missing or insufficient.
 
 Return ONLY valid JSON, no markdown, no prose outside the JSON:
 {
   "results": [
-    {
-      "row_ref": "<copy the row_ref field exactly as given>",
-      "verdict": "Match|Mismatch|Gap",
-      "explanation": "...",
-      "adaptation": "..."
-    }
+    {"row_ref": "<copy the row_ref field exactly as given>", "verdict": "Match|Mismatch|Gap"}
   ]
 }
 
-Rows (JSON array):
+Items (JSON array):
 <<ROWS_JSON>>
 """
 
-# Lighter prompt used only when REASON_DETERMINISTIC_VIA_LLM=1: verdict is
-# fixed and given; the LLM only rewrites the explanation/adaptation in
-# natural language. It is explicitly told it cannot change the verdict.
-REASON_ONLY_PROMPT_TEMPLATE = """You are writing the human-readable explanation for compatibility \
-verdicts that were ALREADY DETERMINED by a deterministic rule engine. You may NOT change any verdict. \
-For each row, given constraint_template, the evidence, and the fixed verdict, write:
-  - "explanation": a short (1-2 sentence) explanation of why that verdict follows from the evidence.
-  - "adaptation": if verdict=="Mismatch", a concrete candidate adaptation; if verdict=="Match", \
-"No adaptation required."; if verdict=="Gap", what missing metadata is needed.
+STAGE2_PROMPT_TEMPLATE = """Stage 2 - Explanation and Adaptation
+
+You are explaining the result of a compatibility assessment. The verdict for each item was
+ALREADY DETERMINED in Stage 1 and is given to you fixed -- you may NOT change it here.
+
+Each item below gives:
+  constraint: the compatibility condition that was assessed
+  criterion: the evaluation criterion
+  model_a_evidence: the relevant evidence extracted from Model A's metadata
+  model_b_evidence: the relevant evidence extracted from Model B's metadata
+  is_requirements: the relevant requirement from the integration specification / realized model
+  verdict: the fixed Stage 1 assessment verdict (Match | Mismatch | Gap)
+
+Using only the supplied evidence, explain why the given verdict applies.
+Do not infer or assume model properties that are not provided.
+
+If Mismatch, recommend an adaptation to address the incompatibility.
+If Gap, identify the additional information required.
+If Match, no adaptation is required.
 
 Return ONLY valid JSON:
 {
@@ -173,7 +181,7 @@ Return ONLY valid JSON:
   ]
 }
 
-Rows (JSON array, each already includes its fixed "verdict"):
+Items (JSON array, each includes its fixed verdict):
 <<ROWS_JSON>>
 """
 
@@ -235,23 +243,34 @@ def call_llm_json(model: str, prompt: str, timeout_s: int, max_retries: int) -> 
 
 
 # =========================
-# Row preparation
+# Row preparation -- maps this pipeline's internal column names onto the
+# figure's field names (constraint / criterion / model_a_evidence /
+# model_b_evidence / is_requirements) for everything sent to the LLM.
 # =========================
-EVIDENCE_COLS = ["constraint_template", "field", "required_check", "pattern",
-                  "A_value", "B_value", "AB_value", "detail"]
-
-
 def _row_ref(idx: int) -> str:
     return f"row-{idx}"
 
 
-def _row_payload(idx: int, r: pd.Series, fixed_verdict: Optional[str] = None) -> Dict[str, Any]:
-    d = {"row_ref": _row_ref(idx)}
-    for c in EVIDENCE_COLS:
-        v = r.get(c, "")
-        d[c] = "" if pd.isna(v) else str(v)[:400]
-    if fixed_verdict is not None:
-        d["verdict"] = fixed_verdict
+def _clip(v: Any) -> str:
+    return "" if pd.isna(v) else str(v)[:400]
+
+
+def _stage1_payload(idx: int, r: pd.Series) -> Dict[str, Any]:
+    return {
+        "row_ref": _row_ref(idx),
+        "constraint": _clip(r.get("constraint_template", "")),
+        "criterion": _clip(r.get("required_check", "")),
+        "model_a_evidence": _clip(r.get("A_value", "")),
+        "model_b_evidence": _clip(r.get("B_value", "")),
+        "is_requirements": _clip(r.get("AB_value", "")),
+        "pattern": _clip(r.get("pattern", "")),
+    }
+
+
+def _stage2_payload(idx: int, r: pd.Series, verdict: str) -> Dict[str, Any]:
+    d = _stage1_payload(idx, r)
+    d.pop("pattern", None)
+    d["verdict"] = verdict
     return d
 
 
@@ -276,7 +295,7 @@ def synthesize_extra_llm_rows(df: pd.DataFrame) -> pd.DataFrame:
             new_r["rm_odp_viewpoint"] = tmpl.viewpoint
             new_r["evaluation_mode"] = tmpl.evaluation_mode
             new_r["in_paper_appendix"] = True
-            new_r["verdict"] = ""       # to be determined by the LLM evaluator
+            new_r["verdict"] = ""       # to be determined by Stage 1
             new_r["explanation"] = ""
             new_r["adaptation"] = ""
             extra_rows.append(new_r)
@@ -288,6 +307,63 @@ def synthesize_extra_llm_rows(df: pd.DataFrame) -> pd.DataFrame:
 def _all_templates_by_name():
     from constraint_templates import all_templates
     return all_templates()
+
+
+# =========================
+# Stage 1 / Stage 2 call helpers (batched, chunked, retried)
+# =========================
+def _run_stage1(df_out: pd.DataFrame, model: str, idx: List[int], col_result: str) -> None:
+    """Compatibility Evaluation: returns ONLY a verdict per row."""
+    for start in range(0, len(idx), LLM_CHUNK_SIZE):
+        chunk = idx[start:start + LLM_CHUNK_SIZE]
+        payload_rows = [_stage1_payload(i, df_out.loc[i]) for i in chunk]
+        prompt = STAGE1_PROMPT_TEMPLATE.replace("<<ROWS_JSON>>", json.dumps(payload_rows, ensure_ascii=False))
+
+        try:
+            solution = call_llm_json(model, prompt, LLM_TIMEOUT_S, LLM_MAX_RETRIES) or {}
+        except Exception as e:
+            for i in chunk:
+                df_out.at[i, col_result] = "Error"
+            print(f"[error] [{model}] Stage 1 chunk starting at {start} failed: {e}")
+            continue
+
+        by_ref = {str(item.get("row_ref", "")).strip(): item for item in (solution.get("results") or [])}
+        for i in chunk:
+            item = by_ref.get(_row_ref(i))
+            if not item:
+                df_out.at[i, col_result] = "Gap"
+                continue
+            verdict = str(item.get("verdict", "")).strip() or "Gap"
+            if verdict not in ("Match", "Mismatch", "Gap"):
+                verdict = "Gap"
+            df_out.at[i, col_result] = verdict
+
+
+def _run_stage2(df_out: pd.DataFrame, model: str, idx: List[int], verdict_col: str,
+                col_expl: str, col_sugg: str) -> None:
+    """Explanation and Adaptation: given a FIXED verdict, returns explanation + adaptation."""
+    idx = [i for i in idx if df_out.at[i, verdict_col] not in ("", "Error")]
+    for start in range(0, len(idx), LLM_CHUNK_SIZE):
+        chunk = idx[start:start + LLM_CHUNK_SIZE]
+        payload_rows = [_stage2_payload(i, df_out.loc[i], df_out.at[i, verdict_col]) for i in chunk]
+        prompt = STAGE2_PROMPT_TEMPLATE.replace("<<ROWS_JSON>>", json.dumps(payload_rows, ensure_ascii=False))
+
+        try:
+            solution = call_llm_json(model, prompt, LLM_TIMEOUT_S, LLM_MAX_RETRIES) or {}
+        except Exception as e:
+            for i in chunk:
+                df_out.at[i, col_expl] = f"Stage 2 call failed: {e}"
+            print(f"[warn] [{model}] Stage 2 chunk starting at {start} failed: {e} (keeping any existing explanation)")
+            continue
+
+        by_ref = {str(item.get("row_ref", "")).strip(): item for item in (solution.get("results") or [])}
+        for i in chunk:
+            item = by_ref.get(_row_ref(i))
+            if not item:
+                df_out.at[i, col_expl] = df_out.at[i, col_expl] or "No Stage 2 response returned for this row."
+                continue
+            df_out.at[i, col_expl] = str(item.get("explanation", "")).strip()
+            df_out.at[i, col_sugg] = str(item.get("adaptation", "")).strip()
 
 
 # =========================
@@ -310,7 +386,7 @@ def run_one_model(df_out: pd.DataFrame, model: str) -> None:
     det_idx = [i for i, r in df_out.iterrows() if r.get("evaluation_mode") == "Deterministic"]
     llm_idx = [i for i, r in df_out.iterrows() if r.get("evaluation_mode") == "LLMAssisted"]
 
-    # --- Deterministic rows: verdict is NOT re-decided by the LLM. ---
+    # --- Deterministic rows: verdict is fixed by the rule engine, not Stage 1/2. ---
     for i in det_idx:
         r = df_out.loc[i]
         df_out.at[i, col_result] = r.get("verdict", "")
@@ -318,61 +394,15 @@ def run_one_model(df_out: pd.DataFrame, model: str) -> None:
         df_out.at[i, col_sugg] = r.get("adaptation", "")
 
     if REASON_DETERMINISTIC_VIA_LLM and det_idx:
-        _run_reason_only(df_out, model, det_idx, col_expl, col_sugg)
+        _run_stage2(df_out, model, det_idx, col_result, col_expl, col_sugg)
 
-    # --- LLMAssisted rows: verdict IS determined by the LLM, from evidence. ---
+    # --- LLMAssisted rows: Stage 1 (verdict), then Stage 2 (explanation/adaptation). ---
     if not llm_idx:
         print(f"[info] [{model}] No LLM-assisted rows to evaluate.")
         return
 
-    for start in range(0, len(llm_idx), LLM_CHUNK_SIZE):
-        chunk = llm_idx[start:start + LLM_CHUNK_SIZE]
-        payload_rows = [_row_payload(i, df_out.loc[i]) for i in chunk]
-        prompt = EVAL_PROMPT_TEMPLATE.replace("<<ROWS_JSON>>", json.dumps(payload_rows, ensure_ascii=False))
-
-        try:
-            solution = call_llm_json(model, prompt, LLM_TIMEOUT_S, LLM_MAX_RETRIES) or {}
-        except Exception as e:
-            for i in chunk:
-                df_out.at[i, col_result] = "Error"
-                df_out.at[i, col_expl] = f"LLM call failed: {e}"
-                df_out.at[i, col_sugg] = ""
-            print(f"[error] [{model}] chunk starting at {start} failed: {e}")
-            continue
-
-        by_ref = {str(item.get("row_ref", "")).strip(): item for item in (solution.get("results") or [])}
-        for i in chunk:
-            ref = _row_ref(i)
-            item = by_ref.get(ref)
-            if not item:
-                df_out.at[i, col_result] = "Gap"
-                df_out.at[i, col_expl] = "No LLM response returned for this row."
-                df_out.at[i, col_sugg] = ""
-                continue
-            verdict = str(item.get("verdict", "")).strip() or "Gap"
-            if verdict not in ("Match", "Mismatch", "Gap"):
-                verdict = "Gap"
-            df_out.at[i, col_result] = verdict
-            df_out.at[i, col_expl] = str(item.get("explanation", "")).strip()
-            df_out.at[i, col_sugg] = str(item.get("adaptation", "")).strip()
-
-
-def _run_reason_only(df_out: pd.DataFrame, model: str, det_idx: List[int], col_expl: str, col_sugg: str) -> None:
-    for start in range(0, len(det_idx), LLM_CHUNK_SIZE):
-        chunk = det_idx[start:start + LLM_CHUNK_SIZE]
-        payload_rows = [_row_payload(i, df_out.loc[i], fixed_verdict=df_out.loc[i, "verdict"]) for i in chunk]
-        prompt = REASON_ONLY_PROMPT_TEMPLATE.replace("<<ROWS_JSON>>", json.dumps(payload_rows, ensure_ascii=False))
-        try:
-            solution = call_llm_json(model, prompt, LLM_TIMEOUT_S, LLM_MAX_RETRIES) or {}
-        except Exception as e:
-            print(f"[warn] [{model}] reasoner pass failed for chunk at {start}: {e} (keeping local explanation)")
-            continue
-        by_ref = {str(item.get("row_ref", "")).strip(): item for item in (solution.get("results") or [])}
-        for i in chunk:
-            item = by_ref.get(_row_ref(i))
-            if item:
-                df_out.at[i, col_expl] = str(item.get("explanation", "")).strip() or df_out.at[i, col_expl]
-                df_out.at[i, col_sugg] = str(item.get("adaptation", "")).strip() or df_out.at[i, col_sugg]
+    _run_stage1(df_out, model, llm_idx, col_result)
+    _run_stage2(df_out, model, llm_idx, col_result, col_expl, col_sugg)
 
 
 # =========================
