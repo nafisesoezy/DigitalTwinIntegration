@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Updated for the RM-ODP constraint-template pipeline (see README.md).
 import os
 import json
 import glob

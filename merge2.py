@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Updated for the RM-ODP constraint-template pipeline (see README.md).
 """
 Create allLLM_match_report_groundTruth.csv from allLLM_match_report.csv
 

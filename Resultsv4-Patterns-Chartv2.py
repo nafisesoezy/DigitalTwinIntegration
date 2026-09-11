@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Updated for the RM-ODP constraint-template pipeline (see README.md).
 """
 HEATMAP of MACRO-F1 per integration pattern (WITH MISSING FILE ONLY):
   - Input: allLLM_match_report_groundTruth.csv

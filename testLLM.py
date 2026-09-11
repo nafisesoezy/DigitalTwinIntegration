@@ -1,3 +1,4 @@
+# Updated for the RM-ODP constraint-template pipeline (see README.md).
 import os
 import requests
 

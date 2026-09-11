@@ -1,3 +1,4 @@
+# Updated for the RM-ODP constraint-template pipeline (see README.md).
 # Usage:
 #   python integration_bottleneckv6.py /path/to/dir_or_files... [--debug]
 # This is the deterministic rule engine (Stage 1 + the Deterministic half of

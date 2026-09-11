@@ -1,3 +1,4 @@
+# Updated for the RM-ODP constraint-template pipeline (see README.md).
 # Usage:
 #   python model_schema_matcher.py /path/to/dir_or_files... [--debug]
 # Scans YAMLs, groups by "<N>-<ROLE>-*.yaml", extracts metadata, infers AB pattern,

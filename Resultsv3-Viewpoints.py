@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Updated for the RM-ODP constraint-template pipeline (see README.md).
 """
 Per-viewpoint detection performance (Accuracy/Precision/Recall/F1) for:
   - Rule-based baseline (Static)
