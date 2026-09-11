@@ -118,6 +118,10 @@ For each row you are given:
   - A_value / B_value / AB_value: the relevant evidence extracted from each model's metadata
   - pattern: the selected integration pattern (One-Way, Loose, Shared, Integrated, Embedded)
 
+Assess the compatibility condition using ONLY the supplied evidence. Do not infer or assume
+model properties that are not provided. If the evidence needed to decide is missing or
+insufficient, you MUST return "Gap" -- never guess a Match or Mismatch to fill the gap.
+
 Task, for EACH row:
 1) Determine a verdict:
    - "Match": the evidence is sufficient and shows the condition IS satisfied.
