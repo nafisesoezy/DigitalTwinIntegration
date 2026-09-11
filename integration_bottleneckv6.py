@@ -1,7 +1,11 @@
 # Usage:
-#   python model_schema_matcher.py /path/to/dir_or_files... [--debug]
+#   python integration_bottleneckv6.py /path/to/dir_or_files... [--debug]
+# This is the deterministic rule engine (Stage 1 + the Deterministic half of
+# Stage 2, see README.md "Pipeline" for the full, accurate script order).
 # Scans YAMLs, groups by "<N>-<ROLE>-*.yaml", extracts metadata, infers AB pattern,
-# evaluates bottlenecks, writes "match_report.csv", and saves figures in ./figs
+# evaluates bottlenecks, writes "match_report.csv" (enriched with the
+# ConstraintTemplate/category/viewpoint/evaluation_mode columns from
+# constraint_templates.py), and saves figures in ./figs
 
 import os
 import re
@@ -19,6 +23,8 @@ import seaborn as sns
 from typing import List, Dict, Any, Tuple, Optional, Set, Iterable
 from dataclasses import dataclass, field
 from collections import defaultdict
+
+from constraint_templates import classify as classify_constraint
 
 
 
@@ -269,6 +275,11 @@ FIELD_ALIASES: Dict[str, List[str]] = {
     "landing_page": ["landing_page","homepage","url"],
     "distribution_version": ["distribution_version","package_version","release_version"],
     "file_formats": ["file_formats","formats","file_format"],
+    "operating_system": ["operating_system","os","supported_os","platform"],
+    "resampling_conversion_policies": [
+        "resampling_conversion_policies","resampling_policy","conversion_policy",
+        "resampling_policies","conversion_policies","unit_conversion","resampling"
+    ],
     # IO (kept for legacy logic)
     "input": ["input"],
     "output": ["output"],
@@ -696,6 +707,81 @@ def bottleneck_viewpoint(name: str) -> str:
         return "Engineering"
     return "Technology"
 
+# ============================================================
+# ConstraintTemplate enrichment (Section 4/5 alignment)
+# ============================================================
+#
+# Tags every rule-engine row with the ConstraintTemplate metadata from
+# constraint_templates.py (name, category, RM-ODP viewpoint, predefined
+# evaluation_mode -- see Algorithm 1 / Appendix Table
+# environmental_constraint_templates) and normalizes the free-text
+# "Missing" verdict to the paper's "Gap" vocabulary.
+#
+# For Deterministic-mode rows this ALSO fills `explanation`/`adaptation`
+# locally (no LLM call needed -- the verdict and its reasoning both come
+# from the explicit rule). For LLMAssisted-mode rows these two columns are
+# left blank here; hybrid_evaluate.py (Section 4.3's LLM-Assisted Evaluator
+# + LLM-Assisted Reasoner) fills them in a separate pass, using the SAME
+# LLM config as the rest of this pipeline.
+
+_DETERMINISTIC_ADAPTATION_HINTS: Dict[str, str] = {
+    "Unit Compatibility": "Apply a unit conversion between the declared source and target units before data exchange.",
+    "Dimensionality Compatibility": "Aggregate or disaggregate the exchanged variable to the dimensionality required by the receiving model.",
+    "Temporal Resolution Compatibility": "Resample the exchanged variable to the temporal resolution required by the receiving model.",
+    "Spatial Resolution Compatibility": "Regrid/aggregate the exchanged variable to the spatial resolution required by the receiving model.",
+    "Data Format Compatibility": "Introduce a file-format transformation step between the two models.",
+    "Execution Ordering Compatibility": "Adjust the invocation order/synchronization so it matches the dependency implied by the selected integration pattern.",
+    "Operating Environment Compatibility": "Containerize or provision a shared operating-system environment (e.g., a common Linux base image) for both models.",
+}
+
+def _local_explanation_and_adaptation(template_name: str, verdict: str, detail: str) -> Tuple[str, str]:
+    detail = detail or ""
+    if verdict == "Match":
+        return (f"Deterministic check: {detail}" if detail else "Deterministic check found no incompatibility.",
+                "No adaptation required.")
+    if verdict == "Gap":
+        return (f"Deterministic check: {detail}" if detail else "Required metadata is absent or insufficient to evaluate this constraint.",
+                "Provide the missing metadata field(s) for both models before this constraint can be assessed.")
+    # Mismatch
+    hint = _DETERMINISTIC_ADAPTATION_HINTS.get(
+        template_name,
+        "Introduce an explicit mediation/adaptation step to resolve this incompatibility before integration.")
+    return (f"Deterministic check: {detail}" if detail else "Deterministic check found an incompatibility.", hint)
+
+def enrich_with_templates(df: "pd.DataFrame") -> "pd.DataFrame":
+    """
+    Adds constraint_template / constraint_category / rm_odp_viewpoint /
+    evaluation_mode / verdict / explanation / adaptation columns to a rule-
+    engine report DataFrame (the schema produced by row()), using
+    constraint_templates.classify(). Existing columns (including the
+    original `result`, kept for backward compatibility with every other
+    script in this repo) are left untouched.
+    """
+    df = df.copy()
+    templates = df.apply(lambda r: classify_constraint(r["bottleneck"], r["field"]), axis=1)
+
+    df["constraint_template"] = templates.apply(lambda t: t.name if t else "(unregistered)")
+    df["constraint_category"] = templates.apply(lambda t: t.category if t else "")
+    df["rm_odp_viewpoint"] = templates.apply(lambda t: t.viewpoint if t else bottleneck_viewpoint(""))
+    df["evaluation_mode"] = templates.apply(lambda t: t.evaluation_mode if t else "")
+    df["in_paper_appendix"] = templates.apply(lambda t: bool(t and t.in_paper_appendix))
+
+    # Normalize verdict vocabulary: Missing -> Gap (paper's terminology).
+    df["verdict"] = df["result"].replace({"Missing": "Gap"})
+
+    explanations, adaptations = [], []
+    for _, r in df.iterrows():
+        if r["evaluation_mode"] == "Deterministic":
+            expl, adapt = _local_explanation_and_adaptation(r["constraint_template"], r["verdict"], r.get("detail", ""))
+        else:
+            # LLMAssisted rows: left for hybrid_evaluate.py's reasoner pass.
+            expl, adapt = "", ""
+        explanations.append(expl)
+        adaptations.append(adapt)
+    df["explanation"] = explanations
+    df["adaptation"] = adaptations
+    return df
+
 
 # ==== helpers used by the gradient rules (put above the 3 functions if needed) ====
 
@@ -916,14 +1002,148 @@ def check_information_viewpoint(group: str, a: ModelMeta, b: ModelMeta, ab: Opti
         av = "; ".join(a.fields.get(key, []))
         bv = "; ".join(b.fields.get(key, []))
         abv = "; ".join((ab.fields.get(key, []) if ab else []))
+        policy = "; ".join((ab.fields.get("resampling_conversion_policies", []) if ab else []))
         if not av or not bv:
             res, det = "Missing", "One or both sides missing metadata."
         else:
             sim = jaccard_token_similarity(av, bv)
-            res = "Match" if sim > 0 else "Mismatch"
-            det = f"A↔B token-sim={sim:.2f} (>0 ⇒ aligned)"
-        rows.append(row(group, label, key, pattern, "Common exchanged variables align semantically", av, bv, abv, det, res))
+            if sim > 0:
+                res, det = "Match", f"A<->B token-sim={sim:.2f} (>0 means aligned)"
+            elif policy:
+                # A and B differ, but the model attached as `ab` (the IS at
+                # prediction time, the realized AB at ground-truth time)
+                # documents a resampling/conversion step that bridges them.
+                # This is what makes the check genuinely depend on `ab`
+                # instead of silently reducing to an A-vs-B-only comparison
+                # (see constraint_templates.py / README "Known limitations"
+                # for why that mattered for ground-truth validity).
+                res, det = "Match", (f"A<->B token-sim={sim:.2f} (not aligned), but a resampling/"
+                                      f"conversion policy is declared: {policy}")
+            else:
+                res, det = "Mismatch", (f"A<->B token-sim={sim:.2f} (not aligned) and no "
+                                         f"resampling/conversion policy is declared.")
+        rows.append(row(group, label, key, pattern, "Common exchanged variables align semantically (or a declared conversion bridges them)", av, bv, abv, det, res))
     return rows
+
+# ---------- Unit Compatibility (Information viewpoint) ----------
+
+# Minimal unit-equivalence table: normalized spellings that denote the SAME
+# physical unit. Anything not in the same equivalence class is treated as a
+# genuine unit mismatch requiring conversion (e.g. the paper's FLake "degC"
+# vs PCLake+ "K" example). This is intentionally conservative -- it does not
+# attempt general unit algebra -- and is documented as such in the README.
+_UNIT_EQUIV_CLASSES: List[Set[str]] = [
+    {"c", "degc", "°c", "celsius", "degrees celsius", "deg c"},
+    {"k", "kelvin", "degrees kelvin"},
+    {"f", "degf", "°f", "fahrenheit"},
+    {"m", "meter", "meters", "metre", "metres"},
+    {"mm", "millimeter", "millimeters", "millimetre", "millimetres"},
+    {"m/s", "meters per second", "metres per second", "m s-1", "m s^-1"},
+    {"mm/day", "mm day-1", "millimeters per day", "millimetres per day"},
+    {"kg/m3", "kg m-3", "kilograms per cubic meter"},
+    {"mg/m2/day", "mg m-2 day-1", "mg/m^2/day"},
+    {"pa", "pascal", "pascals"},
+    {"hpa", "hectopascal", "hectopascals", "mbar", "millibar"},
+    {"%", "percent", "percentage"},
+]
+
+def _normalize_unit(u: str) -> str:
+    return re.sub(r"[\s\-_]+", " ", (u or "").strip().lower()).strip()
+
+def _units_equivalent(u1: str, u2: str) -> bool:
+    n1, n2 = _normalize_unit(u1), _normalize_unit(u2)
+    if not n1 or not n2:
+        return False
+    if n1 == n2:
+        return True
+    for cls in _UNIT_EQUIV_CLASSES:
+        if n1 in cls and n2 in cls:
+            return True
+    return False
+
+def _variable_unit_map(io: "IOSchema") -> Dict[str, str]:
+    """Best-effort pairing of io.variables[i] with io.units[i] by index."""
+    m: Dict[str, str] = {}
+    if not io or not io.variables:
+        return m
+    for i, v in enumerate(io.variables):
+        if i < len(io.units) and io.units[i]:
+            m[v] = io.units[i]
+    return m
+
+def check_unit_compatibility(group: str, a: ModelMeta, b: ModelMeta, ab: Optional[ModelMeta], pattern: str) -> List[Dict[str, Any]]:
+    """
+    Unit Compatibility (Appendix Table `environmental_constraint_templates`,
+    Information Alignment concern, Deterministic evaluation mode).
+    Required metadata: Source Output Unit; Target Input Unit.
+
+    Instantiated over the same activated data-flow edges as Data Schema
+    Mismatch / Variable Semantic Compatibility (Section 4.3.2), using the
+    variable pairs the semantic-overlap matcher already identified.
+    """
+    rows: List[Dict[str, Any]] = []
+
+    def compare_direction(src: ModelMeta, dst: ModelMeta, src_label: str, dst_label: str) -> None:
+        src_out, dst_in = src.outputs.variables, dst.inputs.variables
+        ok, pairs = any_semantic_overlap(src_out, dst_in)
+        if not pairs:
+            return  # no matched exchange on this edge; nothing to check
+        unit_src = _variable_unit_map(src.outputs)
+        unit_dst = _variable_unit_map(dst.inputs)
+        for (s_var, d_var, _score) in pairs:
+            u_s = unit_src.get(s_var, "")
+            u_d = unit_dst.get(d_var, "")
+            field_label = f"{src_label}.output({s_var}) -> {dst_label}.input({d_var})"
+            if not u_s or not u_d:
+                rows.append(row(group, "Unit Mismatch", field_label, pattern,
+                                 "Both sides must declare a unit for the exchanged variable",
+                                 u_s, u_d, "", "Unit not declared on one or both sides.", "Missing"))
+                continue
+            if _units_equivalent(u_s, u_d):
+                rows.append(row(group, "Unit Mismatch", field_label, pattern,
+                                 "Units must be equal or known-equivalent",
+                                 u_s, u_d, "", f"{u_s!r} ~ {u_d!r} (equivalent).", "Match"))
+            else:
+                rows.append(row(group, "Unit Mismatch", field_label, pattern,
+                                 "Units must be equal or known-equivalent",
+                                 u_s, u_d, "", f"{u_s!r} != {u_d!r} and not in a known-equivalent class; conversion required.", "Mismatch"))
+
+    patt = pattern or ""
+    compare_direction(a, b, "A", "B")
+    if patt in ("Loose", "Shared", "Integrated", "Embedded"):
+        compare_direction(b, a, "B", "A")
+    return rows
+
+# ---------- Operating Environment Compatibility (Technology viewpoint) ----------
+
+def check_operating_environment(group: str, a: ModelMeta, b: ModelMeta, ab: Optional[ModelMeta], pattern: str) -> List[Dict[str, Any]]:
+    """
+    Operating Environment Compatibility (Appendix Table
+    `environmental_constraint_templates`, Technological Compatibility
+    concern, Deterministic evaluation mode).
+    Required metadata: Operating System; Software Requirements.
+
+    NOTE (documented in README "Known limitations"): the current environmental
+    metadata corpus (modelsMetadataFullV3/*.yaml) does not populate an
+    Operating System field for the models checked in Section 6 -- this check
+    will legitimately return Gap for most/all of them until that metadata is
+    curated. That is itself a finding for the Technology-viewpoint
+    completeness discussion in Section 6.1, not a bug in this check.
+    """
+    key = "operating_system"
+    av = "; ".join(a.fields.get(key, []))
+    bv = "; ".join(b.fields.get(key, []))
+    if not av or not bv:
+        det = "Operating system not declared on one or both sides."
+        res = "Missing"
+    else:
+        sim = jaccard_token_similarity(av, bv)
+        if av == bv or sim > 0:
+            res, det = "Match", f"Supported operating systems overlap (A={av!r}, B={bv!r})."
+        else:
+            res, det = "Mismatch", f"Declared operating systems do not overlap (A={av!r}, B={bv!r})."
+    return [row(group, "Operating Environment Mismatch", key, pattern,
+                "Declared operating systems must overlap", av, bv, "", det, res)]
 
 # ---------- Computational ----------
 # ===================== COMPUTATIONAL (hardness increases by pattern) =====================
@@ -1304,9 +1524,11 @@ def evaluate_group(gid: str, A: ModelMeta, B: ModelMeta, AB: Optional[ModelMeta]
     rows += check_semantic_mismatch(gid, A, B, AB, pattern)
     rows += check_conceptual_quality_gap(gid, A, B, AB, pattern)
     rows += check_information_viewpoint(gid, A, B, AB, pattern)
+    rows += check_unit_compatibility(gid, A, B, AB, pattern)
     rows += check_computational(gid, A, B, AB, pattern)
     rows += check_engineering(gid, A, B, AB, pattern)
     rows += check_technology(gid, A, B, AB, pattern)
+    rows += check_operating_environment(gid, A, B, AB, pattern)
     return rows
 
 # ============================================================
@@ -3848,6 +4070,7 @@ def main(argv: List[str]) -> None:
         return
 
     df = pd.DataFrame(report_rows)
+    df = enrich_with_templates(df)
 
     # (optional) keep the global file
     out_csv = "match_report.csv"
@@ -3896,7 +4119,9 @@ def write_per_integration_mismatch_reports(
 
     required_cols = [
         "group", "bottleneck", "field", "pattern", "required_check",
-        "A_value", "B_value", "AB_value", "detail", "result", "ab_kind"
+        "A_value", "B_value", "AB_value", "detail", "result", "ab_kind",
+        "constraint_template", "constraint_category", "rm_odp_viewpoint",
+        "evaluation_mode", "verdict", "explanation", "adaptation", "in_paper_appendix",
     ]
 
     # Ensure all required columns exist (create empty ones if missing)
@@ -3933,7 +4158,9 @@ def write_per_integration_reports(
 
     required_cols = [
         "group", "bottleneck", "field", "pattern", "required_check",
-        "A_value", "B_value", "AB_value", "detail", "result", "ab_kind"
+        "A_value", "B_value", "AB_value", "detail", "result", "ab_kind",
+        "constraint_template", "constraint_category", "rm_odp_viewpoint",
+        "evaluation_mode", "verdict", "explanation", "adaptation", "in_paper_appendix",
     ]
     for c in required_cols:
         if c not in df.columns:

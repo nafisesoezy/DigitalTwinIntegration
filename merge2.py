@@ -2,9 +2,50 @@
 """
 Create allLLM_match_report_groundTruth.csv from allLLM_match_report.csv
 
+Ground-truth definition (Section 6.2.1 / 6.2.2 in the paper):
+  "These predictions are then compared with the metadata of the realized
+   integrated model (AB), which serves as the ground truth for integration
+   decisions."
+
+GROUND TRUTH MUST BE INDEPENDENT OF ANY LLM. Concretely: for each key =
+(group, field, bottleneck, pattern), the ground truth is the DETERMINISTIC
+rule engine's own `result` column (integration_bottleneckv6.py), evaluated
+on the row where ab_kind == 'INTEGRATED' -- i.e. the rule engine applied
+directly to the realized model's own declared metadata, not any model's
+opinion of it.
+
+IMPORTANT (previous version of this script): an earlier revision used
+'LLM-result-openai/gpt-oss-120b' as GT_SOURCE_COL. That made GPT-OSS-120B
+simultaneously (a) one of the methods being scored in Table
+detection_performance and (b) the source of the ground truth every method
+-- including itself -- was scored against. That is a validity bug, not a
+methodology choice: it mechanically biases Table 1 in GPT-OSS-120B's favor
+and makes the rule-based baseline and the other LLMs' scores partly a
+measure of agreement with GPT-OSS-120B rather than with the realized
+integration. GT_SOURCE_COL is fixed below to the deterministic 'result'
+column.
+
+Known residual limitation (read before trusting Table 1 numbers):
+Not every deterministic check in integration_bottleneckv6.py actually
+looks at the `ab` argument -- the `info_simple` loop inside
+check_information_viewpoint (Temporal Resolution / Spatial Resolution /
+Dimensionality / their Coverage counterparts) compares A directly to B and
+never touches `ab`. For those specific templates, `result` is IDENTICAL
+whether ab_kind is INTENDED or INTEGRATED, so using it as ground truth is
+tautological with the rule-based baseline's own prediction (the rule-based
+method will score ~100% on them by construction). Fixing this properly
+requires changing those checks to compare AB's own declared field value
+against the requiring side (B) plus its declared
+Resampling/Conversion Policy, matching the paper's Information-viewpoint
+schema (Table env_viewpoint_fields). See constraint_templates.py /
+"Known coverage gaps" and the accompanying write-up for the concrete
+per-template ground-truth rule this should become. Until that lands,
+treat scores on Temporal Resolution / Spatial Resolution / Dimensionality
+Compatibility as provisional.
+
 1) Add column 'groundTruth' using, for each key =
-   (group, field, bottleneck, pattern, required_check),
-   the value of 'LLM-result-openai/gpt-oss-120b' where ab_kind == 'INTEGRATED'.
+   (group, field, bottleneck, pattern),
+   the value of GT_SOURCE_COL where ab_kind == 'INTEGRATED'.
 
 2) Remove all rows where ab_kind == 'INTEGRATED'.
 
@@ -21,7 +62,10 @@ OUT_PATH = "allLLM_match_report_groundTruth.csv"
 
 KEY_COLS = ["group", "field", "bottleneck", "pattern"]
 AB_KIND_COL = "ab_kind"
-GT_SOURCE_COL = "LLM-result-openai/gpt-oss-120b"
+
+# Deterministic, LLM-independent ground-truth source: the rule engine's own
+# verdict when applied to the realized (INTEGRATED) model's metadata.
+GT_SOURCE_COL = "result"
 GT_COL = "groundTruth"
 
 
@@ -69,6 +113,7 @@ def main() -> int:
     # Write output
     df_out.to_csv(OUT_PATH, index=False)
     print(f"Wrote: {OUT_PATH} (rows: {len(df_out)})")
+    print(f"Ground-truth source column: '{GT_SOURCE_COL}' on INTEGRATED rows (deterministic, LLM-independent).")
     return 0
 
 

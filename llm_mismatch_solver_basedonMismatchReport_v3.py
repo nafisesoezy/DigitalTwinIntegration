@@ -241,7 +241,7 @@ def call_llm_json(model: str, prompt: str, timeout_s: int, max_retries: int) -> 
         except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout) as e:
             last_err = e
             sleep_s = min(30, 2 ** attempt)
-            print(f"⚠️ [{model}] Timeout attempt {attempt}/{max_retries}. Retrying in {sleep_s}s...")
+            print(f"[warn] [{model}] Timeout attempt {attempt}/{max_retries}. Retrying in {sleep_s}s...")
             time.sleep(sleep_s)
 
         except json.JSONDecodeError as e:
@@ -250,7 +250,7 @@ def call_llm_json(model: str, prompt: str, timeout_s: int, max_retries: int) -> 
         except Exception as e:
             last_err = e
             sleep_s = min(15, attempt * 3)
-            print(f"⚠️ [{model}] Error attempt {attempt}/{max_retries}: {e}. Retrying in {sleep_s}s...")
+            print(f"[warn] [{model}] Error attempt {attempt}/{max_retries}: {e}. Retrying in {sleep_s}s...")
             time.sleep(sleep_s)
 
     raise RuntimeError(f"[{model}] Failed after {max_retries} attempts. Last error: {last_err}")
@@ -325,7 +325,7 @@ def run_one_model(df_out: pd.DataFrame, model: str) -> None:
     mismatch_idx = [i for i, row in df_out.iterrows() if should_send_to_llm(row)]
 
     if not mismatch_idx:
-        print(f"ℹ️ [{model}] No eligible mismatch rows to send.")
+        print(f"[info] [{model}] No eligible mismatch rows to send.")
         return
 
     all_annotations: Dict[str, Dict[str, str]] = {}
@@ -381,18 +381,18 @@ def main() -> None:
 
     for model in LLM_MODELS:
         try:
-            print(f"\n▶ Running model: {model}")
+            print(f"\nRunning model: {model}")
             run_one_model(df_out, model)
-            print(f"✅ Done: {model}")
+            print(f"Done: {model}")
         except Exception as e:
             # If a model fails, still add columns and mark error across all rows.
             col_result, col_sugg = ensure_model_columns(df_out, model)
             df_out[col_result] = "Error"
             df_out[col_sugg] = f"Model run failed: {e}"
-            print(f"❌ Model failed: {model}: {e}")
+            print(f"[error] Model failed: {model}: {e}")
 
     df_out.to_csv(ALL_LLM_MATCH_REPORT_PATH, index=False)
-    print(f"\n✅ Wrote combined report: {ALL_LLM_MATCH_REPORT_PATH}")
+    print(f"\nWrote combined report: {ALL_LLM_MATCH_REPORT_PATH}")
 
 
 if __name__ == "__main__":
