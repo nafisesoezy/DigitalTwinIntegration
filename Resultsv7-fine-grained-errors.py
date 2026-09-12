@@ -235,7 +235,11 @@ def main() -> None:
     lines.append(r"\hline")
 
     def row_line(analysis_label: str, name: str, base: Dict[str, int], comp: Dict[str, int], first: bool) -> str:
-        a = latex_escape(analysis_label) if first else ""
+        # analysis_label is passed pre-formatted (e.g. r"\textbf{Overall}" or "")
+        # -- it must NOT be latex_escape()'d, or its own backslash gets escaped
+        # into literal text (this was a real bug: produced
+        # "\textbackslash{}textbf{Overall}" instead of "\textbf{Overall}").
+        a = analysis_label if first else ""
         return (f"{a} & {latex_escape(name)} & {base['N_M']} & {base['N_C']} & "
                 f"{dashfmt(base['TP'])} & {dashfmt(base['FP'])} & {dashfmt(base['FN'])} & {dashfmt(base['Gap'])} & "
                 f"{dashfmt(comp['TP'])} & {dashfmt(comp['FP'])} & {dashfmt(comp['FN'])} & {dashfmt(comp['Gap'])} \\\\")
