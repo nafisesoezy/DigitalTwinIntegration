@@ -68,12 +68,33 @@ Env vars (same names/semantics as the script this replaces):
                                  Deterministic-mode rows through the Stage 2
                                  prompt for a natural-language explanation)
 
+Repeated-run stability (opt-in, off by default):
+  Set LLM_NUM_RUNS=N (N>1) to run Stage 1 -- the verdict-determining call --
+  N independent times per LLM-assisted constraint, with identical evidence
+  and settings each time (no shared state, no caching between runs). This
+  answers a DIFFERENT question than accuracy: how stable is the verdict when
+  nothing about the input changes? It does NOT majority-vote the N runs into
+  a single "improved" verdict -- that would silently turn repeated sampling
+  into a new ensemble method and change what is being evaluated. Each run is
+  kept as its own independent replication in its own column
+  (LLM-result-<m>-run1 .. -run{N}); Resultsv6-stability.py scores each run
+  separately against ground truth and reports mean +/- SD across runs, plus
+  the fraction of constraint instances where all N runs agreed (see that
+  script and README.md for the exact methodology). Stage 2 (explanation/
+  adaptation) is run once, using run 1's verdict -- this feature targets
+  verdict stability, not explanation-text stability. Deterministic-mode
+  rows are copied into every run column unchanged (by construction they
+  cannot vary between runs).
+
 Output columns added per model <m>:
-  LLM-result-<m>        Stage 1 verdict:  Match | Mismatch | Gap | Error
-  LLM-explanation-<m>   Stage 2 output (why)
-  LLM-suggestion-<m>    Stage 2 output (adaptation / required information) --
-                        kept under this name for backward compatibility with
-                        scripts that already read "LLM-suggestion-*"
+  LLM-result-<m>            Stage 1 verdict (run 1): Match | Mismatch | Gap | Error
+  LLM-result-<m>-run{i}     Stage 1 verdict for repetition i (1..LLM_NUM_RUNS;
+                            with the default LLM_NUM_RUNS=1 this is just -run1,
+                            identical to LLM-result-<m>)
+  LLM-explanation-<m>       Stage 2 output (why), from run 1's verdict
+  LLM-suggestion-<m>        Stage 2 output (adaptation / required information) --
+                            kept under this name for backward compatibility with
+                            scripts that already read "LLM-suggestion-*"
 """
 
 import os
@@ -100,6 +121,10 @@ LLM_CHUNK_SIZE = int(os.environ.get("LLM_CHUNK_SIZE", "20"))
 LLM_TIMEOUT_S = int(os.environ.get("LLM_TIMEOUT_S", "600"))
 LLM_MAX_RETRIES = int(os.environ.get("LLM_MAX_RETRIES", "4"))
 REASON_DETERMINISTIC_VIA_LLM = os.environ.get("REASON_DETERMINISTIC_VIA_LLM", "0") == "1"
+# Repeated-run stability (opt-in): see module docstring. 1 = current/default
+# behavior (single Stage 1 call per constraint, unchanged output schema
+# other than the always-present "-run1" column).
+LLM_NUM_RUNS = max(1, int(os.environ.get("LLM_NUM_RUNS", "1")))
 
 DEFAULT_MODELS: List[str] = [
     "openai/gpt-oss-120b",
@@ -369,39 +394,56 @@ def _run_stage2(df_out: pd.DataFrame, model: str, idx: List[int], verdict_col: s
 # =========================
 # Per-model evaluation
 # =========================
-def ensure_model_columns(df_out: pd.DataFrame, model: str) -> Tuple[str, str, str]:
+def ensure_model_columns(df_out: pd.DataFrame, model: str) -> Tuple[str, str, str, List[str]]:
     suffix = model.replace(" ", "_")
     col_result = f"LLM-result-{suffix}"
     col_expl = f"LLM-explanation-{suffix}"
     col_sugg = f"LLM-suggestion-{suffix}"   # kept for backward compatibility
-    for c in (col_result, col_expl, col_sugg):
+    run_cols = [f"{col_result}-run{i}" for i in range(1, LLM_NUM_RUNS + 1)]
+    for c in [col_result, col_expl, col_sugg] + run_cols:
         if c not in df_out.columns:
             df_out[c] = ""
-    return col_result, col_expl, col_sugg
+    return col_result, col_expl, col_sugg, run_cols
 
 
 def run_one_model(df_out: pd.DataFrame, model: str) -> None:
-    col_result, col_expl, col_sugg = ensure_model_columns(df_out, model)
+    col_result, col_expl, col_sugg, run_cols = ensure_model_columns(df_out, model)
 
     det_idx = [i for i, r in df_out.iterrows() if r.get("evaluation_mode") == "Deterministic"]
     llm_idx = [i for i, r in df_out.iterrows() if r.get("evaluation_mode") == "LLMAssisted"]
 
-    # --- Deterministic rows: verdict is fixed by the rule engine, not Stage 1/2. ---
+    # --- Deterministic rows: verdict is fixed by the rule engine, not Stage 1/2.
+    #     Copied into every run column unchanged -- by construction a
+    #     deterministic check cannot vary between repeated runs. ---
     for i in det_idx:
         r = df_out.loc[i]
-        df_out.at[i, col_result] = r.get("verdict", "")
+        v = r.get("verdict", "")
+        df_out.at[i, col_result] = v
+        for rc in run_cols:
+            df_out.at[i, rc] = v
         df_out.at[i, col_expl] = r.get("explanation", "")
         df_out.at[i, col_sugg] = r.get("adaptation", "")
 
     if REASON_DETERMINISTIC_VIA_LLM and det_idx:
         _run_stage2(df_out, model, det_idx, col_result, col_expl, col_sugg)
 
-    # --- LLMAssisted rows: Stage 1 (verdict), then Stage 2 (explanation/adaptation). ---
+    # --- LLMAssisted rows: Stage 1 run LLM_NUM_RUNS independent times (each
+    #     an unrelated call with the same evidence/settings -- no majority
+    #     voting; see module docstring), then Stage 2 once using run 1's
+    #     verdict. ---
     if not llm_idx:
         print(f"[info] [{model}] No LLM-assisted rows to evaluate.")
         return
 
-    _run_stage1(df_out, model, llm_idx, col_result)
+    for run_i, rc in enumerate(run_cols, start=1):
+        _run_stage1(df_out, model, llm_idx, rc)
+        print(f"[info] [{model}] Stage 1 run {run_i}/{LLM_NUM_RUNS} complete.")
+
+    # Primary result column mirrors run 1, so every existing script that
+    # reads a single "LLM-result-<model>" column keeps working unchanged.
+    for i in llm_idx:
+        df_out.at[i, col_result] = df_out.at[i, run_cols[0]]
+
     _run_stage2(df_out, model, llm_idx, col_result, col_expl, col_sugg)
 
 
@@ -433,6 +475,9 @@ def main() -> None:
         print(f"  - {m}")
     print(f"Deterministic rows: {(df_out['evaluation_mode'] == 'Deterministic').sum()}")
     print(f"LLM-assisted rows:  {(df_out['evaluation_mode'] == 'LLMAssisted').sum()}")
+    if LLM_NUM_RUNS > 1:
+        print(f"Repeated-run stability mode: LLM_NUM_RUNS={LLM_NUM_RUNS} independent Stage 1 "
+              f"calls per LLM-assisted constraint (see Resultsv6-stability.py).")
 
     for model in LLM_MODELS:
         try:
@@ -440,10 +485,12 @@ def main() -> None:
             run_one_model(df_out, model)
             print(f"Done: {model}")
         except Exception as e:
-            col_result, col_expl, col_sugg = ensure_model_columns(df_out, model)
+            col_result, col_expl, col_sugg, run_cols = ensure_model_columns(df_out, model)
             df_out[col_result] = "Error"
             df_out[col_expl] = f"Model run failed: {e}"
             df_out[col_sugg] = ""
+            for rc in run_cols:
+                df_out[rc] = "Error"
             print(f"[error] Model failed: {model}: {e}")
 
     df_out.to_csv(ALL_LLM_MATCH_REPORT_PATH, index=False)
