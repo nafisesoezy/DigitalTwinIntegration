@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Updated for the RM-ODP constraint-template pipeline (see README.md).
 """
 Evaluate agreement/detection performance between INTENDED vs INTEGRATED rows
 from ONE unified CSV: allLLM_match_report.csv

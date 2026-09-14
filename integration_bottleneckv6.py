@@ -1,4 +1,3 @@
-# Updated for the RM-ODP constraint-template pipeline (see README.md).
 # Usage:
 #   python integration_bottleneckv6.py /path/to/dir_or_files... [--debug]
 # This is the deterministic rule engine (Stage 1 + the Deterministic half of
@@ -902,6 +901,103 @@ def check_conceptual_quality_gap(group: str, a: ModelMeta, b: ModelMeta, ab: Opt
 
 # ---------- Information ----------
 
+# Temporal/Spatial Resolution Compatibility: the real corpus's resolution
+# fields are mostly free-text narrative ("follows host ocean grid orca2",
+# "ecological processes typically updated each hydrodynamic step..."), not
+# clean numeric values. This parser extracts a numeric value ONLY when the
+# declared text is clearly a single quantity or a bounded range with a
+# recognized unit; anything else correctly returns None (unparseable ->
+# Gap), rather than falling back to a token-overlap guess.
+_TEMPORAL_KEYWORD_HOURS = {
+    "hourly": 1.0, "sub-hourly": 1.0, "daily": 24.0, "weekly": 168.0,
+    "monthly": 730.0, "annual": 8760.0, "annually": 8760.0, "yearly": 8760.0,
+}
+_TEMPORAL_UNIT_HOURS = {
+    "s": 1/3600, "sec": 1/3600, "secs": 1/3600, "second": 1/3600, "seconds": 1/3600,
+    "min": 1/60, "mins": 1/60, "minute": 1/60, "minutes": 1/60,
+    "h": 1.0, "hr": 1.0, "hrs": 1.0, "hour": 1.0, "hours": 1.0,
+    "day": 24.0, "days": 24.0,
+    "week": 168.0, "weeks": 168.0,
+    "month": 730.0, "months": 730.0,
+    "year": 8760.0, "years": 8760.0,
+}
+_TEMPORAL_UNIT_ALT = "|".join(sorted(_TEMPORAL_UNIT_HOURS, key=len, reverse=True))
+
+def _parse_temporal_hours_range(text: str) -> Optional[Tuple[float, float]]:
+    low = (text or "").strip().lower()
+    if not low:
+        return None
+    if low in _TEMPORAL_KEYWORD_HOURS:
+        h = _TEMPORAL_KEYWORD_HOURS[low]
+        return (h, h)
+    m = re.fullmatch(
+        rf"(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)\s*({_TEMPORAL_UNIT_ALT})",
+        low)
+    if m:
+        lo, hi, unit = m.groups()
+        factor = _TEMPORAL_UNIT_HOURS[unit]
+        return (float(lo) * factor, float(hi) * factor)
+    m = re.fullmatch(rf"(\d+(?:\.\d+)?)\s*({_TEMPORAL_UNIT_ALT})", low)
+    if m:
+        val, unit = m.groups()
+        h = float(val) * _TEMPORAL_UNIT_HOURS[unit]
+        return (h, h)
+    return None
+
+# Spatial resolution: normalize to meters. A degree of latitude/longitude is
+# approximated at ~111,320 m (equatorial value) -- a documented
+# approximation, not an exact conversion, since the actual ground distance
+# of a degree of longitude varies with latitude.
+_METERS_PER_DEGREE = 111_320.0
+_SPATIAL_UNIT_METERS = {
+    "m": 1.0, "meter": 1.0, "meters": 1.0, "metre": 1.0, "metres": 1.0,
+    "km": 1000.0, "kilometer": 1000.0, "kilometers": 1000.0,
+    "degree": _METERS_PER_DEGREE, "degrees": _METERS_PER_DEGREE,
+    "°": _METERS_PER_DEGREE,
+}
+_SPATIAL_UNIT_ALT = "|".join(sorted((re.escape(k) for k in _SPATIAL_UNIT_METERS), key=len, reverse=True))
+
+def _parse_spatial_meters_range(text: str) -> Optional[Tuple[float, float]]:
+    """Looks for a LEADING number+unit (many entries start with the
+    headline resolution before trailing narrative, e.g. "2 km horizontal",
+    "1.4° x 1.4°, 40 vertical levels") -- uses search, not fullmatch,
+    since the real corpus rarely gives a resolution as the entire string."""
+    low = (text or "").strip().lower()
+    if not low:
+        return None
+    # (?![a-z0-9]) instead of \b: \b is unreliable right after "°", which is
+    # itself a non-word character, so the word-boundary assertion between
+    # "°" and a following space never fires.
+    m = re.match(
+        rf"^(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)\s*({_SPATIAL_UNIT_ALT})(?![a-z0-9])",
+        low)
+    if m:
+        lo, hi, unit = m.groups()
+        factor = _SPATIAL_UNIT_METERS[unit]
+        return (float(lo) * factor, float(hi) * factor)
+    m = re.match(rf"^(\d+(?:\.\d+)?)\s*({_SPATIAL_UNIT_ALT})(?![a-z0-9])", low)
+    if m:
+        val, unit = m.groups()
+        v = float(val) * _SPATIAL_UNIT_METERS[unit]
+        return (v, v)
+    return None
+
+def _resolution_compatible(src_range: Tuple[float, float], dst_range: Tuple[float, float]) -> bool:
+    """Two resolutions (in a common unit) are compatible if their declared
+    ranges overlap, or if the coarser one is within 5% of an integer
+    multiple of the finer one (the finer side can be cleanly aggregated up
+    to the coarser side without a fractional remainder)."""
+    lo1, hi1 = src_range
+    lo2, hi2 = dst_range
+    if lo1 <= hi2 and lo2 <= hi1:
+        return True
+    finer, coarser = (hi1, lo2) if hi1 <= lo2 else (hi2, lo1)
+    if finer <= 0:
+        return False
+    ratio = coarser / finer
+    return abs(ratio - round(ratio)) < 0.05
+
+
 def check_information_viewpoint(group: str, a: ModelMeta, b: ModelMeta, ab: Optional[ModelMeta], pattern: str) -> List[Dict[str,Any]]:
     rows: List[Dict[str,Any]] = []
     # Data Schema Mismatch — semantic overlap rules per pattern
@@ -999,6 +1095,11 @@ def check_information_viewpoint(group: str, a: ModelMeta, b: ModelMeta, ab: Opti
         ("Spatial Coverage Mismatch","spatial_extent_coverage"),
         ("Dimensionality Mismatch","dimensionality"),
     ]
+    _NUMERIC_PARSERS = {
+        "time_steps_temporal_resolution": _parse_temporal_hours_range,
+        "spatial_resolution": _parse_spatial_meters_range,
+    }
+
     for label, key in info_simple:
         av = "; ".join(a.fields.get(key, []))
         bv = "; ".join(b.fields.get(key, []))
@@ -1007,60 +1108,127 @@ def check_information_viewpoint(group: str, a: ModelMeta, b: ModelMeta, ab: Opti
         if not av or not bv:
             res, det = "Missing", "One or both sides missing metadata."
         else:
-            sim = jaccard_token_similarity(av, bv)
-            if sim > 0:
-                res, det = "Match", f"A<->B token-sim={sim:.2f} (>0 means aligned)"
-            elif policy:
-                # A and B differ, but the model attached as `ab` (the IS at
-                # prediction time, the realized AB at ground-truth time)
-                # documents a resampling/conversion step that bridges them.
-                # This is what makes the check genuinely depend on `ab`
-                # instead of silently reducing to an A-vs-B-only comparison
-                # (see constraint_templates.py / README "Known limitations"
-                # for why that mattered for ground-truth validity).
-                res, det = "Match", (f"A<->B token-sim={sim:.2f} (not aligned), but a resampling/"
-                                      f"conversion policy is declared: {policy}")
+            parser = _NUMERIC_PARSERS.get(key)
+            range_a = parser(av) if parser else None
+            range_b = parser(bv) if parser else None
+            if parser and range_a is not None and range_b is not None:
+                # A genuine numeric compatibility check, not a token-overlap
+                # proxy: compatible if the declared ranges overlap, or if
+                # the coarser side is a clean multiple of the finer one.
+                if _resolution_compatible(range_a, range_b):
+                    res, det = "Match", f"A={range_a} vs B={range_b} (common unit) are compatible."
+                elif policy:
+                    res, det = "Match", (f"A={range_a} vs B={range_b} are not directly compatible, "
+                                          f"but a resampling/conversion policy is declared: {policy}")
+                else:
+                    res, det = "Mismatch", (f"A={range_a} vs B={range_b} (common unit) are not "
+                                             f"compatible (no overlap, not a clean multiple) and no "
+                                             f"resampling/conversion policy is declared.")
+            elif parser:
+                # A numeric parser exists for this field but one or both
+                # declared values are free-text narrative it cannot parse
+                # (the common case in this corpus) -- that is a genuine
+                # evidence gap, not something to guess at via token overlap.
+                res, det = "Missing", (f"Could not parse A={av!r} and/or B={bv!r} as a single "
+                                        f"resolution value or bounded range.")
             else:
-                res, det = "Mismatch", (f"A<->B token-sim={sim:.2f} (not aligned) and no "
-                                         f"resampling/conversion policy is declared.")
+                sim = jaccard_token_similarity(av, bv)
+                if sim > 0:
+                    res, det = "Match", f"A<->B token-sim={sim:.2f} (>0 means aligned)"
+                elif policy:
+                    # A and B differ, but the model attached as `ab` (the IS at
+                    # prediction time, the realized AB at ground-truth time)
+                    # documents a resampling/conversion step that bridges them.
+                    res, det = "Match", (f"A<->B token-sim={sim:.2f} (not aligned), but a resampling/"
+                                          f"conversion policy is declared: {policy}")
+                else:
+                    res, det = "Mismatch", (f"A<->B token-sim={sim:.2f} (not aligned) and no "
+                                             f"resampling/conversion policy is declared.")
         rows.append(row(group, label, key, pattern, "Common exchanged variables align semantically (or a declared conversion bridges them)", av, bv, abv, det, res))
     return rows
 
 # ---------- Unit Compatibility (Information viewpoint) ----------
+#
+# Dimensional compatibility via Pint (https://pint.readthedocs.io/), not a
+# fixed list of hand-picked equivalent spellings. Pint knows dimensional
+# equivalence for essentially any pair of units it can parse (degC vs K,
+# mm/day vs m/s, etc.), which generalizes far beyond a hardcoded table.
+#
+# The real environmental corpus is messier than a single clean unit string
+# per variable: many declared "units" fields are a comma-separated list
+# covering several variables at once ("degC, PSU, m/s, m, W/m^2"), or free
+# text ("varies", "see inline comments for each variable"). A comma-joined
+# or otherwise unparseable string is correctly a Gap (insufficient evidence
+# to determine unit compatibility for THIS specific variable) -- it is not
+# guessed at.
+import pint
 
-# Minimal unit-equivalence table: normalized spellings that denote the SAME
-# physical unit. Anything not in the same equivalence class is treated as a
-# genuine unit mismatch requiring conversion (e.g. the paper's FLake "degC"
-# vs PCLake+ "K" example). This is intentionally conservative -- it does not
-# attempt general unit algebra -- and is documented as such in the README.
-_UNIT_EQUIV_CLASSES: List[Set[str]] = [
-    {"c", "degc", "°c", "celsius", "degrees celsius", "deg c"},
-    {"k", "kelvin", "degrees kelvin"},
-    {"f", "degf", "°f", "fahrenheit"},
-    {"m", "meter", "meters", "metre", "metres"},
-    {"mm", "millimeter", "millimeters", "millimetre", "millimetres"},
-    {"m/s", "meters per second", "metres per second", "m s-1", "m s^-1"},
-    {"mm/day", "mm day-1", "millimeters per day", "millimetres per day"},
-    {"kg/m3", "kg m-3", "kilograms per cubic meter"},
-    {"mg/m2/day", "mg m-2 day-1", "mg/m^2/day"},
-    {"pa", "pascal", "pascals"},
-    {"hpa", "hectopascal", "hectopascals", "mbar", "millibar"},
-    {"%", "percent", "percentage"},
-]
+_UREG = pint.UnitRegistry()
+# Domain units Pint does not know by default but that are common in this
+# corpus. PSU (practical salinity unit) is dimensionless by definition;
+# Sverdrup is a standard oceanographic flow-rate unit (1e6 m^3/s).
+_UREG.define("psu = [] = PSU")
+_UREG.define("sverdrup = 1e6 * meter ** 3 / second = Sv")
 
-def _normalize_unit(u: str) -> str:
-    return re.sub(r"[\s\-_]+", " ", (u or "").strip().lower()).strip()
+_SUPERSCRIPT_DIGITS = {
+    "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4",
+    "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9",
+    "⁻": "-",  # superscript minus
+}
+_SUPERSCRIPT_RUN_RE = re.compile("[" + "".join(_SUPERSCRIPT_DIGITS) + "]+")
 
-def _units_equivalent(u1: str, u2: str) -> bool:
-    n1, n2 = _normalize_unit(u1), _normalize_unit(u2)
-    if not n1 or not n2:
-        return False
-    if n1 == n2:
-        return True
-    for cls in _UNIT_EQUIV_CLASSES:
-        if n1 in cls and n2 in cls:
-            return True
-    return False
+def _convert_superscripts(s: str) -> str:
+    """Converts a whole RUN of superscript characters at once (e.g. the two
+    adjacent characters in "m⁻²" -> "m**-2"), not character-by-character --
+    translating "⁻" and "²" independently would produce the broken
+    "m**-**2" instead of "m**-2"."""
+    def repl(m: "re.Match") -> str:
+        ascii_run = "".join(_SUPERSCRIPT_DIGITS[ch] for ch in m.group(0))
+        return "**" + ascii_run
+    return _SUPERSCRIPT_RUN_RE.sub(repl, s)
+
+def _normalize_unit_for_pint(u: str) -> Optional[str]:
+    """Best-effort translation of a declared unit string into a form Pint
+    can parse. Returns None (unparseable) rather than guessing when the
+    string is a list of several units, free text, or otherwise not a
+    single well-formed unit."""
+    s = (u or "").strip()
+    if not s:
+        return None
+    if "," in s or ";" in s:
+        return None  # a combined list of units for several variables, not one
+    low = s.strip().lower()
+    if low in ("varies", "various", "mixed", "dimensionless", "unitless",
+               "categorical", "n/a", "na", "-", "0-1", "0–1",
+               "as indicated inline", "see inline comments for each variable"):
+        return None if low not in ("dimensionless", "unitless") else "dimensionless"
+    s = _convert_superscripts(s)
+    s = s.replace("°", "deg")
+    s = s.replace("^", "**")
+    s = re.sub(r"\s+", " ", s).strip()
+    # "m -2" / "m-2" (space-joined multiplicative units, common in this
+    # corpus) -> "m**-2" style exponent, then space-as-multiplication for
+    # Pint (e.g. "kg m**-2 s**-1" -> "kg * m**-2 * s**-1").
+    s = re.sub(r"([a-zA-Z])\s*\*\*\s*(-?\d+)", r"\1**\2", s)
+    s = re.sub(r"\b([a-zA-Z]+)-(\d+)\b", r"\1**-\2", s)
+    parts = s.split(" ")
+    s = " * ".join(p for p in parts if p)
+    return s or None
+
+def _units_equivalent(u1: str, u2: str) -> Optional[bool]:
+    """True/False when both sides parse to a known dimension; None when
+    either side could not be parsed (a Gap, not a guessed Mismatch)."""
+    p1, p2 = _normalize_unit_for_pint(u1), _normalize_unit_for_pint(u2)
+    if p1 is None or p2 is None:
+        return None
+    try:
+        q1, q2 = _UREG(p1), _UREG(p2)
+    except Exception:
+        return None
+    try:
+        return bool(q1.is_compatible_with(q2))
+    except Exception:
+        return None
 
 def _variable_unit_map(io: "IOSchema") -> Dict[str, str]:
     """Best-effort pairing of io.variables[i] with io.units[i] by index."""
@@ -1100,14 +1268,22 @@ def check_unit_compatibility(group: str, a: ModelMeta, b: ModelMeta, ab: Optiona
                                  "Both sides must declare a unit for the exchanged variable",
                                  u_s, u_d, "", "Unit not declared on one or both sides.", "Missing"))
                 continue
-            if _units_equivalent(u_s, u_d):
+            compatible = _units_equivalent(u_s, u_d)
+            if compatible is None:
                 rows.append(row(group, "Unit Mismatch", field_label, pattern,
-                                 "Units must be equal or known-equivalent",
-                                 u_s, u_d, "", f"{u_s!r} ~ {u_d!r} (equivalent).", "Match"))
+                                 "Units must be dimensionally compatible",
+                                 u_s, u_d, "", f"{u_s!r} and/or {u_d!r} could not be parsed as a single "
+                                 f"well-formed unit (combined list or free text) -- dimensional compatibility "
+                                 f"cannot be determined.", "Missing"))
+            elif compatible:
+                rows.append(row(group, "Unit Mismatch", field_label, pattern,
+                                 "Units must be dimensionally compatible",
+                                 u_s, u_d, "", f"{u_s!r} and {u_d!r} are dimensionally compatible.", "Match"))
             else:
                 rows.append(row(group, "Unit Mismatch", field_label, pattern,
-                                 "Units must be equal or known-equivalent",
-                                 u_s, u_d, "", f"{u_s!r} != {u_d!r} and not in a known-equivalent class; conversion required.", "Mismatch"))
+                                 "Units must be dimensionally compatible",
+                                 u_s, u_d, "", f"{u_s!r} and {u_d!r} are not dimensionally compatible; "
+                                 f"conversion is not possible, an explicit mapping/derivation is required.", "Mismatch"))
 
     patt = pattern or ""
     compare_direction(a, b, "A", "B")
@@ -1117,34 +1293,164 @@ def check_unit_compatibility(group: str, a: ModelMeta, b: ModelMeta, ab: Optiona
 
 # ---------- Operating Environment Compatibility (Technology viewpoint) ----------
 
+# Operating systems are compatible when they belong to the same kernel/
+# platform family (Ubuntu and Debian are both "linux", not merely similar
+# strings), or when either side declares containerization/virtualization
+# tooling that makes cross-family execution feasible. This generalizes
+# beyond exact-string or token-overlap matching, which would miss
+# "Ubuntu 20.04" vs "Debian 11" (zero shared tokens, same family).
+_OS_FAMILY_KEYWORDS: Dict[str, List[str]] = {
+    "linux": ["linux", "ubuntu", "debian", "centos", "rhel", "red hat", "fedora",
+              "suse", "opensuse", "alpine", "arch linux", "rocky linux",
+              "almalinux", "gentoo", "unix"],
+    "windows": ["windows", "win32", "win64", "microsoft windows"],
+    "macos": ["macos", "mac os", "os x", "osx", "darwin"],
+    "bsd": ["freebsd", "openbsd", "netbsd", "bsd"],
+}
+
+_VIRTUALIZATION_KEYWORDS = [
+    "docker", "container", "containerized", "podman", "virtual machine",
+    "virtualbox", "vmware", "kubernetes", "singularity", "apptainer", "wsl",
+]
+
+def _classify_os_family(text: str) -> Optional[str]:
+    low = (text or "").strip().lower()
+    if not low:
+        return None
+    for family, keywords in _OS_FAMILY_KEYWORDS.items():
+        if any(kw in low for kw in keywords):
+            return family
+    return None
+
+def _mentions_virtualization(*texts: str) -> bool:
+    combined = " ".join(t or "" for t in texts).lower()
+    return any(kw in combined for kw in _VIRTUALIZATION_KEYWORDS)
+
 def check_operating_environment(group: str, a: ModelMeta, b: ModelMeta, ab: Optional[ModelMeta], pattern: str) -> List[Dict[str, Any]]:
     """
     Operating Environment Compatibility (Appendix Table
     `environmental_constraint_templates`, Technological Compatibility
     concern, Deterministic evaluation mode).
     Required metadata: Operating System; Software Requirements.
-
-    NOTE (documented in README "Known limitations"): the current environmental
-    metadata corpus (modelsMetadataFullV3/*.yaml) does not populate an
-    Operating System field for the models checked in Section 6 -- this check
-    will legitimately return Gap for most/all of them until that metadata is
-    curated. That is itself a finding for the Technology-viewpoint
-    completeness discussion in Section 6.1, not a bug in this check.
     """
     key = "operating_system"
     av = "; ".join(a.fields.get(key, []))
     bv = "; ".join(b.fields.get(key, []))
+    sw_a = "; ".join(a.fields.get("software_specification_and_requirements", []))
+    sw_b = "; ".join(b.fields.get("software_specification_and_requirements", []))
+
     if not av or not bv:
-        det = "Operating system not declared on one or both sides."
-        res = "Missing"
-    else:
-        sim = jaccard_token_similarity(av, bv)
-        if av == bv or sim > 0:
-            res, det = "Match", f"Supported operating systems overlap (A={av!r}, B={bv!r})."
-        else:
-            res, det = "Mismatch", f"Declared operating systems do not overlap (A={av!r}, B={bv!r})."
+        return [row(group, "Operating Environment Mismatch", key, pattern,
+                     "Declared operating systems must be compatible", av, bv, "",
+                     "Operating system not declared on one or both sides.", "Missing")]
+
+    fam_a, fam_b = _classify_os_family(av), _classify_os_family(bv)
+    if fam_a is None or fam_b is None:
+        return [row(group, "Operating Environment Mismatch", key, pattern,
+                     "Declared operating systems must be compatible", av, bv, "",
+                     f"Could not classify the declared OS into a known family "
+                     f"(A={av!r}, B={bv!r}).", "Missing")]
+
+    if fam_a == fam_b:
+        return [row(group, "Operating Environment Mismatch", key, pattern,
+                     "Declared operating systems must be compatible", av, bv, "",
+                     f"Both declare the same OS family ({fam_a}): A={av!r}, B={bv!r}.", "Match")]
+
+    if _mentions_virtualization(av, bv, sw_a, sw_b):
+        return [row(group, "Operating Environment Mismatch", key, pattern,
+                     "Declared operating systems must be compatible", av, bv, "",
+                     f"Different OS families (A={fam_a}, B={fam_b}), but containerization/"
+                     f"virtualization is declared, making cross-platform execution feasible.", "Match")]
+
     return [row(group, "Operating Environment Mismatch", key, pattern,
-                "Declared operating systems must overlap", av, bv, "", det, res)]
+                 "Declared operating systems must be compatible", av, bv, "",
+                 f"Different OS families (A={fam_a}: {av!r}, B={fam_b}: {bv!r}) and no "
+                 f"containerization/virtualization declared.", "Mismatch")]
+
+# ---------- Data Format Compatibility (Information viewpoint) ----------
+#
+# Formats are compatible when they belong to the same family (a self-
+# describing scientific array format like NetCDF/HDF5, a delimited text
+# format like CSV/TSV, a vector GIS format like Shapefile/GeoJSON, ...), or
+# when a well-known conversion tool exists between the two families. This
+# generalizes beyond exact-string or token-similarity matching, which would
+# flag "NetCDF" vs "netcdf, csv" as different formats even though the
+# second side explicitly also supports the first.
+_FORMAT_FAMILIES: Dict[str, List[str]] = {
+    "netcdf": ["netcdf", "nc4", "nc"],
+    "hdf5": ["hdf5", "hdf", "h5"],
+    "csv": ["csv"],
+    "tsv": ["tsv"],
+    "geotiff": ["geotiff", "tiff", "tif"],
+    "shapefile": ["shapefile", "shp"],
+    "geojson": ["geojson"],
+    "json": ["json"],
+    "text": ["ascii", "plain text", "txt", "text"],
+    "excel": ["xlsx", "xls", "excel"],
+    "pdf": ["pdf"],
+    "grib": ["grib", "grib2"],
+}
+
+_KNOWN_FORMAT_CONVERTERS: Set[frozenset] = {
+    frozenset({"netcdf", "csv"}), frozenset({"netcdf", "geotiff"}),
+    frozenset({"hdf5", "netcdf"}), frozenset({"shapefile", "geojson"}),
+    frozenset({"csv", "excel"}), frozenset({"csv", "text"}),
+    frozenset({"tsv", "csv"}), frozenset({"json", "geojson"}),
+    frozenset({"netcdf", "text"}), frozenset({"grib", "netcdf"}),
+}
+
+def _classify_format_families(text: str) -> Set[str]:
+    """A field may list several supported formats (e.g. "netcdf, csv") --
+    returns the set of ALL families found, not just the first."""
+    low = (text or "").strip().lower()
+    if not low:
+        return set()
+    found: Set[str] = set()
+    for family, keywords in _FORMAT_FAMILIES.items():
+        for kw in keywords:
+            if re.search(r"\b" + re.escape(kw) + r"\b", low):
+                found.add(family)
+                break
+    return found
+
+def check_data_format_compatibility(group: str, a: ModelMeta, b: ModelMeta, ab: Optional[ModelMeta], pattern: str) -> List[Dict[str, Any]]:
+    """
+    Data Format Compatibility (Appendix Table `environmental_constraint_
+    templates`, Information Alignment concern, Deterministic evaluation
+    mode). Required metadata: Source Output Format; Target Input Format.
+    """
+    key = "file_formats"
+    av = "; ".join(a.fields.get(key, []))
+    bv = "; ".join(b.fields.get(key, []))
+
+    if not av or not bv:
+        return [row(group, "File Format Mismatch", key, pattern,
+                     "Declared formats must share a family or a known converter", av, bv, "",
+                     "File format not declared on one or both sides.", "Missing")]
+
+    fam_a, fam_b = _classify_format_families(av), _classify_format_families(bv)
+    if not fam_a or not fam_b:
+        return [row(group, "File Format Mismatch", key, pattern,
+                     "Declared formats must share a family or a known converter", av, bv, "",
+                     f"Could not classify the declared format into a known family "
+                     f"(A={av!r}, B={bv!r}).", "Missing")]
+
+    if fam_a & fam_b:
+        shared = ", ".join(sorted(fam_a & fam_b))
+        return [row(group, "File Format Mismatch", key, pattern,
+                     "Declared formats must share a family or a known converter", av, bv, "",
+                     f"Shared format family/families: {shared}.", "Match")]
+
+    if any(frozenset({x, y}) in _KNOWN_FORMAT_CONVERTERS for x in fam_a for y in fam_b):
+        return [row(group, "File Format Mismatch", key, pattern,
+                     "Declared formats must share a family or a known converter", av, bv, "",
+                     f"No shared family (A={sorted(fam_a)}, B={sorted(fam_b)}), but a "
+                     f"well-known conversion tool exists between them.", "Match")]
+
+    return [row(group, "File Format Mismatch", key, pattern,
+                 "Declared formats must share a family or a known converter", av, bv, "",
+                 f"No shared family (A={sorted(fam_a)}, B={sorted(fam_b)}) and no known "
+                 f"converter between them; an explicit transformation step is required.", "Mismatch")]
 
 # ---------- Computational ----------
 # ===================== COMPUTATIONAL (hardness increases by pattern) =====================
@@ -1458,17 +1764,18 @@ def check_technology(group: str, a: ModelMeta, b: ModelMeta, ab: Optional[ModelM
     per_component_presence("Implementation Verification Gap", "implementation_verification", "A", required_from_level=2)
     per_component_presence("Implementation Verification Gap", "implementation_verification", "B", required_from_level=3)
 
-    # Software / Hardware / Versions / File formats: escalate similarity → equality
+    # Software / Hardware / Versions: escalate similarity -> equality (LLMAssisted
+    # templates -- these seed values are superseded once hybrid_evaluate.py runs).
     tech_compare("Software Environment Mismatch", "software_specification_and_requirements",
                  exact_from_level=5, strong_from_level=4, required_from_level=2)
     tech_compare("Hardware Resource Mismatch", "hardware_specification_and_requirements",
                  exact_from_level=5, strong_from_level=4, required_from_level=2)
-    # Versions: exact for Integrated+Embedded (very sensitive)
     tech_compare("Distribution Version Mismatch", "distribution_version",
                  exact_from_level=4, strong_from_level=4, required_from_level=2)
-    # File formats: exact for Embedded
-    tech_compare("File Format Mismatch", "file_formats",
-                 exact_from_level=5, strong_from_level=4, required_from_level=2)
+
+    # File formats: Deterministic template -- see check_data_format_compatibility(),
+    # called separately from evaluate_group() with the format-family classifier
+    # (not tech_compare's token-similarity threshold).
 
     # License: presence escalates; similarity threshold escalates; exact only at Embedded
     key = "license"
@@ -1530,6 +1837,7 @@ def evaluate_group(gid: str, A: ModelMeta, B: ModelMeta, AB: Optional[ModelMeta]
     rows += check_engineering(gid, A, B, AB, pattern)
     rows += check_technology(gid, A, B, AB, pattern)
     rows += check_operating_environment(gid, A, B, AB, pattern)
+    rows += check_data_format_compatibility(gid, A, B, AB, pattern)
     return rows
 
 # ============================================================

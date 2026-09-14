@@ -8,24 +8,19 @@ by RM-ODP viewpoint, integration pattern, and mismatch type -- showing
 WHERE detection errors occur and WHERE the hybrid procedure improves over
 the baseline, rather than only aggregate metrics.
 
-Ground truth: the corrected, deterministic ground truth (merge2.py --
-`result` applied to the realized/INTEGRATED model, see README.md §8), NOT
-the earlier circular LLM-derived one. On the real, already-collected
-dataset this gives N_M=97 reference mismatches, N_C=280 reference-
-compatible cases, 59 Gap (insufficient-evidence) cases -- confirmed against
-allLLM_match_report_groundTruth.csv, NOT the 29/348 split from the invalid
-ground truth used in an earlier draft.
+Ground truth: merge2.py's deterministic `result` applied to the realized/
+INTEGRATED model (README.md §8). On allLLM_match_report_groundTruth.csv
+this gives N_M=97 reference mismatches, N_C=280 compatible cases, and 59
+Gap (insufficient-evidence) cases.
 
-Definitions (fixed, computed directly from the raw prediction/ground-truth
-strings -- never derived from rounded metrics):
+Definitions (computed directly from the raw prediction/ground-truth
+strings, not derived from rounded metrics):
   TP  = groundTruth==Mismatch AND prediction==Mismatch
   FN  = groundTruth==Mismatch AND prediction==Match
   FP  = groundTruth==Match    AND prediction==Mismatch
   Gap = prediction is Missing/Gap, counted regardless of ground-truth class
-        (both Gap-when-Mismatch and Gap-when-Match contribute to this one
-        column, matching a single "Gap" column per method). Gap is NEVER
-        folded into FN or FP: it is an abstention (insufficient evidence),
-        not a compatibility judgment -- see README.md §8.
+        (one Gap column per method). Never folded into FN or FP: it is an
+        abstention, not a compatibility judgment (README.md §8).
   (TN is not tabulated; it is implied by N_C - FP - Gap-when-Match.)
 
 Mismatch-type grouping (raw `bottleneck` values -> display label; see
@@ -46,22 +41,19 @@ constraint_templates.py for the corresponding ConstraintTemplate names):
                                           Temporal Coverage Mismatch,
                                           Spatial Resolution Mismatch,
                                           Spatial Coverage Mismatch
-("Execution constraints" additionally absorbs Latency Expectation Mismatch
-so the nine rows above sum to exactly 97 -- Latency has no natural row of
-its own in the requested nine and is a sibling Runtime Coordination concern
-to Execution Constraint Compatibility in constraint_templates.py.)
+(Execution constraints additionally absorbs Latency Expectation Mismatch,
+a sibling Runtime Coordination concern to Execution Constraint
+Compatibility in constraint_templates.py, so the nine rows sum to 97.)
 
-IMPORTANT SCOPE NOTE: this grouping is applied over ALL rows with a
-reference groundTruth (the same row set Table `detection_performance`
-scores), NOT restricted to constraint_templates.in_paper_appendix==True
-rows. So "Semantic" also includes the legacy Title/Description/Keywords/
-Model Type/Model Version auxiliary fields (grouped under the same
-"Semantic Mismatch" bottleneck as the paper's Purpose/Scope/Assumption
-templates), and "Spatial/Temporal Alignment" also includes the legacy
-Coverage fields alongside the paper's Resolution templates. This keeps
-this table's Overall row identical to Table `detection_performance`'s N
-(97/280/59). A stricter Appendix-only variant would show smaller counts
-for both rows -- ask if that variant is wanted instead.
+Scope: this grouping covers ALL rows with a reference groundTruth (the
+same row set Table `detection_performance` scores), not restricted to
+constraint_templates.in_paper_appendix==True rows. "Semantic" therefore
+also includes the legacy Title/Description/Keywords/Model Type/Model
+Version auxiliary fields alongside the paper's Purpose/Scope/Assumption
+templates, and "Spatial/Temporal Alignment" includes the legacy Coverage
+fields alongside the paper's Resolution templates -- keeping this table's
+Overall row identical to Table `detection_performance`'s N (97/280/59). An
+Appendix-only variant would show smaller counts for both.
 
 Run:
   python Resultsv7-fine-grained-errors.py

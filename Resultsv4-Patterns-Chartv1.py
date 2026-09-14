@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Updated for the RM-ODP constraint-template pipeline (see README.md).
 """
 Side-by-side HEATMAPS of ACCURACY per integration pattern:
   - Left:  with missing  (allLLM_match_report_groundTruth.csv)

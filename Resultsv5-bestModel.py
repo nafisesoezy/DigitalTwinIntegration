@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Updated for the RM-ODP constraint-template pipeline (see README.md).
 """
 Create the 3 *descriptive overview* charts for the BEST model:
   OpenAI GPT-OSS-120B  -> column: "LLM-result-openai/gpt-oss-120b"

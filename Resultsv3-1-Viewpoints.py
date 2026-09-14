@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Updated for the RM-ODP constraint-template pipeline (see README.md).
 """
 Create a LaTeX detection-performance table *per viewpoint* from:
   allLLM_match_report_groundTruth.csv

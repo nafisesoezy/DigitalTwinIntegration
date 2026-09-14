@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Updated for the RM-ODP constraint-template pipeline (see README.md).
 """
 constraint_templates.py
 
@@ -146,18 +145,16 @@ _BY_BOTTLENECK_FIELD: Dict[Tuple[str, str], ConstraintTemplate] = {
         "Assumption Compatibility", "PatternAgnostic", "Domain",
         "LLMAssisted", "Semantic Compatibility"),
 
-    # execution_constraints is evaluated by TWO templates in the paper:
-    # a deterministic ordering check (vs. the active dependency edges) and
-    # a broader LLM-assisted judgment of whether the declared constraints
-    # are compatible with the integration's requirements. The rule engine
-    # currently emits ONE row for this field (a sync-token / pattern-graded
-    # rule) -- classify it as the deterministic "Execution Ordering
-    # Compatibility" template, and run "Execution Constraint Compatibility"
-    # as an *additional* LLM-assisted evaluation over the same evidence
-    # (see hybrid_evaluate.py: EXTRA_LLM_TEMPLATES).
+    # execution_constraints is evaluated by TWO templates over the same
+    # evidence: this ordering check, and "Execution Constraint Compatibility"
+    # (see hybrid_evaluate.py: EXTRA_LLM_TEMPLATES). Determining whether a
+    # declared execution ordering is actually satisfied means extracting a
+    # dependency claim from free text -- a keyword search for sync-related
+    # terms is not a rigorous deterministic rule for that, so this template
+    # is LLMAssisted, matching its sibling.
     ("Execution Constraint Mismatch", "execution_constraints"): ConstraintTemplate(
         "Execution Ordering Compatibility", "RuntimeLevel", "Engineering",
-        "Deterministic", "Runtime Coordination"),
+        "LLMAssisted", "Runtime Coordination"),
 }
 
 # ---------------------------------------------------------------------------

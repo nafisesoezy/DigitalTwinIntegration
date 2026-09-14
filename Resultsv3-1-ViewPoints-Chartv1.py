@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Updated for the RM-ODP constraint-template pipeline (see README.md).
 """
 Grouped horizontal bar chart: Accuracy per viewpoint per method
 (WITHOUT missing).

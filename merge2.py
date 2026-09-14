@@ -1,48 +1,20 @@
 #!/usr/bin/env python3
-# Updated for the RM-ODP constraint-template pipeline (see README.md).
 """
 Create allLLM_match_report_groundTruth.csv from allLLM_match_report.csv
 
-Ground-truth definition (Section 6.2.1 / 6.2.2 in the paper):
-  "These predictions are then compared with the metadata of the realized
-   integrated model (AB), which serves as the ground truth for integration
-   decisions."
+Ground truth (Section 6.2.1 / 6.2.2): for each key = (group, field,
+bottleneck, pattern), groundTruth is the deterministic rule engine's own
+`result` column (integration_bottleneckv6.py), evaluated on the row where
+ab_kind == 'INTEGRATED' -- the rule engine applied to the realized model's
+own declared metadata. GT_SOURCE_COL must stay independent of every LLM
+column scored against it in Table detection_performance.
 
-GROUND TRUTH MUST BE INDEPENDENT OF ANY LLM. Concretely: for each key =
-(group, field, bottleneck, pattern), the ground truth is the DETERMINISTIC
-rule engine's own `result` column (integration_bottleneckv6.py), evaluated
-on the row where ab_kind == 'INTEGRATED' -- i.e. the rule engine applied
-directly to the realized model's own declared metadata, not any model's
-opinion of it.
-
-IMPORTANT (previous version of this script): an earlier revision used
-'LLM-result-openai/gpt-oss-120b' as GT_SOURCE_COL. That made GPT-OSS-120B
-simultaneously (a) one of the methods being scored in Table
-detection_performance and (b) the source of the ground truth every method
--- including itself -- was scored against. That is a validity bug, not a
-methodology choice: it mechanically biases Table 1 in GPT-OSS-120B's favor
-and makes the rule-based baseline and the other LLMs' scores partly a
-measure of agreement with GPT-OSS-120B rather than with the realized
-integration. GT_SOURCE_COL is fixed below to the deterministic 'result'
-column.
-
-Known residual limitation (read before trusting Table 1 numbers):
-Not every deterministic check in integration_bottleneckv6.py actually
-looks at the `ab` argument -- the `info_simple` loop inside
-check_information_viewpoint (Temporal Resolution / Spatial Resolution /
-Dimensionality / their Coverage counterparts) compares A directly to B and
-never touches `ab`. For those specific templates, `result` is IDENTICAL
-whether ab_kind is INTENDED or INTEGRATED, so using it as ground truth is
-tautological with the rule-based baseline's own prediction (the rule-based
-method will score ~100% on them by construction). Fixing this properly
-requires changing those checks to compare AB's own declared field value
-against the requiring side (B) plus its declared
-Resampling/Conversion Policy, matching the paper's Information-viewpoint
-schema (Table env_viewpoint_fields). See constraint_templates.py /
-"Known coverage gaps" and the accompanying write-up for the concrete
-per-template ground-truth rule this should become. Until that lands,
-treat scores on Temporal Resolution / Spatial Resolution / Dimensionality
-Compatibility as provisional.
+Residual limitation: for Temporal Resolution / Spatial Resolution /
+Dimensionality, `info_simple` treats a difference between A and B as a
+Match only when `ab` declares a resampling/conversion policy for that
+field. Where the corpus does not document that policy at all (currently
+the common case), this reduces to comparing A directly against B, so
+scores on these templates are provisional until policy coverage improves.
 
 1) Add column 'groundTruth' using, for each key =
    (group, field, bottleneck, pattern),

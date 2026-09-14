@@ -1,4 +1,3 @@
-# Updated for the RM-ODP constraint-template pipeline (see README.md).
 def generate_figures(df: pd.DataFrame) -> None:
     if not HAS_MPL:
         return
